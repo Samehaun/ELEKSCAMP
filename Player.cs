@@ -15,5 +15,9 @@ namespace ELEKSUNI
             coin = 0;
             health = 100;
         }
+        public void CurrentState()
+        {
+            Console.WriteLine($"{ name } has { coin  } coins and { health } health");
+        }
     }
 }

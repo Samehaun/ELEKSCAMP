@@ -13,6 +13,7 @@ namespace ELEKSUNI
             //Console.WriteLine(player.name);
             //Console.WriteLine(player.health);
             //Console.WriteLine(player.coin);
+            player.CurrentState();
             Console.WriteLine("Вы очнулись в лесу ваши действия:");
             Console.WriteLine("1: Позвать на помощь");
             Console.WriteLine("2: Осмотреться");
@@ -27,6 +28,7 @@ namespace ELEKSUNI
                     break;
                 case 2:
                     Console.WriteLine("В груде листьев вы нашли нож.");
+
                     break;
                 case 3:
                     Console.WriteLine("Вы замерзли и проголодались");
@@ -36,6 +38,7 @@ namespace ELEKSUNI
                     Console.WriteLine("Неверный ввод");
                     break;
             }
+            player.CurrentState();
             switch (Convert.ToInt32(Console.ReadLine()))
             {
                 case 1:
@@ -50,6 +53,7 @@ namespace ELEKSUNI
                 default:
                     break;
             }
+            player.CurrentState();
             switch (Convert.ToInt32(Console.ReadLine()))
             {
                 case 1:
