@@ -1,4 +1,6 @@
-﻿namespace ELEKSUNI
+﻿using System;
+
+namespace ELEKSUNI
 {
     public class Item
     {
@@ -10,6 +12,18 @@
             this.Name = name;
             this.Price = price;
             this.Weight = weight;
+        }
+        public virtual void PrintItemSpecs()
+        {
+            Console.WriteLine($" { Name } { Weight } кг");
+        }
+        public virtual void PickAnItem(Player player)
+        {
+            player.inventory.AddItem(this);
+        }
+        public virtual void UseThisItem(Player player)
+        {
+
         }
     }
 }

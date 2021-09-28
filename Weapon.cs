@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace ELEKSUNI
 {
-    class Weapon : Item
+    public class Weapon : Item
     {
         public int Attack { get; set; }
         public int Defence { get; set; }
@@ -12,6 +11,20 @@ namespace ELEKSUNI
         {
             this.Attack = attack;
             this.Defence = defence;
+        }
+        public override void PrintItemSpecs()
+        {
+            Console.WriteLine($"{ Name }  {Attack } атака { Defence } защита {Weight } кг");
+        }
+        public override void PickAnItem(Player player)
+        {
+            player.inventory.AddItem(this);
+            UseThisItem(player);
+        }
+        public override void UseThisItem(Player player)
+        {
+            player.Attack = this.Attack;
+            player.Defence += this.Defence;
         }
     }
 }

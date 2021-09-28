@@ -4,18 +4,21 @@ using System.Text;
 
 namespace ELEKSUNI
 {
-    class Spot
+    public class Spot
     {
-        public Index index;
-        public string Cache { get; }
         public string Description { get; set; }
-        private Item hidenObject;
-        public Spot(Index coordinates, string hideout, string description, Item treasure)
+        public (int x, int y) Coordinates { get;}
+        public Item HiddenObject { get; set; }
+        public NPC NPC { get; set; }
+        public Spot((int i, int j) tuple, string description, Item treasure)
         {
-            this.index = coordinates;
-            this.Cache = hideout;
+            this.Coordinates = tuple;
             this.Description = description;
-            this.hidenObject = treasure;
+            this.HiddenObject = treasure;
+        }
+        public void GetHiddenObject(Player player)
+        {
+            HiddenObject.PickAnItem(player);
         }
     }
 }

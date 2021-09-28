@@ -4,9 +4,10 @@ using System.Text;
 
 namespace ELEKSUNI
 {
-    class Effect
+    public class Effect
     {
         public string Name { get; }
+        public double NegativeEffectMultiplier { get; set; }
         public bool IsActive { get; set; }
         public Effect(string name)
         {
