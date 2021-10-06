@@ -47,7 +47,7 @@ namespace ELEKSUNI
             {
                 return $" нужен отдых";
             }
-            else if (!player.currentSpot.IsPossibleToMoveInThatDurection(direction))
+            else if (!player.CurrentPosition.IsPossibleToMoveInThatDurection(direction))
             {
                 return $" похоже, что в этом направлении невозможно пройти";
             }
@@ -56,16 +56,16 @@ namespace ELEKSUNI
                 switch (direction)
                 {
                     case "Север":
-                        player.currentSpot = spots[(player.currentSpot.Coordinates.x - 1, player.currentSpot.Coordinates.y)];
+                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x - 1, player.CurrentPosition.Coordinates.y)];
                         break;
                     case "Юг":
-                        player.currentSpot = spots[(player.currentSpot.Coordinates.x + 1, player.currentSpot.Coordinates.y)];
+                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x + 1, player.CurrentPosition.Coordinates.y)];
                         break;
                     case "Запад":
-                        player.currentSpot = spots[(player.currentSpot.Coordinates.x, player.currentSpot.Coordinates.y - 1)];
+                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x, player.CurrentPosition.Coordinates.y - 1)];
                         break;
                     case "Восток":
-                        player.currentSpot = spots[(player.currentSpot.Coordinates.x, player.currentSpot.Coordinates.y + 1)];
+                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x, player.CurrentPosition.Coordinates.y + 1)];
                         break;
                 }
                 return $" Вы благополучно добрались до следующей зоны";

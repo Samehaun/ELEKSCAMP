@@ -5,7 +5,6 @@ namespace ELEKSUNI
 {
     public class Player : Entity
     {
-        public Spot currentSpot;
         private double stamina;
         private double speed;
         public Weapon CurrentWeapon { get; set; }
@@ -37,9 +36,9 @@ namespace ELEKSUNI
             posibilities.Add("Спать");
             posibilities.Add("Искать");
             posibilities.Add("Инвентарь");
-            if(currentSpot.NPC != null)
+            if(CurrentPosition.NPC != null)
             {
-                posibilities.Add(currentSpot.NPC.Name);
+                posibilities.Add(CurrentPosition.NPC.Name);
             }
             return posibilities;
         }

@@ -18,7 +18,7 @@ namespace ELEKSUNI
         {
             Map questMap = CreatePredefinedMap();
             Player player = CreatePlayer();
-            player.currentSpot = questMap.GetSpotByCoordinate((1, 1));
+            player.CurrentPosition = questMap.GetSpotByCoordinate((1, 1));
             int playerInput;
             Console.WriteLine(player.GetCurrentState());
             ShowAvailableOptions(player.GetListOfPossibleOptions());
