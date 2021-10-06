@@ -22,6 +22,12 @@ namespace ELEKSUNI
             int playerInput;
             Console.WriteLine(player.GetCurrentState());
             ShowAvailableOptions(player.GetListOfPossibleOptions());
+            do
+            {
+
+            }
+            while (!CheckInput(out playerInput, player.GetListOfPossibleOptions()));
+            player.DesideWhatToDo(playerInput);
         }
         public static Player CreatePlayer()
         {
