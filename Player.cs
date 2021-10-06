@@ -6,13 +6,15 @@ namespace ELEKSUNI
 {
     public class Player : Entity
     {
-        private Spot CurrentSpot;
+        private Spot currentSpot;
         private double stamina;
         private double speed;
+        private Weapon currentWeapn;
+        private Clothes currentClothes;
         public int Coins { get; set; }
         public int Warmth { get; set; }
-        private List<Effect> negativeEffects;
-        private Effect isHungry, isBleeding, isFrozen, isPoisoned, isInjured;
+        //private List<Effect> negativeEffects;
+        //private Effect isHungry, isBleeding, isFrozen, isPoisoned, isInjured;
         public Spot CurrentPosition { get; set; }
         public Player(string playerName)
         {
@@ -23,26 +25,27 @@ namespace ELEKSUNI
             this.Warmth = 5;
             this.speed = (int)MainQuestConfig.BasePlayerSpeed;
             this.stamina = 100;
-            isBleeding = new Effect("кровотечение");
-            isFrozen = new Effect("обморожение");
-            isHungry = new Effect("голод");
-            isInjured = new Effect("травма");
-            isPoisoned = new Effect("отравление");
-            negativeEffects = new List<Effect>() { isBleeding, isFrozen, isHungry, isInjured, isPoisoned };
-            this.Attack = 5;
+            //isBleeding = new Effect("кровотечение");
+            //isFrozen = new Effect("обморожение");
+            //isHungry = new Effect("голод");
+            //isInjured = new Effect("травма");
+            //isPoisoned = new Effect("отравление");
+            //negativeEffects = new List<Effect>() { isBleeding, isFrozen, isHungry, isInjured, isPoisoned };
+            this.Attack = 0;
             base.inventory = new Inventory();
         }
-        public void PrintCurrentState()
+        public string GetCurrentState()
         {
-            StringBuilder activeEffects = new StringBuilder();
-            foreach (var effect in negativeEffects)
-            {
-                if (effect.IsActive)
-                {
-                    activeEffects.Append(" " + effect.Name + " ");
-                }
-            }
-            Console.WriteLine($" У игрока { Name } { Coins } монет { Health } хп { activeEffects.ToString() }");
+            //StringBuilder activeEffects = new StringBuilder();
+            //foreach (var effect in negativeEffects)
+            //{
+            //    if (effect.IsActive)
+            //    {
+            //        activeEffects.Append(" " + effect.Name + " ");
+            //    }
+            //}
+            //return $" У игрока { Name } { Coins } монет { Health } хп { activeEffects.ToString() }";
+            return $" У игрока { Name } { Coins } монет { Health } хп ";
         }
         public void ShowAvailableOptions()
         {
@@ -70,8 +73,7 @@ namespace ELEKSUNI
         }
         private double CalculateTimeNeededToTravel()
         {
-            double  time;
-            time = (int)MainQuestConfig.BaseTimeToChangeLocation * ((int)MainQuestConfig.BasePlayerSpeed / speed);
+            double time = (int)MainQuestConfig.BaseTimeToChangeLocation * ((int)MainQuestConfig.BasePlayerSpeed / speed);
             return time;
         }
         private double CalculateStaminaNeededToTravel()

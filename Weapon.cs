@@ -6,17 +6,15 @@ namespace ELEKSUNI
     public class Weapon : Item
     {
         public int Attack { get; set; }
-        public int Defence { get; set; }
-        public Weapon(string name, int attack, int defence, int price, double weight ) : base (name, price, weight)
+        public Weapon(string name, int attack, int price, double weight ) : base (name, price, weight)
         {
             this.Attack = attack;
-            this.Defence = defence;
         }
-        public override void PrintItemSpecs()
+        public override string GetItemSpecs()
         {
-            Console.WriteLine($"{ Name }  {Attack } атака { Defence } защита {Weight } кг");
+            return $"{ Name }  {Attack } атака {Weight } кг";
         }
-        public override void PickAnItem(Player player)
+        public override void PickThisItem(Player player)
         {
             player.inventory.AddItem(this);
             UseThisItem(player);
@@ -24,7 +22,14 @@ namespace ELEKSUNI
         public override void UseThisItem(Player player)
         {
             player.Attack = this.Attack;
-            player.Defence += this.Defence;
+        }
+        public override void RemoveThisItem(Player player)
+        {
+            if(player.Attack == this.Attack)
+            {
+                player.Attack = 0;
+            }
+            player.inventory.DropItem(this);
         }
     }
 }

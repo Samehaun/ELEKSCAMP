@@ -17,7 +17,7 @@ namespace ELEKSUNI
         }
         public void TimeOfTheDay(double hours)
         {
-            currentTime.AddHours(hours);
+            this.currentTime = currentTime.AddHours(hours);
         }
         public void AddSpot(Spot newSpot)
         {

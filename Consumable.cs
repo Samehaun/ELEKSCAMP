@@ -11,14 +11,6 @@ namespace ELEKSUNI
         {
 
         }
-        public override void PrintItemSpecs()
-        {
-            Console.WriteLine($" { Name } { Weight } кг");
-        }
-        public override void PickAnItem(Player player)
-        {
-            player.inventory.AddItem(this);
-        }
         public override void UseThisItem(Player player)
         {
 

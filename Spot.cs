@@ -18,7 +18,7 @@ namespace ELEKSUNI
         }
         public void GetHiddenObject(Player player)
         {
-            HiddenObject.PickAnItem(player);
+            HiddenObject.PickThisItem(player);
         }
     }
 }

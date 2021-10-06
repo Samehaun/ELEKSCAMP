@@ -12,18 +12,18 @@ namespace ELEKSUNI
             this.Warmth = warmth;
             this.Defence = defence;
         }
-        public override void PrintItemSpecs()
+        public override string GetItemSpecs()
         {
-            Console.WriteLine($" { Name } { Defence } защита { Weight } кг");
+            return $" { Name } защита { Weight } кг";
         }
-        public override void PickAnItem(Player player)
+        public override void PickThisItem(Player player)
         {
             player.inventory.AddItem(this);
         }
         public override void UseThisItem(Player player)
         {
-            player.Defence = this.Defence;
             player.Warmth = this.Warmth;
+            player.Defence = this.Defence;
         }
     }
 }

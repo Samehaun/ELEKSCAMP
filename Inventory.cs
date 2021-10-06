@@ -7,38 +7,37 @@ namespace ELEKSUNI
     public class Inventory
     {
         private List<Item> items;
+        private double totalWeight;
         public Inventory()
         {
             items = new List<Item>();
+            totalWeight = 0;
         }
-        public void ShowInventory()
+        public List<string> ShowInventory()
         {
-            Console.Clear();
+            List<string> inventory = new List<string>();
             foreach (var item in items)
             {
-                item.PrintItemSpecs();
+                inventory.Add(item.GetItemSpecs());
             }
+            return inventory;
         }
         public void AddItem(Item newItem)
         {
             items.Add(newItem);
+            totalWeight += newItem.Weight;
         }
-        public void DropItem(int index)
+        public void DropItem(Item item)
         {
-            items.RemoveAt(index);
+            totalWeight -= item.Weight;
+            items.Remove(item);
         }
         public double GetTotalWeight()
         {
-            double totalWeight = 0;
-            foreach (var item in items)
-            {
-                totalWeight += item.Weight;
-            }
             return totalWeight;
         }
-        public Item GetItem(int index)
+        private void EquipTheTheBest()
         {
-            return items[index];
 
         }
     }

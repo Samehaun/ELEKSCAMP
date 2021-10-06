@@ -13,13 +13,17 @@ namespace ELEKSUNI
             this.Price = price;
             this.Weight = weight;
         }
-        public virtual void PrintItemSpecs()
+        public virtual string GetItemSpecs()
         {
-            Console.WriteLine($" { Name } { Weight } кг");
+            return $" { Name } { Weight } кг";
         }
-        public virtual void PickAnItem(Player player)
+        public virtual void PickThisItem(Player player)
         {
             player.inventory.AddItem(this);
+        }
+        public virtual void RemoveThisItem(Player player)
+        {
+            player.inventory.DropItem(this);
         }
         public virtual void UseThisItem(Player player)
         {
