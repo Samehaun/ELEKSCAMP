@@ -36,9 +36,15 @@ namespace ELEKSUNI
         {
             return totalWeight;
         }
-        private void EquipTheTheBest()
-        {
-
-        }
+        //private void EquipTheTheBest()
+        //{
+        //    foreach (var item in items)
+        //    {
+        //        if(item is IEquipment)
+        //        {
+        //            (IEquipment)item.
+        //        }
+        //    }
+        //}
     }
 }

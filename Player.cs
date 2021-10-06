@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ELEKSUNI
 {
     public class Player : Entity
     {
-        private Spot currentSpot;
+        public Spot currentSpot;
         private double stamina;
         private double speed;
-        private Weapon currentWeapn;
-        private Clothes currentClothes;
+        public Weapon CurrentWeapon { get; set; }
+        public Clothes CurrentClothes { get; set; }
         public int Coins { get; set; }
         public int Warmth { get; set; }
-        //private List<Effect> negativeEffects;
-        //private Effect isHungry, isBleeding, isFrozen, isPoisoned, isInjured;
         public Spot CurrentPosition { get; set; }
         public Player(string playerName)
         {
@@ -25,36 +22,32 @@ namespace ELEKSUNI
             this.Warmth = 5;
             this.speed = (int)MainQuestConfig.BasePlayerSpeed;
             this.stamina = 100;
-            //isBleeding = new Effect("кровотечение");
-            //isFrozen = new Effect("обморожение");
-            //isHungry = new Effect("голод");
-            //isInjured = new Effect("травма");
-            //isPoisoned = new Effect("отравление");
-            //negativeEffects = new List<Effect>() { isBleeding, isFrozen, isHungry, isInjured, isPoisoned };
             this.Attack = 0;
             base.inventory = new Inventory();
         }
         public string GetCurrentState()
         {
-            //StringBuilder activeEffects = new StringBuilder();
-            //foreach (var effect in negativeEffects)
-            //{
-            //    if (effect.IsActive)
-            //    {
-            //        activeEffects.Append(" " + effect.Name + " ");
-            //    }
-            //}
-            //return $" У игрока { Name } { Coins } монет { Health } хп { activeEffects.ToString() }";
             return $" У игрока { Name } { Coins } монет { Health } хп ";
         }
-        public void ShowAvailableOptions()
+        public List<string> GetListOfPossibleOptions()
         {
-
+            List<string> posibilities = new List<string>();
+            posibilities.Add("Идти");
+            posibilities.Add("Отдыхать");
+            posibilities.Add("Спать");
+            posibilities.Add("Искать");
+            posibilities.Add("Инвентарь");
+            if(currentSpot.NPC != null)
+            {
+                posibilities.Add(currentSpot.NPC.Name);
+            }
+            return posibilities;
         }
-        public void Travel()
+        public void DesideWhatToDo(int chosenOption)
         {
-
+           
         }
+        
         public void Rest()
         {
 
@@ -71,24 +64,17 @@ namespace ELEKSUNI
         {
 
         }
-        private double CalculateTimeNeededToTravel()
+        public double OverweightFactor()
         {
-            double time = (int)MainQuestConfig.BaseTimeToChangeLocation * ((int)MainQuestConfig.BasePlayerSpeed / speed);
-            return time;
+            return 1 + Math.Sqrt(inventory.GetTotalWeight() / (int)MainQuestConfig.MaxWeigtPlayerCanCarry);
         }
-        private double CalculateStaminaNeededToTravel()
+        public double GetPlayerSpeed()
         {
-            return CalculateTimeNeededToTravel() * (int)MainQuestConfig.BasePlayerStaminaConsuption * NegativeEffectsMultiplier();
+            return speed;
         }
-        private double NegativeEffectsMultiplier()
+        public double GetPlayerStamina()
         {
-            double multiplier = 1;
-            foreach (var effect in negativeEffects)
-            {
-                if (effect.IsActive)
-                    multiplier *= effect.NegativeEffectMultiplier;
-            }
-            return multiplier;
+            return stamina;
         }
     }
 }

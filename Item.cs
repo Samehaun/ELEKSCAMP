@@ -2,6 +2,10 @@
 
 namespace ELEKSUNI
 {
+    interface IEquipment
+    {
+        string Equip(Player player);
+    }
     public class Item
     {
         public string Name { get; }
@@ -25,9 +29,16 @@ namespace ELEKSUNI
         {
             player.inventory.DropItem(this);
         }
-        public virtual void UseThisItem(Player player)
+        public virtual string UseThisItem(Player player)
         {
-
+            if(this.Name == "Огниво")
+            {
+                return $" вы успешно разожгли костер и согрелись. Горячая пища вкуснее и лучше усваивается";
+            }
+            else
+            {
+                return $" не похоже, что это дало какой-либо эффект";
+            }
         }
     }
 }

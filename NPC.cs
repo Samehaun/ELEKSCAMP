@@ -17,9 +17,24 @@ namespace ELEKSUNI
             this.Defence = defence;
             base.inventory = new Inventory();
         }
-        public void Talk()
+        public List<String> GetPossibleInteractOptions()
         {
-
+            List<string> posibilities = new List<string>();
+            if(IsHostile)
+            {
+                posibilities.Add("Бежать");
+                posibilities.Add("Драться");
+            }
+            else
+            {
+                posibilities.Add("Говорить");
+                posibilities.Add("Торговать");
+            }
+            return posibilities;
+        }
+        public string Talk()
+        {
+            return $"вы не узнали ничего интересного";
         }
         public void Trade()
         {

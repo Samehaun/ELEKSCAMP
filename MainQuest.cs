@@ -9,85 +9,105 @@ namespace ELEKSUNI
         BasePlayerSpeed = 5,
         BasePlayerStaminaConsuption = 1,
         MaxWeigtPlayerCanCarry = 10,
-        BaseTimeToChangeLocation = 3
+        BaseTimeToChangeLocation = 3,
+        MapSize = 4
     }
     class MainQuest
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine("Enter your name");
-            //Player player = new Player(Console.ReadLine());
-            //player.PrintCurrentState();
-            //Console.WriteLine("Вы очнулись в лесу ваши действия:");
-            //Console.WriteLine("1: Позвать на помощь");
-            //Console.WriteLine("2: Осмотреться");
-            //Console.WriteLine("3: Ждать");
-            //switch (Convert.ToInt32(Console.ReadLine()))
-            //{
-            //    case 1:
-            //        Console.WriteLine("Упс... Вы привлекли внимание медведя");
-            //        Console.WriteLine("Бежать");
-            //        Console.WriteLine("Драться");
-            //        Console.WriteLine("Попытаться напугать");
-            //        break;
-            //    case 2:
-            //        Console.WriteLine("В груде листьев вы нашли нож.");
-            //        Console.WriteLine("");
-
-            //        break;
-            //    case 3:
-            //        Console.WriteLine("Вы замерзли и проголодались");
-            //        player.health = player.health - 10;
-            //        break;
-            //    default:
-            //        Console.WriteLine("Неверный ввод");
-            //        break;
-            //}
-
-
+            Map questMap = CreatePredefinedMap();
+            Player player = CreatePlayer();
+            player.currentSpot = questMap.GetSpotByCoordinate((1, 1));
+            int playerInput;
+            Console.WriteLine(player.GetCurrentState());
+            ShowAvailableOptions(player.GetListOfPossibleOptions());
         }
-        static Map CreateNewMap(int xDimension, int yDimension)
+        public static Player CreatePlayer()
+        {
+            Console.WriteLine("Enter your name");
+            Player player = new Player(Console.ReadLine());
+            player.inventory.AddItem(new Clothes("простая одежда", 0, 0, 5, 1.0));
+            return player;
+        }
+        public static void ShowAvailableOptions(List<string> posibilities)
+        {
+            int i = 0;
+            foreach (var option in posibilities)
+            {
+                Console.WriteLine($" { i++ } - { option }");
+            }
+            Console.WriteLine($" { i } - назад");
+        }
+        public static bool CheckInput(out int input, List<string> posibiliies)
+        {
+            input = Convert.ToInt32(Console.ReadLine());
+            if (input > 0 && input < posibiliies.Count)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+       
+        public static Map CreatePredefinedMap()
         {
             Map questMap = new Map();
-            for (int i = 0; i < xDimension; i++)
-            {
-                for (int j = 0; j < yDimension; j++)
-                {
-                    questMap.AddSpot(new Spot((i, j), GetDescription(spotDesccriptionDatabase()), ChoseRandomItem(ItemDatabse())));
-                }
-            }
-
+            questMap.AddSpot(new Spot((0, 0), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", new Item("Огниво", 25, 0.3), null));
+            questMap.AddSpot(new Spot((0, 1), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", null, null));
+            questMap.AddSpot(new Spot((0, 2), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", null, null));
+            questMap.AddSpot(new Spot((1, 0), "Много кустарника. Возможно, возможно ягоды съедобны", new Weapon("Нож", 15, 25, 0.3), null));
+            questMap.AddSpot(new Spot((1, 1), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", new Item("Огниво", 25, 0.3), null));
+            questMap.AddSpot(new Spot((1, 2), "Много кустарника. Возможно, возможно ягоды съедобны", new Item("Огниво", 25, 0.3), null));
+            questMap.AddSpot(new Spot((2, 0), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", null, null));
+            questMap.AddSpot(new Spot((2, 1), "Много кустарника. Возможно, возможно ягоды съедобны", new Item("Огниво", 25, 0.3), null));
+            questMap.AddSpot(new Spot((2, 2), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", new Item("Огниво", 25, 0.3), null));
             return questMap;
         }
-        static string GetDescription(List<String> descriptions)
-        {
-            //add some additional constrains later on
+        //public static Map CreateNewMap(int xDimension, int yDimension)
+        //{
+        //    Map questMap = new Map();
+        //    for (int i = 0; i < xDimension; i++)
+        //    {
+        //        for (int j = 0; j < yDimension; j++)
+        //        {
+        //            questMap.AddSpot(new Spot((i, j), GetDescription(spotDesccriptionDatabase()), ChoseRandomItem(ItemDatabse())));
+        //        }
+        //    }
 
-            Random rnd = new Random(DateTime.Now.Minute);
-            return descriptions[rnd.Next(0, descriptions.Count - 1)];
-        }
-        static List<string> spotDesccriptionDatabase()
-        {
-            List<string> descriptions = new List<string>();
+        //    return questMap;
+        //}
+        //static string GetDescription(List<String> descriptions)
+        //{
+        //    //add some additional constrains later on
 
-            //add text getter from some file or DB
+        //    Random rnd = new Random(DateTime.Now.Minute);
+        //    return descriptions[rnd.Next(0, descriptions.Count - 1)];
+        //}
+        //static List<string> spotDesccriptionDatabase()
+        //{
+        //    List<string> descriptions = new List<string>();
 
-            return descriptions;
-        }
-        static Item ChoseRandomItem(List<Item> itemDatabase)
-        {
-            //add some additional constrains later on
+        //    //add text getter from some file or DB
 
-            Random rnd = new Random(DateTime.Now.Second);
-            return itemDatabase[rnd.Next(0, itemDatabase.Count - 1)];
-        }
-        static List<Item> ItemDatabse()
-        {
-            List<Item> items = new List<Item>();
+        //    return descriptions;
+        //}
+        //static Item ChoseRandomItem(List<Item> itemDatabase)
+        //{
+        //    //add some additional constrains later on
 
-            //add text getter from some file or DB
+        //    Random rnd = new Random(DateTime.Now.Second);
+        //    return itemDatabase[rnd.Next(0, itemDatabase.Count - 1)];
+        //}
+        //static List<Item> ItemDatabse()
+        //{
+        //    List<Item> items = new List<Item>();
 
-            return items;
-        }
+        //    //add text getter from some file or DB
+
+        //    return items;
+        //}
     }
 }

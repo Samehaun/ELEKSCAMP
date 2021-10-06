@@ -3,7 +3,7 @@
 
 namespace ELEKSUNI
 {
-    public class Weapon : Item
+    public class Weapon : Item, IEquipment
     {
         public int Attack { get; set; }
         public Weapon(string name, int attack, int price, double weight ) : base (name, price, weight)
@@ -17,19 +17,35 @@ namespace ELEKSUNI
         public override void PickThisItem(Player player)
         {
             player.inventory.AddItem(this);
-            UseThisItem(player);
+            Equip(player);
         }
-        public override void UseThisItem(Player player)
+        public override string UseThisItem(Player player)
         {
-            player.Attack = this.Attack;
+            return Equip(player);
         }
         public override void RemoveThisItem(Player player)
         {
-            if(player.Attack == this.Attack)
+            if(player.CurrentWeapon == this)
             {
                 player.Attack = 0;
             }
             player.inventory.DropItem(this);
+            player.CurrentWeapon = null;
         }
+        public string Equip(Player player)
+        {
+            if(player.Attack < this.Attack)
+            {
+                player.CurrentWeapon = this;
+                player.Attack = this.Attack;
+                return $" Вы экипировали { this.Name }";
+            }
+            else
+            {
+                return $" Ваше текущее оружие имеет лучшие или аналогичные характеристики";
+            }
+
+        }
+
     }
 }
