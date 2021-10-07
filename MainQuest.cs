@@ -14,26 +14,25 @@ namespace ELEKSUNI
     }
     class MainQuest
     {
+        Player player;
+        Map questMap;
+        bool gameOver;
+        public MainQuest()
+        {
+            gameOver = false;
+            player = CreatePlayer();
+            questMap = CreateNewMap((int)MainQuestConfig.MapSize, player);
+            questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
+        }
         static void Main(string[] args)
         {
-            Map questMap = CreatePredefinedMap();
-            Player player = CreatePlayer();
-            player.CurrentPosition = questMap.GetSpotByCoordinate((1, 1));
-            int playerInput;
-            Console.WriteLine(player.GetCurrentState());
-            ShowAvailableOptions(player.GetListOfPossibleOptions());
-            do
-            {
-
-            }
-            while (!CheckInput(out playerInput, player.GetListOfPossibleOptions()));
-            player.DesideWhatToDo(playerInput);
+            MainQuest quest = new MainQuest();
+            quest.Play();           
         }
-        public static Player CreatePlayer()
+        public Player CreatePlayer()
         {
-            Console.WriteLine("Enter your name");
+            Output("Enter your name");
             Player player = new Player(Console.ReadLine());
-            player.inventory.AddItem(new Clothes("простая одежда", 0, 0, 5, 1.0));
             return player;
         }
         public static void ShowAvailableOptions(List<string> posibilities)
@@ -41,14 +40,21 @@ namespace ELEKSUNI
             int i = 0;
             foreach (var option in posibilities)
             {
-                Console.WriteLine($" { i++ } - { option }");
+               Output($" { i++ } - { option }");
             }
-            Console.WriteLine($" { i } - назад");
         }
-        public static bool CheckInput(out int input, List<string> posibiliies)
+        public static bool CheckInput(string input, List<string> posibilities)
         {
-            input = Convert.ToInt32(Console.ReadLine());
-            if (input > 0 && input < posibiliies.Count)
+            int inputNumber;
+            try
+            {
+                inputNumber = Convert.ToInt32(Console.ReadLine());
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            if (inputNumber > 0 && inputNumber < posibilities.Count)
             {
                 return true;
             }
@@ -57,41 +63,73 @@ namespace ELEKSUNI
                 return false;
             }
         }
-       
-        public static Map CreatePredefinedMap()
+        public static int GetConsoleInput(List<string> posibilities)
         {
-            Map questMap = new Map();
-            questMap.AddSpot(new Spot((0, 0), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", new Item("Огниво", 25, 0.3), null));
-            questMap.AddSpot(new Spot((0, 1), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", null, null));
-            questMap.AddSpot(new Spot((0, 2), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", null, null));
-            questMap.AddSpot(new Spot((1, 0), "Много кустарника. Возможно, возможно ягоды съедобны", new Weapon("Нож", 15, 25, 0.3), null));
-            questMap.AddSpot(new Spot((1, 1), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", new Item("Огниво", 25, 0.3), null));
-            questMap.AddSpot(new Spot((1, 2), "Много кустарника. Возможно, возможно ягоды съедобны", new Item("Огниво", 25, 0.3), null));
-            questMap.AddSpot(new Spot((2, 0), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", null, null));
-            questMap.AddSpot(new Spot((2, 1), "Много кустарника. Возможно, возможно ягоды съедобны", new Item("Огниво", 25, 0.3), null));
-            questMap.AddSpot(new Spot((2, 2), "Лес как и везде. Не видно ничего необычного кроме опавшей листвы", new Item("Огниво", 25, 0.3), null));
+            string input;
+            do
+            {
+                input = Console.ReadLine();
+            }
+            while (!CheckInput(input, posibilities));
+            return Convert.ToInt32(input);
+        }
+        public void Play()
+        {
+            while (!gameOver)
+            {
+                Output(questMap.GetLocationDescription());
+                Output(player.GetCurrentState());
+                ShowAvailableOptions(questMap.GetPossibleOptions());
+                ProceedInput(GetConsoleInput(questMap.GetPossibleOptions()));
+            }
+        } 
+        private void ProceedInput(int input)
+        {
+            switch (input)
+            {
+                case 0:
+                    Output(questMap.Travel());
+                    break;
+                default:
+                    break;
+            }
+        }
+        public static void Output(string result)
+        {
+            Console.WriteLine(result);
+        }
+        private List<string> HardcodedSpotDescriptions()
+        {
+            List<string> descriptions = new List<string>();
+            descriptions.Add("Просека. Много поваленных дереьев");
+            descriptions.Add("Лес как лес. Кроме опавшей листвы ничего интересного");
+            descriptions.Add("Старый дуб. Есть большое дупло, кажется, до него можно добраться");
+            descriptions.Add("Смешанный лес. Много кустарника, есть ягоды");
+            descriptions.Add("Преобладает хвоя приятно дышать полной грудью");
+            descriptions.Add("Большая удача вы нашли ручей");
+            descriptions.Add("Заросшее русло высохшей реки");
+            descriptions.Add("Пещера. Выглядит довольно большой");
+            descriptions.Add("Покинутая землянка. Дверь выглядит функционирующей, но замок рассыпался");
+            descriptions.Add("Большая поляна");
+            return descriptions;
+        }
+        public Map CreateNewMap(int mapSize, Player player)
+        {
+            Map questMap = new Map(player);
+            for (int i = 0; i < mapSize; i++)
+            {
+                for (int j = 0; j < mapSize; j++)
+                {
+                    questMap.AddSpot(new Spot((i, j), GetDescription(HardcodedSpotDescriptions())));
+                }
+            }
             return questMap;
         }
-        //public static Map CreateNewMap(int xDimension, int yDimension)
-        //{
-        //    Map questMap = new Map();
-        //    for (int i = 0; i < xDimension; i++)
-        //    {
-        //        for (int j = 0; j < yDimension; j++)
-        //        {
-        //            questMap.AddSpot(new Spot((i, j), GetDescription(spotDesccriptionDatabase()), ChoseRandomItem(ItemDatabse())));
-        //        }
-        //    }
-
-        //    return questMap;
-        //}
-        //static string GetDescription(List<String> descriptions)
-        //{
-        //    //add some additional constrains later on
-
-        //    Random rnd = new Random(DateTime.Now.Minute);
-        //    return descriptions[rnd.Next(0, descriptions.Count - 1)];
-        //}
+        static string GetDescription(List<String> descriptions)
+        {
+            Random rnd = new Random(DateTime.Now.Minute);
+            return descriptions[rnd.Next(0, descriptions.Count - 1)];
+        }
         //static List<string> spotDesccriptionDatabase()
         //{
         //    List<string> descriptions = new List<string>();

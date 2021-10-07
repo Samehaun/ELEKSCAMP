@@ -8,20 +8,12 @@ namespace ELEKSUNI
         private List<string> travelDirecionsAvailableFromThisSpot;
         public string Description { get; set; }
         public (int x, int y) Coordinates { get;}
-        public Item HiddenObject { get; set; }
-        public NPC NPC { get; set; }
-        public Spot((int i, int j) tuple, string description, Item treasure, NPC npc)
+        public Spot((int i, int j) tuple, string description)
         {
             travelDirecionsAvailableFromThisSpot = new List<string>();
             SetAvailableTravelDirections(tuple);
             this.Coordinates = tuple;
             this.Description = description;
-            this.HiddenObject = treasure;
-            this.NPC = npc;
-        }
-        public void GetHiddenObject(Player player)
-        {
-            HiddenObject.PickThisItem(player);
         }
         public void AddAvailableTravelDirection(String direction)
         {
@@ -46,9 +38,20 @@ namespace ELEKSUNI
                 travelDirecionsAvailableFromThisSpot.Add("Восток");
             }
         }
-        public bool IsPossibleToMoveInThatDurection(string direction)
+        public List<string> GetAvailableDirections()
         {
-            return travelDirecionsAvailableFromThisSpot.Contains(direction);
+            List<string> options = new List<string>();
+            options.AddRange(travelDirecionsAvailableFromThisSpot);
+            options.Add(" назад ");
+            return options;
+        }
+        public List<string> GetListOfPossibleOptions()
+        {
+            List<string> posibilities = new List<string>();
+            posibilities.Add("Идти");
+            posibilities.Add("Отдыхать");
+            posibilities.Add("Спать");
+            return posibilities;
         }
     }
 }

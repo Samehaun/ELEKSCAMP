@@ -10,6 +10,5 @@ namespace ELEKSUNI
         public int Health { get; set; }
         public int Defence { get; set; }
         public int Attack { get; set; }
-        public Inventory inventory;
     }
 }

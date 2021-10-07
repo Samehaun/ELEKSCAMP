@@ -7,65 +7,29 @@ namespace ELEKSUNI
     {
         private double stamina;
         private double speed;
-        public Weapon CurrentWeapon { get; set; }
-        public Clothes CurrentClothes { get; set; }
         public int Coins { get; set; }
-        public int Warmth { get; set; }
-        public Spot CurrentPosition { get; set; }
         public Player(string playerName)
         {
             this.Name = playerName;
             this.Coins = 0;
             this.Health = 100;
             this.Defence = 0;
-            this.Warmth = 5;
             this.speed = (int)MainQuestConfig.BasePlayerSpeed;
             this.stamina = 100;
             this.Attack = 0;
-            base.inventory = new Inventory();
         }
         public string GetCurrentState()
         {
             return $" У игрока { Name } { Coins } монет { Health } хп ";
         }
-        public List<string> GetListOfPossibleOptions()
+        public string Rest()
         {
-            List<string> posibilities = new List<string>();
-            posibilities.Add("Идти");
-            posibilities.Add("Отдыхать");
-            posibilities.Add("Спать");
-            posibilities.Add("Искать");
-            posibilities.Add("Инвентарь");
-            if(CurrentPosition.NPC != null)
-            {
-                posibilities.Add(CurrentPosition.NPC.Name);
-            }
-            return posibilities;
+                return "Вы немного отдохнули";
         }
-        public void DesideWhatToDo(int chosenOption)
+        public string Sleep()
         {
-           
-        }
-        
-        public void Rest()
-        {
+                return "Вы полны сил";
 
-        }
-        public void Sleep()
-        {
-
-        }
-        public void Fight(NPC enemy)
-        {
-
-        }
-        public void Retreat(NPC enemy)
-        {
-
-        }
-        public double OverweightFactor()
-        {
-            return 1 + Math.Sqrt(inventory.GetTotalWeight() / (int)MainQuestConfig.MaxWeigtPlayerCanCarry);
         }
         public double GetPlayerSpeed()
         {

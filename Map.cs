@@ -14,12 +14,15 @@ namespace ELEKSUNI
     {
         private Dictionary<(int x, int y), Spot> spots;
         private DateTime currentTime, night, morning;
-        public Map()
+        private Player player;
+        private Spot playerSpot;
+        public Map(Player player)
         {
             spots = new Dictionary<(int x, int y), Spot>();
             currentTime = DateTime.Today.AddHours(12);
             night = DateTime.Today.AddHours(19);
             morning = DateTime.Today.AddHours(6);
+            this.player = player;
         }
         public void TimeOfTheDay(double hours)
         {
@@ -37,40 +40,46 @@ namespace ELEKSUNI
         {
             return spots[tupl];
         }
-        public string Travel(Player player, string direction)
+        public void SetPlayerLocation((int, int) tupl)
         {
+            playerSpot = spots[tupl];
+        }
+        public List<string> GetPossibleOptions()
+        {
+            return playerSpot.GetListOfPossibleOptions();
+        }
+        public string Travel()
+        {
+            string input;
+            MainQuest.ShowAvailableOptions(playerSpot.GetAvailableDirections());
+            input = playerSpot.GetListOfPossibleOptions()[MainQuest.GetConsoleInput(playerSpot.GetAvailableDirections())];
             if (!NotNightTime())
             {
                 return $" уже слишком поздно для перехода";
             }
             else if (player.GetPlayerStamina() < CalculateStaminaNeededToTravel(player))
             {
-                return $" нужен отдых";
-            }
-            else if (!player.CurrentPosition.IsPossibleToMoveInThatDurection(direction))
-            {
-                return $" похоже, что в этом направлении невозможно пройти";
+                return $" вы слишком устали нужен отдых";
             }
             else
             {
-                switch (direction)
+                switch (input)
                 {
                     case "Север":
-                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x - 1, player.CurrentPosition.Coordinates.y)];
+                        playerSpot = spots[(playerSpot.Coordinates.x - 1, playerSpot.Coordinates.y)];
                         break;
                     case "Юг":
-                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x + 1, player.CurrentPosition.Coordinates.y)];
+                        playerSpot = spots[(playerSpot.Coordinates.x + 1, playerSpot.Coordinates.y)];
                         break;
                     case "Запад":
-                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x, player.CurrentPosition.Coordinates.y - 1)];
+                        playerSpot = spots[(playerSpot.Coordinates.x, playerSpot.Coordinates.y - 1)];
                         break;
                     case "Восток":
-                        player.CurrentPosition = spots[(player.CurrentPosition.Coordinates.x, player.CurrentPosition.Coordinates.y + 1)];
+                        playerSpot = spots[(playerSpot.Coordinates.x, playerSpot.Coordinates.y + 1)];
                         break;
                 }
                 return $" Вы благополучно добрались до следующей зоны";
-            }
-                
+            }            
         }
         private double CalculateTimeNeededToTravel(Player player)
         {
@@ -79,7 +88,11 @@ namespace ELEKSUNI
         }
         private double CalculateStaminaNeededToTravel(Player player)
         {
-            return CalculateTimeNeededToTravel(player) * (int)MainQuestConfig.BasePlayerStaminaConsuption * player.OverweightFactor();
+            return CalculateTimeNeededToTravel(player) * (int)MainQuestConfig.BasePlayerStaminaConsuption;
+        }
+        public string GetLocationDescription()
+        {
+            return playerSpot.Description;
         }
     }
 }
