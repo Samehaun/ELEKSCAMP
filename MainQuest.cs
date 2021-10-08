@@ -7,7 +7,7 @@ namespace ELEKSUNI
     enum MainQuestConfig 
     {
         BasePlayerSpeed = 5,
-        BasePlayerStaminaConsuption = 1,
+        BasePlayerStaminaConsuption = 5,
         MaxWeigtPlayerCanCarry = 10,
         BaseTimeToChangeLocation = 3,
         MapSize = 4
@@ -17,12 +17,16 @@ namespace ELEKSUNI
         Player player;
         Map questMap;
         bool gameOver;
+        public Random randomizer;
         public MainQuest()
         {
+            randomizer = new Random(DateTime.Now.Minute);
             gameOver = false;
             player = CreatePlayer();
             questMap = CreateNewMap((int)MainQuestConfig.MapSize, player);
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
+            ClearOutdateInfo();
+            Output("Вы пришли в себя в незнакомом месте. Неизвестно как вы здесь оказались, но по крайней мере вы живы и здоровы... пока");
         }
         static void Main(string[] args)
         {
@@ -48,13 +52,13 @@ namespace ELEKSUNI
             int inputNumber;
             try
             {
-                inputNumber = Convert.ToInt32(Console.ReadLine());
+                inputNumber = Convert.ToInt32(input);
             }
             catch (Exception)
             {
                 return false;
             }
-            if (inputNumber > 0 && inputNumber < posibilities.Count)
+            if (inputNumber >= 0  && inputNumber < posibilities.Count)
             {
                 return true;
             }
@@ -88,9 +92,14 @@ namespace ELEKSUNI
             switch (input)
             {
                 case 0:
+                    ClearOutdateInfo();
                     Output(questMap.Travel());
                     break;
-                default:
+                case 1:
+                    questMap.ChangeTime(player.Rest());
+                    break;
+                case 2:
+                    questMap.ChangeTime(player.Sleep());
                     break;
             }
         }
@@ -113,45 +122,39 @@ namespace ELEKSUNI
             descriptions.Add("Большая поляна");
             return descriptions;
         }
+        public static void ClearOutdateInfo()
+        {
+            Console.Clear();
+        }
         public Map CreateNewMap(int mapSize, Player player)
         {
+            Spot exit;
             Map questMap = new Map(player);
-            for (int i = 0; i < mapSize; i++)
+            for (int i = 0; i <= mapSize; i++)
             {
-                for (int j = 0; j < mapSize; j++)
+                for (int j = 0; j <= mapSize; j++)
                 {
-                    questMap.AddSpot(new Spot((i, j), GetDescription(HardcodedSpotDescriptions())));
+                    questMap.AddSpot(new Spot((i, j), PickRandomDescription(HardcodedSpotDescriptions(), randomizer)));
                 }
             }
             return questMap;
         }
-        static string GetDescription(List<String> descriptions)
+        private Spot CreateExit()
         {
-            Random rnd = new Random(DateTime.Now.Minute);
-            return descriptions[rnd.Next(0, descriptions.Count - 1)];
+            int x = randomizer.Next(0, (int)MainQuestConfig.MapSize);
+            int y;
+            if( x == 0 || x == (int)MainQuestConfig.MapSize)
+            {
+                y = randomizer.Next(0, (int)MainQuestConfig.MapSize);
+            }
+            else
+            {
+                y = randomizer.Next(0, 1) * (int)MainQuestConfig.MapSize;
+            }
         }
-        //static List<string> spotDesccriptionDatabase()
-        //{
-        //    List<string> descriptions = new List<string>();
-
-        //    //add text getter from some file or DB
-
-        //    return descriptions;
-        //}
-        //static Item ChoseRandomItem(List<Item> itemDatabase)
-        //{
-        //    //add some additional constrains later on
-
-        //    Random rnd = new Random(DateTime.Now.Second);
-        //    return itemDatabase[rnd.Next(0, itemDatabase.Count - 1)];
-        //}
-        //static List<Item> ItemDatabse()
-        //{
-        //    List<Item> items = new List<Item>();
-
-        //    //add text getter from some file or DB
-
-        //    return items;
-        //}
+        static string PickRandomDescription(List<String> descriptions, Random randomizer)
+        {
+            return descriptions[randomizer.Next(0, descriptions.Count - 1)];
+        }
     }
 }

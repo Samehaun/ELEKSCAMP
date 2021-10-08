@@ -21,11 +21,11 @@ namespace ELEKSUNI
         }
         private void SetAvailableTravelDirections((int i, int j) tuple)
         {
-            if (tuple.i > 0)
+            if (tuple.i > 0 && tuple.i <= (int)MainQuestConfig.MapSize)
             {
                 travelDirecionsAvailableFromThisSpot.Add("Север");
             }
-            if (tuple.j > 0)
+            if (tuple.j > 0 && tuple.j <= (int)MainQuestConfig.MapSize)
             {
                 travelDirecionsAvailableFromThisSpot.Add("Запад");
             }

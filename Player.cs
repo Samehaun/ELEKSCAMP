@@ -5,11 +5,13 @@ namespace ELEKSUNI
 {
     public class Player : Entity
     {
+        private double staminaRegenRate;
         private double stamina;
         private double speed;
         public int Coins { get; set; }
         public Player(string playerName)
         {
+            this.staminaRegenRate = 3;
             this.Name = playerName;
             this.Coins = 0;
             this.Health = 100;
@@ -22,14 +24,19 @@ namespace ELEKSUNI
         {
             return $" У игрока { Name } { Coins } монет { Health } хп ";
         }
-        public string Rest()
+        public double Rest()
         {
-                return "Вы немного отдохнули";
+            MainQuest.ClearOutdateInfo();
+            MainQuest.Output("Вы немного отдохнули");
+            stamina += CalculateStaminaNeededToTravel();
+            return CalculateStaminaNeededToTravel() / staminaRegenRate ;
         }
-        public string Sleep()
+        public double Sleep()
         {
-                return "Вы полны сил";
-
+            MainQuest.ClearOutdateInfo();
+            MainQuest.Output("Вы полны сил");
+            stamina = 100;
+            return 100 / (staminaRegenRate * 4);
         }
         public double GetPlayerSpeed()
         {
@@ -38,6 +45,19 @@ namespace ELEKSUNI
         public double GetPlayerStamina()
         {
             return stamina;
+        }
+        public double CalculateTimeNeededToTravel()
+        {
+            double time = (int)MainQuestConfig.BaseTimeToChangeLocation * ((int)MainQuestConfig.BasePlayerSpeed / speed);
+            return time;
+        }
+        public double CalculateStaminaNeededToTravel()
+        {
+            return CalculateTimeNeededToTravel() * (int)MainQuestConfig.BasePlayerStaminaConsuption;
+        }
+        public void Travel()
+        {
+            stamina -= CalculateStaminaNeededToTravel();
         }
     }
 }

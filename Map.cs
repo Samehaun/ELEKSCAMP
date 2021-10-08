@@ -12,6 +12,7 @@ namespace ELEKSUNI
     }
     class Map
     {
+        public static Dictionary<string, (int x, int y) Tuple> directions;
         private Dictionary<(int x, int y), Spot> spots;
         private DateTime currentTime, night, morning;
         private Player player;
@@ -24,10 +25,6 @@ namespace ELEKSUNI
             morning = DateTime.Today.AddHours(6);
             this.player = player;
         }
-        public void TimeOfTheDay(double hours)
-        {
-            this.currentTime = currentTime.AddHours(hours);
-        }
         public void AddSpot(Spot newSpot)
         {
             spots.Add(newSpot.Coordinates, newSpot);
@@ -35,10 +32,6 @@ namespace ELEKSUNI
         public bool NotNightTime()
         {
             return ((currentTime.Hour >= morning.Hour) && (currentTime.Hour <= night.Hour));
-        }
-        public Spot GetSpotByCoordinate((int x, int y) tupl)
-        {
-            return spots[tupl];
         }
         public void SetPlayerLocation((int, int) tupl)
         {
@@ -51,13 +44,14 @@ namespace ELEKSUNI
         public string Travel()
         {
             string input;
+            MainQuest.Output("Выберите направление");
             MainQuest.ShowAvailableOptions(playerSpot.GetAvailableDirections());
-            input = playerSpot.GetListOfPossibleOptions()[MainQuest.GetConsoleInput(playerSpot.GetAvailableDirections())];
+            input = playerSpot.GetAvailableDirections()[MainQuest.GetConsoleInput(playerSpot.GetAvailableDirections())];
             if (!NotNightTime())
             {
-                return $" уже слишком поздно для перехода";
+                return $" слишком темно для перехода";
             }
-            else if (player.GetPlayerStamina() < CalculateStaminaNeededToTravel(player))
+            else if (player.GetPlayerStamina() < player.CalculateStaminaNeededToTravel())
             {
                 return $" вы слишком устали нужен отдых";
             }
@@ -77,22 +71,23 @@ namespace ELEKSUNI
                     case "Восток":
                         playerSpot = spots[(playerSpot.Coordinates.x, playerSpot.Coordinates.y + 1)];
                         break;
+                    default:
+                        MainQuest.ClearOutdateInfo();
+                        return $" ";
                 }
+                ChangeTime(player.CalculateTimeNeededToTravel());
+                player.Travel();
+                MainQuest.ClearOutdateInfo();
                 return $" Вы благополучно добрались до следующей зоны";
             }            
-        }
-        private double CalculateTimeNeededToTravel(Player player)
-        {
-            double time = (int)MainQuestConfig.BaseTimeToChangeLocation * ((int)MainQuestConfig.BasePlayerSpeed / player.GetPlayerSpeed());
-            return time;
-        }
-        private double CalculateStaminaNeededToTravel(Player player)
-        {
-            return CalculateTimeNeededToTravel(player) * (int)MainQuestConfig.BasePlayerStaminaConsuption;
         }
         public string GetLocationDescription()
         {
             return playerSpot.Description;
+        }
+        public void ChangeTime(double timeSpent)
+        {
+            this.currentTime = currentTime.AddHours(timeSpent);
         }
     }
 }
