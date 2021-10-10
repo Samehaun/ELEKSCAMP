@@ -27,20 +27,19 @@ namespace ELEKSUNI
         public double Rest()
         {
             MainQuest.ClearOutdateInfo();
+            if(stamina < 100)
+            {
+                stamina += CalculateStaminaNeededToTravel();
+            }
             MainQuest.Output("Вы немного отдохнули");
-            stamina += CalculateStaminaNeededToTravel();
-            return CalculateStaminaNeededToTravel() / staminaRegenRate ;
+            return CalculateStaminaNeededToTravel() / staminaRegenRate;
         }
         public double Sleep()
         {
             MainQuest.ClearOutdateInfo();
             MainQuest.Output("Вы полны сил");
             stamina = 100;
-            return 100 / (staminaRegenRate * 4);
-        }
-        public double GetPlayerSpeed()
-        {
-            return speed;
+            return 100 / (staminaRegenRate * 3);
         }
         public double GetPlayerStamina()
         {

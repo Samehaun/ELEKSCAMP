@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ELEKSUNI
 {
@@ -10,22 +9,20 @@ namespace ELEKSUNI
         BasePlayerStaminaConsuption = 5,
         MaxWeigtPlayerCanCarry = 10,
         BaseTimeToChangeLocation = 3,
-        MapSize = 4
+        MapSize = 4,
+        MazeDifficulty = 2
     }
     class MainQuest
     {
         Player player;
         Map questMap;
-        bool gameOver;
-        public Random randomizer;
         public MainQuest()
         {
-            randomizer = new Random(DateTime.Now.Minute);
-            gameOver = false;
             player = CreatePlayer();
-            questMap = CreateNewMap((int)MainQuestConfig.MapSize, player);
+            questMap = new Map(player);
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
             ClearOutdateInfo();
+            questMap.PlayerReachedExit += GameOver;
             Output("Вы пришли в себя в незнакомом месте. Неизвестно как вы здесь оказались, но по крайней мере вы живы и здоровы... пока");
         }
         static void Main(string[] args)
@@ -67,7 +64,7 @@ namespace ELEKSUNI
                 return false;
             }
         }
-        public static int GetConsoleInput(List<string> posibilities)
+        public static int GetInput(List<string> posibilities)
         {
             string input;
             do
@@ -79,12 +76,12 @@ namespace ELEKSUNI
         }
         public void Play()
         {
-            while (!gameOver)
+            while (true)
             {
                 Output(questMap.GetLocationDescription());
                 Output(player.GetCurrentState());
                 ShowAvailableOptions(questMap.GetPossibleOptions());
-                ProceedInput(GetConsoleInput(questMap.GetPossibleOptions()));
+                ProceedInput(GetInput(questMap.GetPossibleOptions()));
             }
         } 
         private void ProceedInput(int input)
@@ -99,62 +96,31 @@ namespace ELEKSUNI
                     questMap.ChangeTime(player.Rest());
                     break;
                 case 2:
-                    questMap.ChangeTime(player.Sleep());
-                    break;
+                    if(questMap.NotNightTime())
+                    {
+                        Output($"Спать днем?! А что собираетесь делать ночью?");
+                        break;
+                    }
+                    else
+                    {
+                        questMap.ChangeTime(player.Sleep());
+                        break;
+                    }
             }
         }
         public static void Output(string result)
         {
             Console.WriteLine(result);
         }
-        private List<string> HardcodedSpotDescriptions()
-        {
-            List<string> descriptions = new List<string>();
-            descriptions.Add("Просека. Много поваленных дереьев");
-            descriptions.Add("Лес как лес. Кроме опавшей листвы ничего интересного");
-            descriptions.Add("Старый дуб. Есть большое дупло, кажется, до него можно добраться");
-            descriptions.Add("Смешанный лес. Много кустарника, есть ягоды");
-            descriptions.Add("Преобладает хвоя приятно дышать полной грудью");
-            descriptions.Add("Большая удача вы нашли ручей");
-            descriptions.Add("Заросшее русло высохшей реки");
-            descriptions.Add("Пещера. Выглядит довольно большой");
-            descriptions.Add("Покинутая землянка. Дверь выглядит функционирующей, но замок рассыпался");
-            descriptions.Add("Большая поляна");
-            return descriptions;
-        }
         public static void ClearOutdateInfo()
+
         {
             Console.Clear();
         }
-        public Map CreateNewMap(int mapSize, Player player)
+        private void GameOver()
         {
-            Spot exit;
-            Map questMap = new Map(player);
-            for (int i = 0; i <= mapSize; i++)
-            {
-                for (int j = 0; j <= mapSize; j++)
-                {
-                    questMap.AddSpot(new Spot((i, j), PickRandomDescription(HardcodedSpotDescriptions(), randomizer)));
-                }
-            }
-            return questMap;
-        }
-        private Spot CreateExit()
-        {
-            int x = randomizer.Next(0, (int)MainQuestConfig.MapSize);
-            int y;
-            if( x == 0 || x == (int)MainQuestConfig.MapSize)
-            {
-                y = randomizer.Next(0, (int)MainQuestConfig.MapSize);
-            }
-            else
-            {
-                y = randomizer.Next(0, 1) * (int)MainQuestConfig.MapSize;
-            }
-        }
-        static string PickRandomDescription(List<String> descriptions, Random randomizer)
-        {
-            return descriptions[randomizer.Next(0, descriptions.Count - 1)];
+            Output(questMap.GetLocationDescription());
+            System.Environment.Exit(0);
         }
     }
 }

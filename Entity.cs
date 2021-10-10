@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ELEKSUNI
+﻿namespace ELEKSUNI
 {
      public abstract class Entity
     {

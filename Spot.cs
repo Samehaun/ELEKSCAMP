@@ -6,34 +6,34 @@ namespace ELEKSUNI
     public class Spot
     {
         private List<string> travelDirecionsAvailableFromThisSpot;
-        public string Description { get; set; }
+        public string Description { get; }
         public (int x, int y) Coordinates { get;}
-        public Spot((int i, int j) tuple, string description)
+        public Spot((int i, int j) index, string description)
         {
             travelDirecionsAvailableFromThisSpot = new List<string>();
-            SetAvailableTravelDirections(tuple);
-            this.Coordinates = tuple;
+            SetAvailableTravelDirections(index);
+            this.Coordinates = index;
             this.Description = description;
         }
-        public void AddAvailableTravelDirection(String direction)
+        public void AddAvailableTravelDirection(string direction)
         {
             travelDirecionsAvailableFromThisSpot.Add(direction);
         }
-        private void SetAvailableTravelDirections((int i, int j) tuple)
+        private void SetAvailableTravelDirections((int i, int j) index)
         {
-            if (tuple.i > 0 && tuple.i <= (int)MainQuestConfig.MapSize)
+            if (index.i > 0 && index.i <= (int)MainQuestConfig.MapSize)
             {
                 travelDirecionsAvailableFromThisSpot.Add("Север");
             }
-            if (tuple.j > 0 && tuple.j <= (int)MainQuestConfig.MapSize)
+            if (index.j > 0 && index.j <= (int)MainQuestConfig.MapSize)
             {
                 travelDirecionsAvailableFromThisSpot.Add("Запад");
             }
-            if (tuple.i < (int)MainQuestConfig.MapSize)
+            if (index.i < (int)MainQuestConfig.MapSize)
             {
                 travelDirecionsAvailableFromThisSpot.Add("Юг");
             }
-            if (tuple.j < (int)MainQuestConfig.MapSize)
+            if (index.j < (int)MainQuestConfig.MapSize)
             {
                 travelDirecionsAvailableFromThisSpot.Add("Восток");
             }
@@ -52,6 +52,10 @@ namespace ELEKSUNI
             posibilities.Add("Отдыхать");
             posibilities.Add("Спать");
             return posibilities;
+        }
+        public void RemoveAvailableTravelDirection(string direction)
+        {
+            this.travelDirecionsAvailableFromThisSpot.Remove(direction);
         }
     }
 }
