@@ -154,12 +154,10 @@ namespace ELEKSUNI
                 }
             }
         }
-
         private string GetRandomAvailableDirection(Spot baseSpot)
         {
             return baseSpot.GetAvailableDirections()[randomizer.Next(0, baseSpot.GetAvailableDirections().Count - 1)];
         }
-
         public static (int, int) AddCoordinates((int x, int y) coordinates1, (int x, int y) coordinates2)
         {
             return (coordinates1.x + coordinates2.x, coordinates1.y + coordinates2.y);
@@ -178,6 +176,12 @@ namespace ELEKSUNI
             descriptions.Add("Покинутая землянка. Дверь выглядит функционирующей, но замок рассыпался");
             descriptions.Add("Большая поляна");
             descriptions.Add("Овраг");
+            descriptions.Add("Избушка на курьих ножках");
+            descriptions.Add("Домик лесника");
+            descriptions.Add("Холм с норой. В ней определенно кто-то живет");
+            descriptions.Add("Лесное озеро");
+            descriptions.Add("Никогда вы не видели пня таких огромных размеров. Еще более удивительно, что сбоку есть дверца, а из маленькой трубы идет дым О.о");
+            descriptions.Add("Огромный валун из которого торчит меч");
             return descriptions;
         }
         private bool PossibleToSeparate(Spot baseSpot, Spot nextSpot)
