@@ -7,8 +7,13 @@ namespace ELEKSUNI
     {
         private List<string> travelDirecionsAvailableFromThisSpot;
         public string Description { get; }
-        public (int x, int y) Coordinates { get;}
-        public Spot((int i, int j) index, string description)
+        public (int x, int y) Coordinates { get; private set; }
+        public Spot(string description)
+        {
+            travelDirecionsAvailableFromThisSpot = new List<string>();
+            this.Description = description;
+        }
+        public Spot((int, int) index, string description)
         {
             travelDirecionsAvailableFromThisSpot = new List<string>();
             SetAvailableTravelDirections(index);
@@ -56,6 +61,11 @@ namespace ELEKSUNI
         public void RemoveAvailableTravelDirection(string direction)
         {
             this.travelDirecionsAvailableFromThisSpot.Remove(direction);
+        }
+        public void SetPosition((int, int) index)
+        {
+            Coordinates = index;
+            SetAvailableTravelDirections(index);
         }
     }
 }

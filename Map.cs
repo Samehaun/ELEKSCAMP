@@ -16,7 +16,40 @@ namespace ELEKSUNI
         {
             { (-1, 0), "Север" } , { (1, 0), "Юг"}, { (0, 1), "Восток"}, { (0, -1), "Запад"}
         };
-        private Dictionary<(int x, int y), Spot> spots;
+        private List<Spot> spots = new List<Spot>()
+        {
+            { new Spot("Просека. Много поваленных дереьев") },
+            { new Spot("Лес как лес. Кроме опавшей листвы не видно ничего интересного") },
+            { new Spot("Лес как лес. Кроме опавшей листвы не видно ничего интересного") },
+            { new Spot("Лес как лес. Кроме опавшей листвы не видно ничего интересного") },
+            { new Spot("Старый дуб. Есть большое дупло, кажется, до него можно добраться") },
+            { new Spot("Старый дуб. Есть большое дупло, кажется, до него можно добраться") },
+            { new Spot("Старый дуб. Есть большое дупло, кажется, до него можно добраться") },
+            { new Spot("Смешанный лес. Много кустарника, есть ягоды") },
+            { new Spot("Смешанный лес. Много кустарника, есть ягоды") },
+            { new Spot("Смешанный лес. Много кустарника, есть ягоды") },
+            { new Spot("Преобладает хвоя приятно дышать полной грудью") },
+            { new Spot("Большая удача вы нашли ручей") },
+            { new Spot("Заросшее русло высохшей реки") },
+            { new Spot("Пещера. Выглядит довольно большой") },
+            { new Spot("Пещера. Выглядит довольно большой") },
+            { new Spot("Покинутая землянка. Дверь выглядит функционирующей, но замок рассыпался") },
+            { new Spot("Большая поляна") },
+            { new Spot("Овраг") },
+            { new Spot("Избушка на курьих ножках") },
+            { new Spot("Домик лесника") },
+            { new Spot("Холм с норой. В ней определенно кто-то живет") },
+            { new Spot("Лесное озеро") },
+            { new Spot("Никогда вы не видели пня таких огромных размеров. Еще более удивительно, что сбоку есть дверца, а из маленькой трубы идет дым О.о") },
+            { new Spot("Огромный валун из которого торчит меч") },
+            { new Spot("Волчья яма. Хорошо, что вы не первый, кто ее нашел") },
+            { new Spot("Большая воронка непонятного происхождения") },
+            { new Spot("Повешенный. Выглядит жутко") },
+            { new Spot("Просека. Много поваленных дереьев") },
+            { new Spot("Просека. Много поваленных дереьев") },
+            { new Spot("Просека. Много поваленных дереьев") },
+        };
+        private Dictionary<(int x, int y), Spot> map;
         private DateTime currentTime, night, morning;
         private Player player;
         private Spot playerSpot;
@@ -24,7 +57,7 @@ namespace ELEKSUNI
         public Map(Player player)
         {
             randomizer = new Random(DateTime.Now.Millisecond);
-            spots = new Dictionary<(int x, int y), Spot>();
+            map = new Dictionary<(int x, int y), Spot>();
             currentTime = DateTime.Today.AddHours(12);
             night = DateTime.Today.AddHours(21);
             morning = DateTime.Today.AddHours(6);
@@ -33,7 +66,7 @@ namespace ELEKSUNI
         }
         public void AddSpot(Spot newSpot)
         {
-            spots.Add(newSpot.Coordinates, newSpot);
+            map.Add(newSpot.Coordinates, newSpot);
         }
         public bool NotNightTime()
         {
@@ -41,7 +74,7 @@ namespace ELEKSUNI
         }
         public void SetPlayerLocation((int, int) index)
         {
-            playerSpot = spots[index];
+            playerSpot = map[index];
         }
         public List<string> GetPossibleOptions()
         {
@@ -92,15 +125,19 @@ namespace ELEKSUNI
             {
                 for (int j = 0; j <= mapSize; j++)
                 {
-                    this.AddSpot(new Spot((i, j), PickRandomDescription(GetSpotDescriptions())));
+                    Spot nextSpot = PickRandomSpotFromSpotPrefabs(spots);
+                    nextSpot.SetPosition((i, j));
+                    this.AddSpot(nextSpot);
                 }
             }
             CreateExit();
             CreateMaze();
         }
-        private string PickRandomDescription(List<String> descriptions)
+        private Spot PickRandomSpotFromSpotPrefabs(List<Spot> spots)
         {
-            return descriptions[randomizer.Next(0, descriptions.Count - 1)];
+            Spot random = spots[randomizer.Next(0, spots.Count - 1)];
+            spots.Remove(random);
+            return random;
         }
         public void CreateExit()
         {
@@ -131,20 +168,20 @@ namespace ELEKSUNI
             {
                 y = randomizer.Next(0, 1) * (int)MainQuestConfig.MapSize;
             }
-            return spots[(x, y)];
+            return map[(x, y)];
         }
-        private Spot GetRandomSpot()
+        private Spot GetRandomSpotOnTheMap()
         {
             int x = randomizer.Next(0, (int)MainQuestConfig.MapSize);
             int y = randomizer.Next(0, (int)MainQuestConfig.MapSize);
-            return spots[(x, y)];
+            return map[(x, y)];
         }
         public void CreateMaze()
         {
             int mazeWallCounter = 0;
             while(mazeWallCounter < (int)MainQuestConfig.MapSize * (int)MainQuestConfig.MazeDifficulty)
             {
-                Spot baseSpot = GetRandomSpot();
+                Spot baseSpot = GetRandomSpotOnTheMap();
                 string direction = GetRandomAvailableDirection(baseSpot);
                 Spot nextSpot = GetNearestSpotInDirection(baseSpot, direction);
                 if (PossibleToSeparate(baseSpot, nextSpot))
@@ -162,28 +199,6 @@ namespace ELEKSUNI
         {
             return (coordinates1.x + coordinates2.x, coordinates1.y + coordinates2.y);
         }
-        private List<string> GetSpotDescriptions()
-        {
-            List<string> descriptions = new List<string>();
-            descriptions.Add("Просека. Много поваленных дереьев");
-            descriptions.Add("Лес как лес. Кроме опавшей листвы ничего интересного");
-            descriptions.Add("Старый дуб. Есть большое дупло, кажется, до него можно добраться");
-            descriptions.Add("Смешанный лес. Много кустарника, есть ягоды");
-            descriptions.Add("Преобладает хвоя приятно дышать полной грудью");
-            descriptions.Add("Большая удача вы нашли ручей");
-            descriptions.Add("Заросшее русло высохшей реки");
-            descriptions.Add("Пещера. Выглядит довольно большой");
-            descriptions.Add("Покинутая землянка. Дверь выглядит функционирующей, но замок рассыпался");
-            descriptions.Add("Большая поляна");
-            descriptions.Add("Овраг");
-            descriptions.Add("Избушка на курьих ножках");
-            descriptions.Add("Домик лесника");
-            descriptions.Add("Холм с норой. В ней определенно кто-то живет");
-            descriptions.Add("Лесное озеро");
-            descriptions.Add("Никогда вы не видели пня таких огромных размеров. Еще более удивительно, что сбоку есть дверца, а из маленькой трубы идет дым О.о");
-            descriptions.Add("Огромный валун из которого торчит меч");
-            return descriptions;
-        }
         private bool PossibleToSeparate(Spot baseSpot, Spot nextSpot)
         {
             if ((baseSpot != exit) && (nextSpot != exit))
@@ -198,7 +213,7 @@ namespace ELEKSUNI
         private Spot GetNearestSpotInDirection(Spot baseSpot, string direction)
         {
             (int, int) vector = directionVectors[direction];
-            return spots[AddCoordinates(baseSpot.Coordinates, vector)];
+            return map[AddCoordinates(baseSpot.Coordinates, vector)];
         }
         private void SeparateSpots(Spot baseSpot, Spot nextSpot, string direction)
         {
