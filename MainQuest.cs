@@ -12,7 +12,7 @@ namespace ELEKSUNI
         MapSize = 4,
         MazeDifficulty = 2
     }
-    class MainQuest
+    public class MainQuest
     {
         Player player;
         Map questMap;
@@ -28,7 +28,7 @@ namespace ELEKSUNI
         static void Main(string[] args)
         {
             MainQuest quest = new MainQuest();
-            quest.Play();           
+            quest.InteractWithLocation();
         }
         public Player CreatePlayer()
         {
@@ -41,7 +41,7 @@ namespace ELEKSUNI
             int i = 0;
             foreach (var option in posibilities)
             {
-               Output($" { i++ } - { option }");
+                Output($" { i++ } - { option }");
             }
         }
         public static bool CheckInput(string input, List<string> posibilities)
@@ -55,7 +55,7 @@ namespace ELEKSUNI
             {
                 return false;
             }
-            if (inputNumber >= 0  && inputNumber < posibilities.Count)
+            if (inputNumber >= 0 && inputNumber < posibilities.Count)
             {
                 return true;
             }
@@ -74,16 +74,13 @@ namespace ELEKSUNI
             while (!CheckInput(input, posibilities));
             return Convert.ToInt32(input);
         }
-        public void Play()
+        public void InteractWithLocation()
         {
-            while (true)
-            {
-                Output(questMap.GetLocationDescription());
-                Output(player.GetCurrentState());
-                ShowAvailableOptions(questMap.GetPossibleOptions());
-                ProceedInput(GetInput(questMap.GetPossibleOptions()));
-            }
-        } 
+            Output(questMap.GetLocationDescription());
+            Output(player.GetCurrentState());
+            ShowAvailableOptions(questMap.GetPossibleOptions());
+            ProceedInput(GetInput(questMap.GetPossibleOptions()));
+        }
         private void ProceedInput(int input)
         {
             switch (input)
@@ -91,21 +88,24 @@ namespace ELEKSUNI
                 case 0:
                     ClearOutdateInfo();
                     Output(questMap.Travel());
+                    InteractWithLocation();
                     break;
                 case 1:
                     questMap.ChangeTime(player.Rest());
+                    InteractWithLocation();
                     break;
                 case 2:
-                    if(questMap.NotNightTime())
+                    if (questMap.NotNightTime())
                     {
+                        ClearOutdateInfo();
                         Output($"Спать днем?! А что собираетесь делать ночью?");
-                        break;
                     }
                     else
                     {
                         questMap.ChangeTime(player.Sleep());
-                        break;
                     }
+                    InteractWithLocation();
+                    break;
             }
         }
         public static void Output(string result)

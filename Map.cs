@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
-    class Map
+    public class Map
     {
         private Random randomizer;
         public delegate void MapHandler();
         public event MapHandler PlayerReachedExit;
+        public event MapHandler PlayerReachedNewLocation;
         public static Dictionary<string, (int, int)> directionVectors = new Dictionary<string, (int, int)>()
         {
             { "Север", (-1, 0) } , { "Юг", (1, 0) }, { "Восток", (0, 1) }, { "Запад", (0, -1) }
@@ -64,7 +65,7 @@ namespace ELEKSUNI
             this.player = player;
             CreateNewMap((int)MainQuestConfig.MapSize, player);
         }
-        public void AddSpot(Spot newSpot)
+        private void AddSpot(Spot newSpot)
         {
             map.Add(newSpot.Coordinates, newSpot);
         }
@@ -139,7 +140,7 @@ namespace ELEKSUNI
             spots.Remove(random);
             return random;
         }
-        public void CreateExit()
+        private void CreateExit()
         {
             Dictionary<string, (int, int)> possibleExitLocations = new Dictionary<string, (int, int)>(directionVectors);
             Spot randomBorder = GetRandomBorderSpot();
@@ -176,7 +177,7 @@ namespace ELEKSUNI
             int y = randomizer.Next(0, (int)MainQuestConfig.MapSize);
             return map[(x, y)];
         }
-        public void CreateMaze()
+        private void CreateMaze()
         {
             int mazeWallCounter = 0;
             while(mazeWallCounter < (int)MainQuestConfig.MapSize * (int)MainQuestConfig.MazeDifficulty)
