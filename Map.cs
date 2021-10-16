@@ -81,13 +81,8 @@ namespace ELEKSUNI
         {
             return playerSpot.GetListOfPossibleOptions();
         }
-        public string Travel()
+        public string Travel(string input)
         {
-            string input;
-            MainQuest.Output("Выберите направление");
-            MainQuest.ShowAvailableOptions(playerSpot.GetAvailableDirections());
-            input = playerSpot.GetAvailableDirections()[MainQuest.GetInput(playerSpot.GetAvailableDirections())];
-            MainQuest.ClearOutdateInfo();
             if (!directionVectors.ContainsKey(input))
             {
                 return $" ";
@@ -104,7 +99,7 @@ namespace ELEKSUNI
             {
                 playerSpot = GetNearestSpotInDirection(playerSpot, input);
                 ChangeTime(player.CalculateTimeNeededToTravel());
-                player.Travel();
+                player.RecaculateStateDueToTraveling();
                 if (playerSpot == this.exit)
                 {
                     PlayerReachedExit?.Invoke();
@@ -226,6 +221,10 @@ namespace ELEKSUNI
             (int, int) vector = directionVectors[direction];
             (int, int) inversVector = (vector.Item1 * -1, vector.Item2 * -1);
             return directionNames[inversVector];
+        }
+        public List<string> GetTravelDirections()
+        {
+            return playerSpot.GetAvailableDirections();
         }
     }
 }
