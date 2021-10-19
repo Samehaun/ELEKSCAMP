@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="DataAndSettings.cs">
+    <Compile Update="Quest.cs">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Compile>
   </ItemGroup>

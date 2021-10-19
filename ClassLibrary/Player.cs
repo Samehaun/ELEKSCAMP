@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
-    public class Player : Entity
+    class Player : Entity
     {
         private double staminaRegenRate;
         private double stamina;

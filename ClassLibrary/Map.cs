@@ -3,12 +3,11 @@ using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
-    public class Map
+    class Map
     {
         private Random randomizer;
         public delegate void MapHandler();
         public event MapHandler PlayerReachedExit;
-        public event MapHandler PlayerReachedNewLocation;
         public static Dictionary<string, (int, int)> directionVectors = new Dictionary<string, (int, int)>()
         {
             { "Север", (-1, 0) } , { "Юг", (1, 0) }, { "Восток", (0, 1) }, { "Запад", (0, -1) }

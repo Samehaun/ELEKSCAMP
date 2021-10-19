@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
-    public class Spot
+    class Spot
     {
         private List<string> travelDirecionsAvailableFromThisSpot;
         public string Description { get; }

@@ -1,6 +1,6 @@
 ﻿namespace ELEKSUNI
 {
-     public abstract class Entity
+    abstract class Entity
     {
         public string Name { get; set; }
         public int Health { get; set; }
