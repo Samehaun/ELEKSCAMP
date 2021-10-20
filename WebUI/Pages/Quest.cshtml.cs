@@ -10,10 +10,16 @@ namespace WebUI.Pages
 {
     public class QuestModel : PageModel
     {
-        Quest quest;
-        public void OnGet(string name)
+        public Quest quest;
+        [BindProperty(SupportsGet = true)]
+        public string Name { get; set; }
+        public string Message { get; set; }
+        public List<string> options;
+        public void OnGet(string Name)
         {
-            quest = new Quest(name);
+            quest = new Quest(Name);
+            Message = "Вы пришли в себя в незнакомом месте. Неизвестно как вы здесь оказались, но по крайней мере вы живы и здоровы... пока";
+            options = quest.GetPossibleOptions();
         }
     }
 }

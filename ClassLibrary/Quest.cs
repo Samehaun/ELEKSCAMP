@@ -18,7 +18,12 @@ namespace ELEKSUNI
         Player player;
         public delegate void QuestHandler();
         public event QuestHandler GameOver;
-       public Quest(string playerName)
+        public event QuestHandler OnPlayerTravel;
+        public event QuestHandler OnPlayerSleep;
+        public event QuestHandler OnPlayerRest;
+        public event QuestHandler OnDayTimeSleep;
+        public event QuestHandler OnPlayerReachedNewSpot;
+        public Quest(string playerName)
         {
             player = new Player(playerName);
             questMap = new Map(player);
@@ -29,42 +34,30 @@ namespace ELEKSUNI
         {
             GameOver?.Invoke();
         }
-
         public string GetLocationDescription()
         {
             return questMap.GetLocationDescription();
         }
-
         public string GetCurrentPlayerState()
         {
             return player.GetCurrentState();
         }
-
         public List<string> GetPossibleOptions()
         {
             return questMap.GetPossibleOptions();
         }
-
-        public bool PlayerCanTravel()
-        {
-            return questMap.NotNightTime();
-        }
-
-        public void Rest()
+        private void Rest()
         {
             questMap.ChangeTime(player.Rest());
         }
-
-        public void Sleep()
+        private void Sleep()
         {
             questMap.ChangeTime(player.Sleep());
         }
-
         public List<string> GetTravelDirections()
         {
             return questMap.GetTravelDirections();
         }
-
         public string Travel(string input)
         {
             return questMap.Travel(input);
@@ -88,6 +81,31 @@ namespace ELEKSUNI
             {
                 return false;
             }
+        }
+        public void ProceedInput(int input)
+        {
+            switch (input)
+            {
+                case 0:
+                    OnPlayerTravel?.Invoke();
+                    break;
+                case 1:
+                    Rest();
+                    OnPlayerRest?.Invoke();
+                    break;
+                case 2:
+                    if (questMap.NotNightTime())
+                    {
+                        OnDayTimeSleep?.Invoke();
+                    }
+                    else
+                    {
+                        Sleep();
+                        OnPlayerSleep?.Invoke();
+                    }
+                    break;
+            }
+            OnPlayerReachedNewSpot?.Invoke();
         }
     }
 }
