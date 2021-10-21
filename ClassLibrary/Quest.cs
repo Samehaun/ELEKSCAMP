@@ -16,35 +16,16 @@ namespace ELEKSUNI
     {
         Map questMap;
         Player player;
-        public delegate void QuestHandler();
-        public event QuestHandler GameOver;
-        public event QuestHandler OnPlayerTravel;
-        public event QuestHandler OnPlayerSleep;
-        public event QuestHandler OnPlayerRest;
-        public event QuestHandler OnDayTimeSleep;
-        public event QuestHandler OnPlayerReachedNewSpot;
-        public Quest(string playerName)
+        public delegate void EndHandler(string message);
+        public delegate void QuestHandler((string message, string playerState, List<string> options) state);
+        public delegate void InputHandler(int input);
+        public InputHandler ProcceedInput;
+        public event EndHandler QuestOver;
+        public event QuestHandler WaitingForInput;
+
+        private void EndQuest()
         {
-            player = new Player(playerName);
-            questMap = new Map(player);
-            questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
-            questMap.PlayerReachedExit += Victory;
-        }
-        private void Victory()
-        {
-            GameOver?.Invoke();
-        }
-        public string GetLocationDescription()
-        {
-            return questMap.GetLocationDescription();
-        }
-        public string GetCurrentPlayerState()
-        {
-            return player.GetCurrentState();
-        }
-        public List<string> GetPossibleOptions()
-        {
-            return questMap.GetPossibleOptions();
+            QuestOver?.Invoke(questMap.GetLocationDescription());
         }
         private void Rest()
         {
@@ -54,58 +35,53 @@ namespace ELEKSUNI
         {
             questMap.ChangeTime(player.Sleep());
         }
-        public List<string> GetTravelDirections()
+        private void LocationMainDialog(int input)
         {
-            return questMap.GetTravelDirections();
-        }
-        public string Travel(string input)
-        {
-            return questMap.Travel(input);
-        }
-        public static bool CheckInput(string input, List<string> posibilities)
-        {
-            int inputNumber;
-            try
-            {
-                inputNumber = Convert.ToInt32(input);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            if (inputNumber >= 0 && inputNumber < posibilities.Count)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public void ProceedInput(int input)
-        {
+            string info;
+            List<string> options = questMap.GetPossibleOptions();
             switch (input)
             {
                 case 0:
-                    OnPlayerTravel?.Invoke();
+                    info = "Выберите направление";
+                    options = questMap.GetTravelDirections();
+                    ProcceedInput = TravelDialog;
                     break;
                 case 1:
                     Rest();
-                    OnPlayerRest?.Invoke();
+                    info = $"Вы немного отдохнули {Environment.NewLine} { questMap.GetLocationDescription() }";
                     break;
                 case 2:
                     if (questMap.NotNightTime())
                     {
-                        OnDayTimeSleep?.Invoke();
+                        info = $"Спать днем?! А что собираетесь делать ночью? {Environment.NewLine} { questMap.GetLocationDescription() }";
                     }
                     else
                     {
                         Sleep();
-                        OnPlayerSleep?.Invoke();
+                        info = $"Вы полны сил {Environment.NewLine} { questMap.GetLocationDescription() }";
                     }
                     break;
+                default:
+                    info = "incorrect input";
+                    break;
             }
-            OnPlayerReachedNewSpot?.Invoke();
+            WaitingForInput?.Invoke((info, player.GetCurrentState(), options));
+        }
+        public void Start(string name)
+        {
+            string initialMessage = "Вы пришли в себя в незнакомом месте. Неизвестно как вы здесь оказались, но по крайней мере вы живы и здоровы... пока";
+            player = new Player(name);
+            questMap = new Map(player);
+            questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
+            questMap.PlayerReachedExit += EndQuest;
+            ProcceedInput = LocationMainDialog; 
+            WaitingForInput?.Invoke((initialMessage, player.GetCurrentState(), questMap.GetPossibleOptions()));
+        }
+        private void TravelDialog(int input)
+        {
+            string info = questMap.Travel(questMap.GetTravelDirections()[input]);
+            ProcceedInput = LocationMainDialog;
+            WaitingForInput?.Invoke((info, player.GetCurrentState(), questMap.GetPossibleOptions()));
         }
     }
 }

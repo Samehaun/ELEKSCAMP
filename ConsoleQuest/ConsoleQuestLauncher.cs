@@ -9,93 +9,71 @@ namespace ConsoleQuest
         Quest quest;
         public ConsoleQuestLauncher()
         {
-            Output("Enter your name");
-            quest = new Quest(Console.ReadLine());
-            ClearOutdateInfo();
-            quest.GameOver += GameOver;
-            quest.OnPlayerTravel += Travel;
-            quest.OnPlayerRest += Rest;
-            quest.OnPlayerSleep += Sleep;
-            quest.OnDayTimeSleep += ImpossibleToSleepAtDayTime;
-            quest.OnPlayerReachedNewSpot += InteractWithLocation;
-            Output("Вы пришли в себя в незнакомом месте. Неизвестно как вы здесь оказались, но по крайней мере вы живы и здоровы... пока");
+            Console.WriteLine("Enter your name");
+            quest = new Quest();
+            quest.QuestOver += GameOver;
+            quest.WaitingForInput += MakeAChoice;
+            quest.Start(Console.ReadLine());
         }
-
-        private void ImpossibleToSleepAtDayTime()
-        {
-            ClearOutdateInfo();
-            Output($"Спать днем?! А что собираетесь делать ночью?");
-        }
-
-        private void Sleep()
-        {
-            ClearOutdateInfo();
-            Output("Вы полны сил");
-        }
-
-        private void Rest()
-        {
-            ClearOutdateInfo();
-            Output("Вы немного отдохнули");
-        }
-
-        private void Travel()
-        {
-            Output(TravelMenu());
-        }
-
         static void Main(string[] args)
         {
-            ConsoleQuestLauncher quest = new ConsoleQuestLauncher();
-            quest.InteractWithLocation();
+            ConsoleQuestLauncher launcher = new ConsoleQuestLauncher();
         }
-        public static void ShowAvailableOptions(List<string> posibilities)
+        private static void ShowAvailableOptions(List<string> posibilities)
         {
             int i = 0;
             foreach (var option in posibilities)
             {
-                Output($" { i++ } - { option }");
+                Console.WriteLine($" { i++ } - { option }");
             }
         }
-        public static int GetInput(List<string> posibilities)
+        private int GetInput(int maxPossibleInput)
         {
             string input;
             do
             {
                 input = Console.ReadLine();
             }
-            while (!Quest.CheckInput(input, posibilities));
+            while (!CheckInput(input, maxPossibleInput));
             return Convert.ToInt32(input);
         }
-        public void InteractWithLocation()
-        {
-            Output(quest.GetLocationDescription());
-            Output(quest.GetCurrentPlayerState());
-            ShowAvailableOptions(quest.GetPossibleOptions());
-            quest.ProceedInput(GetInput(quest.GetPossibleOptions()));
-        }
-        public static void Output(string result)
-        {
-            Console.WriteLine(result);
-        }
-        public static void ClearOutdateInfo()
+        public void MakeAChoice((string message, string playerState, List<string> options) state)
         {
             Console.Clear();
+            Output(state);
+            quest.ProcceedInput(GetInput(state.options.Count));
         }
-        private void GameOver()
+        private void GameOver(string endMessage)
         {
-            Output(quest.GetLocationDescription());
+            Console.WriteLine(endMessage);
             Environment.Exit(0);
         }
-        public string TravelMenu()
+        private void Output((string message, string state, List<string> options) questState)
         {
-            string input;
-            ClearOutdateInfo();
-            Output("Выберите направление");
-            ShowAvailableOptions(quest.GetTravelDirections());
-            input = quest.GetTravelDirections()[GetInput(quest.GetTravelDirections())];
-            ClearOutdateInfo();
-            return quest.Travel(input);
+            Console.Clear();
+            Console.WriteLine(questState.message);
+            Console.WriteLine(questState.state);
+            ShowAvailableOptions(questState.options);
+        }
+        private static bool CheckInput(string input, int maxPossibleInput)
+        {
+            int inputNumber;
+            try
+            {
+                inputNumber = Convert.ToInt32(input);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            if (inputNumber >= 0 && inputNumber < maxPossibleInput)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

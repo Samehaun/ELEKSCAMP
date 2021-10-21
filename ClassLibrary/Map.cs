@@ -84,15 +84,15 @@ namespace ELEKSUNI
         {
             if (!directionVectors.ContainsKey(input))
             {
-                return $" ";
+                return playerSpot.Description;
             }
             else if (!NotNightTime())
             {
-                return $" слишком темно для перехода";
+                return $" слишком темно для перехода {Environment.NewLine} { playerSpot.Description }";
             }
             else if (player.GetPlayerStamina() < player.CalculateStaminaNeededToTravel())
             {
-                return $" вы слишком устали, нужен отдых";
+                return $" вы слишком устали, нужен отдых {Environment.NewLine} { playerSpot.Description }";
             }
             else
             {
