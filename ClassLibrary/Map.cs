@@ -88,11 +88,11 @@ namespace ELEKSUNI
             }
             else if (!NotNightTime())
             {
-                return $" слишком темно для перехода {Environment.NewLine} { playerSpot.Description }";
+                return $" слишком темно для перехода ";
             }
             else if (player.GetPlayerStamina() < player.CalculateStaminaNeededToTravel())
             {
-                return $" вы слишком устали, нужен отдых {Environment.NewLine} { playerSpot.Description }";
+                return $" вы слишком устали, нужен отдых ";
             }
             else
             {

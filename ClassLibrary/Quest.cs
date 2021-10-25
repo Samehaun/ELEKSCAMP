@@ -17,11 +17,9 @@ namespace ELEKSUNI
         Map questMap;
         Player player;
         public delegate void EndHandler(string message);
-        public delegate void QuestHandler((string message, string playerState, List<string> options) state);
-        public delegate void InputHandler(int input);
+        public delegate QuestState InputHandler(int input);
         public InputHandler ProcceedInput;
         public event EndHandler QuestOver;
-        public event QuestHandler WaitingForInput;
 
         private void EndQuest()
         {
@@ -35,7 +33,7 @@ namespace ELEKSUNI
         {
             questMap.ChangeTime(player.Sleep());
         }
-        private void LocationMainDialog(int input)
+        private QuestState LocationMainDialog(int input)
         {
             string info;
             List<string> options = questMap.GetPossibleOptions();
@@ -65,9 +63,9 @@ namespace ELEKSUNI
                     info = "incorrect input";
                     break;
             }
-            WaitingForInput?.Invoke((info, player.GetCurrentState(), options));
+            return new QuestState(info, player.GetCurrentState(), options);
         }
-        public void Start(string name)
+        public QuestState Start(string name)
         {
             string initialMessage = "Вы пришли в себя в незнакомом месте. Неизвестно как вы здесь оказались, но по крайней мере вы живы и здоровы... пока";
             player = new Player(name);
@@ -75,13 +73,14 @@ namespace ELEKSUNI
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
             questMap.PlayerReachedExit += EndQuest;
             ProcceedInput = LocationMainDialog; 
-            WaitingForInput?.Invoke((initialMessage, player.GetCurrentState(), questMap.GetPossibleOptions()));
+            return new QuestState($"{initialMessage } {Environment.NewLine} { questMap.GetLocationDescription() }" ,
+                player.GetCurrentState(), questMap.GetPossibleOptions());
         }
-        private void TravelDialog(int input)
+        private QuestState TravelDialog(int input)
         {
-            string info = questMap.Travel(questMap.GetTravelDirections()[input]);
+            string info = $"{ questMap.Travel(questMap.GetTravelDirections()[input]) } {Environment.NewLine} {questMap.GetLocationDescription()}";
             ProcceedInput = LocationMainDialog;
-            WaitingForInput?.Invoke((info, player.GetCurrentState(), questMap.GetPossibleOptions()));
+            return new QuestState(info, player.GetCurrentState(), questMap.GetPossibleOptions());
         }
     }
 }

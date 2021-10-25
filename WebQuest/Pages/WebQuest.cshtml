@@ -1,0 +1,14 @@
+﻿@page
+@model WebQuest.Pages.WebQuestModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+}
+<h4>@Model.Message</h4>
+<h4>@Model.PlayerState</h4>
+@for (int i = 0; i < 3; i++)
+{
+    <form method="post">
+        <button class="btn btn-default">@Model.Options[i]</button>
+        <input type="hidden" name="selectedOptionId" value="@i" />
+    </form>
+}

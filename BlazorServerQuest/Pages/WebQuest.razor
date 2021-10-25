@@ -1,0 +1,37 @@
+﻿@page "/quest"
+<h1>Quest</h1>
+
+
+@if (quest != null)
+{
+    <h4>@state.Message</h4>
+    <h4>@state.PlayerState</h4>
+    @for (int i = 0; i < 3; i++)
+    {
+        var j = i;
+        <button class="btn btn-default" @onclick="()=>Input(j)">@state.Options[i]</button>
+    }
+}
+else
+{
+    <form method="post">
+        <input type="text" @bind="name" />
+        <input type="submit" @onclick="Begin" />
+    </form>
+}
+@code {
+    private string name;
+    private int input;
+    private Quest quest;
+    private QuestState state;
+    private void Begin()
+    {
+        quest = new Quest();
+        state = quest.Start(name);
+    }
+    private void Input(int i)
+    {
+        input = i;
+        state = quest.ProcceedInput(input);
+    }
+}
