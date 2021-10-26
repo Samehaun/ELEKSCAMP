@@ -1,10 +1,15 @@
 ﻿@page "/quest"
-<h1>Quest</h1>
-
-
-@if (quest != null)
+@if (questOver) 
+{ 
+    <h4>@endMessage</h4>
+}
+else if (name != null)
 {
-    <h4>@state.Message</h4>
+    if(quest == null)
+    {
+        Begin();
+    }
+    <h4 class="message">@state.Message</h4>
     <h4>@state.PlayerState</h4>
     @for (int i = 0; i < 3; i++)
     {
@@ -14,9 +19,10 @@
 }
 else
 {
-    <form method="post">
-        <input type="text" @bind="name" />
-        <input type="submit" @onclick="Begin" />
+    <h2>Введите имя</h2>
+    <form>
+        <input type="text" @bind="name" class="valid"/>
+        <input type="submit" />
     </form>
 }
 @code {
@@ -24,14 +30,22 @@ else
     private int input;
     private Quest quest;
     private QuestState state;
+    private bool questOver = false;
+    private string endMessage;
     private void Begin()
     {
         quest = new Quest();
         state = quest.Start(name);
+        quest.QuestOver += EndQuest;
     }
     private void Input(int i)
     {
         input = i;
         state = quest.ProcceedInput(input);
     }
+    private void EndQuest(string questResult)
+        {
+        endMessage = questResult;
+        questOver = true;
+        }
 }

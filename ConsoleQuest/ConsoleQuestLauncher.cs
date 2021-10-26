@@ -54,7 +54,6 @@ namespace ConsoleQuest
         }
         private static void Output(QuestState state)
         {
-            Console.Clear();
             Console.WriteLine(state.Message);
             Console.WriteLine(state.PlayerState);
             ShowAvailableOptions(state.Options);

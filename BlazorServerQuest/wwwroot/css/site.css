@@ -8,6 +8,9 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.message {
+    white-space: pre-wrap;
+}
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
