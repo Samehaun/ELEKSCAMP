@@ -5,22 +5,22 @@ namespace ELEKSUNI
 {
     class Spot
     {
-        private List<string> travelDirecionsAvailableFromThisSpot;
-        public string Description { get; }
+        private List<Keys> travelDirecionsAvailableFromThisSpot;
+        public Keys Description { get; }
         public (int x, int y) Coordinates { get; private set; }
-        public Spot(string description)
+        public Spot(Keys description)
         {
-            travelDirecionsAvailableFromThisSpot = new List<string>();
+            travelDirecionsAvailableFromThisSpot = new List<Keys>();
             this.Description = description;
         }
-        public Spot((int, int) index, string description)
+        public Spot((int, int) index, Keys description)
         {
-            travelDirecionsAvailableFromThisSpot = new List<string>();
+            travelDirecionsAvailableFromThisSpot = new List<Keys>();
             SetAvailableTravelDirections(index);
             this.Coordinates = index;
             this.Description = description;
         }
-        public void AddAvailableTravelDirection(string direction)
+        public void AddAvailableTravelDirection(Keys direction)
         {
             travelDirecionsAvailableFromThisSpot.Add(direction);
         }
@@ -28,37 +28,37 @@ namespace ELEKSUNI
         {
             if (index.i > 0 && index.i <= (int)MainQuestConfig.MapSize)
             {
-                travelDirecionsAvailableFromThisSpot.Add("Север");
+                travelDirecionsAvailableFromThisSpot.Add(Keys.North);
             }
             if (index.j > 0 && index.j <= (int)MainQuestConfig.MapSize)
             {
-                travelDirecionsAvailableFromThisSpot.Add("Запад");
+                travelDirecionsAvailableFromThisSpot.Add(Keys.West);
             }
             if (index.i < (int)MainQuestConfig.MapSize)
             {
-                travelDirecionsAvailableFromThisSpot.Add("Юг");
+                travelDirecionsAvailableFromThisSpot.Add(Keys.South);
             }
             if (index.j < (int)MainQuestConfig.MapSize)
             {
-                travelDirecionsAvailableFromThisSpot.Add("Восток");
+                travelDirecionsAvailableFromThisSpot.Add(Keys.East);
             }
         }
-        public List<string> GetAvailableDirections()
+        public List<Keys> GetAvailableDirections()
         {
-            List<string> options = new List<string>();
+            List<Keys> options = new List<Keys>();
             options.AddRange(travelDirecionsAvailableFromThisSpot);
-            options.Add(" назад ");
+            options.Add(Keys.Cancel);
             return options;
         }
-        public List<string> GetListOfPossibleOptions()
+        public List<Keys> GetListOfPossibleOptions()
         {
-            List<string> posibilities = new List<string>();
-            posibilities.Add("Идти");
-            posibilities.Add("Отдыхать");
-            posibilities.Add("Спать");
+            List<Keys> posibilities = new List<Keys>();
+            posibilities.Add(Keys.Travel);
+            posibilities.Add(Keys.Rest);
+            posibilities.Add(Keys.Sleep);
             return posibilities;
         }
-        public void RemoveAvailableTravelDirection(string direction)
+        public void RemoveAvailableTravelDirection(Keys direction)
         {
             this.travelDirecionsAvailableFromThisSpot.Remove(direction);
         }

@@ -8,8 +8,13 @@ using ELEKSUNI;
 
 namespace WebQuest.Pages
 {
+    static class ActiveQuests
+    {
+        public static Dictionary<Guid, Quest> quests = new Dictionary<Guid, Quest>();
+    }
     public class WebQuestModel : PageModel
     {
+        private static Guid id;
         private Quest quest;
         private QuestState state;
         public string Message { get; private set; }
@@ -22,9 +27,12 @@ namespace WebQuest.Pages
             Message = state.Message;
             PlayerState = state.PlayerState;
             Options = state.Options;
+            id = Guid.NewGuid();
+            ActiveQuests.quests.Add(id, quest);
         }
         public void OnPost(int selectedOptionId)
         {
+            quest = ActiveQuests.quests[id];
             state = quest.ProcceedInput(selectedOptionId);
             Message = state.Message;
             PlayerState = state.PlayerState;

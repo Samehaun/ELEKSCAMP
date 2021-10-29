@@ -20,10 +20,6 @@ namespace ELEKSUNI
             this.stamina = 100;
             this.Attack = 0;
         }
-        public string GetCurrentState()
-        {
-            return $" У игрока { Name } { Coins } монет { Health } хп ";
-        }
         public double Rest()
         {
             if(stamina < 100)

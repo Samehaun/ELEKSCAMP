@@ -1,27 +1,30 @@
 ﻿@page "/quest"
-@if (questOver) 
-{ 
+@if (questOver)
+{
     <h4>@endMessage</h4>
 }
 else if (name != null)
 {
-    if(quest == null)
+    if (quest == null)
     {
         Begin();
     }
     <h4 class="message">@state.Message</h4>
     <h4>@state.PlayerState</h4>
-    @for (int i = 0; i < 3; i++)
+    if (state.Options != null)
     {
-        var j = i;
-        <button class="btn btn-default" @onclick="()=>Input(j)">@state.Options[i]</button>
+        for (int i = 0; i < state.Options.Count - 1; i++)
+        {
+            var j = i;
+            <button class="btn btn-default" @onclick="()=>Input(j)">@state.Options[i]</button>
+        }
     }
 }
 else
 {
     <h2>Введите имя</h2>
     <form>
-        <input type="text" @bind="name" class="valid"/>
+        <input type="text" @bind="name" class="valid" />
         <input type="submit" />
     </form>
 }
@@ -36,16 +39,10 @@ else
     {
         quest = new Quest();
         state = quest.Start(name);
-        quest.QuestOver += EndQuest;
     }
     private void Input(int i)
     {
         input = i;
         state = quest.ProcceedInput(input);
     }
-    private void EndQuest(string questResult)
-        {
-        endMessage = questResult;
-        questOver = true;
-        }
 }

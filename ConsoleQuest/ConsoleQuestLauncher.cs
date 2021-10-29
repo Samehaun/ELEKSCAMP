@@ -12,17 +12,17 @@ namespace ConsoleQuest
         {
             Console.WriteLine("Enter your name");
             quest = new Quest();
-            quest.QuestOver += GameOver;
             state = quest.Start(Console.ReadLine());
         }
         static void Main(string[] args)
         {
             ConsoleQuestLauncher launcher = new ConsoleQuestLauncher();
-            while(true)
+            do
             {
                 ShowState(launcher.state);
                 launcher.state = launcher.quest.ProcceedInput(GetInput(launcher.state.Options.Count));
-            }
+            } while (!launcher.quest.IsEnded);
+            ShowState(launcher.state);
         }
         private static void ShowAvailableOptions(List<string> posibilities)
         {
@@ -55,8 +55,14 @@ namespace ConsoleQuest
         private static void Output(QuestState state)
         {
             Console.WriteLine(state.Message);
-            Console.WriteLine(state.PlayerState);
-            ShowAvailableOptions(state.Options);
+            if(state.PlayerState != null)
+            {
+                Console.WriteLine(state.PlayerState);
+            }
+            if (state.Options != null)
+            {
+                ShowAvailableOptions(state.Options);
+            }
         }
         private static bool CheckInput(string input, int maxPossibleInput)
         {
