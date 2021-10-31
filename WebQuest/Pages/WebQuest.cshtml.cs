@@ -14,7 +14,7 @@ namespace WebQuest.Pages
     }
     public class WebQuestModel : PageModel
     {
-        private static Guid id;
+        public Guid id;
         private Quest quest;
         private QuestState state;
         public string Message { get; private set; }
@@ -22,6 +22,7 @@ namespace WebQuest.Pages
         public List<string> Options { get; private set; }
         public void OnGet(string name)
         {
+            id = Guid.NewGuid();
             quest = new Quest();
             state = quest.Start(name);
             Message = state.Message;
@@ -30,8 +31,9 @@ namespace WebQuest.Pages
             id = Guid.NewGuid();
             ActiveQuests.quests.Add(id, quest);
         }
-        public void OnPost(int selectedOptionId)
+        public void OnPost(int selectedOptionId, Guid id)
         {
+            this.id = id;
             quest = ActiveQuests.quests[id];
             state = quest.ProcceedInput(selectedOptionId);
             Message = state.Message;
