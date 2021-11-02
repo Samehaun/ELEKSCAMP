@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ELEKSUNI
 {
-    enum Keys
+    public enum Keys
     {
         Clearing,
         OrdinaryForest,
@@ -46,7 +46,14 @@ namespace ELEKSUNI
         WakeUp,
         Exit,
         Cancel,
-        Travel
+        Travel,
+        Drop,
+        Use,
+        Defence,
+        Weight,
+        Attack,
+        Inventory,
+        Search
     }
     static class Data
     {
@@ -80,7 +87,7 @@ namespace ELEKSUNI
             {Keys.Monolith, "Absolutely black monolith. It looks like metal, but warm."},
             {Keys.ThermalSprings, "Thermal springs"},
             {Keys.Exit, "Road! It will lead somewhere. You got out!" },
-            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}
+            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}, {Keys.Drop, ""}, {Keys.Use, ""}, {Keys.Search, ""}, {Keys.Inventory, ""}, {Keys.Weight, ""}, {Keys.Defence, ""}, {Keys.Attack, ""}
         };
         private static Dictionary<Keys, string> ruText = new Dictionary<Keys, string>()
         {
@@ -112,7 +119,7 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно черный монолит. Похоже на металл, но теплый."},
             {Keys.ThermalSprings, "Термальный источник"},
             {Keys.Exit, "Дорога! Куда-то она да приведет. Вы выбрались!" },
-            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"}
+            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"}, {Keys.Drop, ""}, {Keys.Use, ""}
         };
         private static Dictionary<Keys, string> uaText = new Dictionary<Keys, string>()
         {
@@ -144,7 +151,7 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно чорний моноліт. Схоже на метал, але теплий."},
             {Keys.ThermalSprings, "Термальне джерело"},
             {Keys.Exit, "Дорога! Кудись вона та приведе. Ви вибралися!" },
-            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"}
+            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"}, {Keys.Drop, ""}, {Keys.Use, ""}
         };
         public static string Localize(Keys text, string languageSettings)
         {

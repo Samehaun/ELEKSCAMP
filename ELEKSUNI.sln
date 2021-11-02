@@ -12,7 +12,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleQuest", "ConsoleQues
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebQuest", "WebQuest\WebQuest.csproj", "{5CC4E030-5D09-4329-BC7B-AFB39428F318}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorServerQuest", "BlazorServerQuest\BlazorServerQuest.csproj", "{6D847298-0148-4511-BFF5-B821102E9007}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorServerQuest", "BlazorServerQuest\BlazorServerQuest.csproj", "{6D847298-0148-4511-BFF5-B821102E9007}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestTesting", "QuestTesting\QuestTesting.csproj", "{6C3D4DFE-4609-4691-9CE2-890B9C80136B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{6D847298-0148-4511-BFF5-B821102E9007}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D847298-0148-4511-BFF5-B821102E9007}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D847298-0148-4511-BFF5-B821102E9007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C3D4DFE-4609-4691-9CE2-890B9C80136B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C3D4DFE-4609-4691-9CE2-890B9C80136B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C3D4DFE-4609-4691-9CE2-890B9C80136B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C3D4DFE-4609-4691-9CE2-890B9C80136B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

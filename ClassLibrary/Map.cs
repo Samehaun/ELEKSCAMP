@@ -195,5 +195,7 @@ namespace ELEKSUNI
         {
             return playerSpot.GetAvailableDirections();
         }
+
+
     }
 }

@@ -6,6 +6,7 @@ namespace ELEKSUNI
     class Spot
     {
         private List<Keys> travelDirecionsAvailableFromThisSpot;
+        private Item item;
         public Keys Description { get; }
         public (int x, int y) Coordinates { get; private set; }
         public Spot(Keys description)
@@ -13,12 +14,14 @@ namespace ELEKSUNI
             travelDirecionsAvailableFromThisSpot = new List<Keys>();
             this.Description = description;
         }
-        public Spot((int, int) index, Keys description)
+        public Spot((int, int) index, Keys description) : this(description)
         {
-            travelDirecionsAvailableFromThisSpot = new List<Keys>();
             SetAvailableTravelDirections(index);
             this.Coordinates = index;
-            this.Description = description;
+        }
+        public Spot((int, int) index, Keys description, Item item) : this(index, description)
+        {
+            this.item = item;
         }
         public void AddAvailableTravelDirection(Keys direction)
         {
@@ -56,6 +59,8 @@ namespace ELEKSUNI
             posibilities.Add(Keys.Travel);
             posibilities.Add(Keys.Rest);
             posibilities.Add(Keys.Sleep);
+            posibilities.Add(Keys.Search);
+            posibilities.Add(Keys.Inventory);
             return posibilities;
         }
         public void RemoveAvailableTravelDirection(Keys direction)

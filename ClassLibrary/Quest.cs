@@ -14,8 +14,8 @@ namespace ELEKSUNI
     }
     public class Quest
     {
-        Map questMap;
-        Player player;
+        private Map questMap;
+        private Player player;
         public delegate QuestState InputHandler(int input);
         public InputHandler ProcceedInput;
         private string language;
@@ -55,6 +55,8 @@ namespace ELEKSUNI
                         info = $"{Data.Localize(Keys.WakeUp, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
                     }
                     break;
+                case 3:
+                    questMap.
                 default:
                     info = "incorrect input";
                     break;
@@ -82,6 +84,9 @@ namespace ELEKSUNI
                 IsEnded = true;
                 return new QuestState(info, null, null);
             }
+        }
+        private QuestState InventoryDialog(int input)
+        {
 
         }
         private QuestState SetLanguage(int input)
@@ -106,4 +111,5 @@ namespace ELEKSUNI
                 Data.StateBuilder(player, language), Data.Localize(questMap.GetPossibleOptions(), language));
         }
     }
+
 }
