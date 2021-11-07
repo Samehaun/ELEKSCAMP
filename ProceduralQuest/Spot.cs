@@ -72,5 +72,11 @@ namespace ProceduralQuest
             Coordinates = index;
             SetAvailableTravelDirections(index);
         }
+        public Item GetHidden()
+        {
+            Item find = item;
+            item = null;
+            return find;
+        }
     }
 }

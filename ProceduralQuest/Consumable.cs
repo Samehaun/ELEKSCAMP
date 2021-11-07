@@ -31,11 +31,11 @@ namespace ProceduralQuest
         }
         public static Consumable CreateTrap(int effect)
         {
-            return new Consumable(Keys.Trap, 0, 0, Keys.TriggerTrap, effect, true);
+            return new Consumable(Keys.Trap, 0, 0, Keys.Trap, effect, true);
         }
         public static Consumable CreateHornetNest(int effect)
         {
-            return new Consumable(Keys.HornetNest, 0, 0, Keys.TriggerHornetNest, effect, true);
+            return new Consumable(Keys.HornetNest, 0, 0, Keys.HornetNest, effect, true);
         }
         public static Consumable CreateBandage(int price, double weight)
         {

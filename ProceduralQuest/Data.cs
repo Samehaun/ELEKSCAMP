@@ -21,7 +21,7 @@ namespace ProceduralQuest
         Clearing,
         OrdinaryForest,
         Oak,
-        Berries,
+        Mixed,
         Pine,
         Creek,
         DryRiver,
@@ -66,9 +66,12 @@ namespace ProceduralQuest
         Inventory,
         Search,
         Coins,
-        Poisone, Eat,  StopBleeding, CurePoison, TriggerTrap, TriggerHornetNest,
+        Poisone, Eat,  StopBleeding, CurePoison,
         Campfire, Trap, Cure, HornetNest, Bondage,
-        SimpleClothes, SimpleClothesWear
+        SimpleClothes, ThickClothes, WolfSkinClothes,
+        Knife, SharpKnife, Axe, SharpAxe, Stake,
+        Flint, Grindstone,
+        Trade, Talk, Sell, Buy, Equip, Drink, Loot, Fire
     }
     static class Data
     {
@@ -92,7 +95,7 @@ namespace ProceduralQuest
             {Keys.Clearing, "Clearing. Many fallen trees"},
             {Keys.OrdinaryForest, "Ordinary forest. Nothing to look at except fallen leaves"},
             {Keys.Oak, "Old oak. There is a big hollow, it seems that you can get to it"},
-            {Keys.Berries, "Mixed forest. Lots of shrubs with berries"},
+            {Keys.Mixed, "Mixed forest. Lots of shrubs with berries"},
             {Keys.Pine, "Pine trees predominate, it is pleasant to breathe deeply"},
             {Keys.Creek, "Great luck you found the creek"},
             {Keys.DryRiver, "Overgrown dry river bed" },
@@ -113,7 +116,11 @@ namespace ProceduralQuest
             {Keys.Monolith, "Absolutely black monolith. It looks like metal, but warm."},
             {Keys.ThermalSprings, "Thermal springs"},
             {Keys.Exit, "Road! It will lead somewhere. You got out!" },
-            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}, {Keys.Drop, ""}, {Keys.Use, ""}, {Keys.Search, ""}, {Keys.Inventory, ""}, {Keys.Weight, ""}, {Keys.Defence, ""}, {Keys.Attack, ""}
+            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}, {Keys.Drop, ""}, {Keys.Use, ""},
+            {Keys.Search, ""}, {Keys.Inventory, ""}, {Keys.Weight, ""},
+            {Keys.Defence, ""}, {Keys.Attack, ""}, {Keys.Search, ""}, {Keys.Coins, ""},
+            {Keys.Poisone, ""}, {Keys.Eat, ""}, {Keys.StopBleeding, ""}, {Keys.CurePoison, ""},
+            {Keys.Trap, ""}, {Keys.Cure, ""}, {Keys.HornetNest, ""}, {Keys.Bondage, ""},
         };
         private static Dictionary<Keys, string> ruText = new Dictionary<Keys, string>()
         {
@@ -124,7 +131,7 @@ namespace ProceduralQuest
             {Keys.Clearing, "Просека. Много поваленных деревьев"},
             {Keys.OrdinaryForest, "Лес как лес. Кроме опавшей листвы не видно ничего интересного"},
             {Keys.Oak, "Старый дуб. Есть большое дупло, кажется, до него можно добраться"},
-            {Keys.Berries, "Смешанный лес. Много кустарника, есть ягоды"},
+            {Keys.Mixed, "Смешанный лес. Много кустарника, есть ягоды"},
             {Keys.Pine, "Преобладает хвоя приятно дышать полной грудью"},
             {Keys.Creek, "Большая удача вы нашли ручей"},
             {Keys.DryRiver, "Засохшее русло высохшей реки" },
@@ -156,7 +163,7 @@ namespace ProceduralQuest
             {Keys.Clearing, "Просіка. Багато повалених дерев"},
             {Keys.OrdinaryForest, "Ліс, як ліс. Крім опалого листя не видно нічого цікавого"},
             {Keys.Oak, "Старий дуб. Є велике дупло, здається, до нього можна дістатися"},
-            {Keys.Berries, "Змішаний ліс. Багато чагарників, є ягоди"},
+            {Keys.Mixed, "Змішаний ліс. Багато чагарників, є ягоди"},
             {Keys.Pine, "Переважає хвоя приємно дихати на повні груди"},
             {Keys.Creek, "Великий успіх ви знайшли струмок"},
             {Keys.DryRiver, "Заросле русло висохлої річки" },
@@ -216,6 +223,5 @@ namespace ProceduralQuest
             }
             return localizedOptions;
         }
-        public static Clothes simpleClothes = new Clothes(Keys.SimpleClothes, 5, 1.5, Keys.SimpleClothesWear, 5, 10);
     }
 }
