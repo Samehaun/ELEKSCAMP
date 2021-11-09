@@ -19,13 +19,10 @@ namespace ELEKSUNI
         Map questMap;
         Player player;
         private List<Keys> availableCommands;
-        public delegate QuestState InputHandler(int input);
-        public InputHandler ProcceedInput;
         private string language;
         public bool IsEnded { get; private set; }
-        private List<string> languages = new List<string>() { "EN", "RU", "UA" };
         QuestState state;
-        private QuestState LocationMainDialog(int input)
+        public QuestState ProceedInput(int input)
         {
             commands[availableCommands[input]].Invoke();
             return state;
@@ -44,58 +41,59 @@ namespace ELEKSUNI
                 { Keys.West, GoWest },
                 { Keys.Travel, Travel},
                 { Keys.Sleep, Sleep},
-                { Keys.Rest, Rest}
+                { Keys.Rest, Rest},
+                { Keys.EN, EN},
+                { Keys.RU, RU},
+                { Keys.UA, UA},
             };
             availableCommands = new List<Keys>();
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
-            ProcceedInput = SetLanguage;
             state.Message = $"Select prefered language:";
-            state.Options = languages;
+            availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
+            state.Options.AddRange(new List<string>() { "EN", "RU", "UA" });
             return state;         
         }
-        private QuestState TravelDialog(int input)
+        private void MainDialog()
         {
-            commands[availableCommands[input]].Invoke();
             if (!questMap.ExitReached)
             {
                 state.PlayerState = Data.StateBuilder(player, language);
+                ResetOptions(questMap.GetPossibleOptions());
             }
             else
             {
                 IsEnded = true;
                 state.PlayerState = null;
                 state.Options = null;
-            }
-            ProcceedInput = LocationMainDialog;
-            return state;
+            }           
         }
-        private QuestState SetLanguage(int input)
+        private void ResetOptions(List<Keys> options)
         {
-            switch (input)
-            {
-                case 0:
-                    language = "EN";
-                    break;
-                case 1:
-                    language = "RU";
-                    break;
-                case 2:
-                    language = "UA";
-                    break;
-                default:
-                    break;
-            }
+            availableCommands.Clear();
+            availableCommands.AddRange(options);
+            state.Options.Clear();
+            state.Options.AddRange(Data.Localize(options, language));
+        }
+        private void Start()
+        {
             string initialMessage = Data.Localize(Keys.InitialMessage, language);
-            ProcceedInput = LocationMainDialog;
             state.Message = $"{ initialMessage } {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
-            state.PlayerState = Data.StateBuilder(player, language);
-            availableCommands.AddRange(questMap.GetPossibleOptions());
-            state.Options = Data.Localize(availableCommands, language);
-            return state;
+            MainDialog();
         }
         private void EN()
         {
-
+            language = "EN";
+            Start();
+        }
+        private void RU()
+        {
+            language = "RU";
+            Start();
+        }
+        private void UA()
+        {
+            language = "UA";
+            Start();
         }
         private void Sleep()
         {
@@ -126,12 +124,12 @@ namespace ELEKSUNI
         }
         private void GoEast()
         {
-            questMap.Go(Keys.South);
+            questMap.Go(Keys.East);
             NewZone();
         }
         private void GoWest()
         {
-            questMap.Go(Keys.South);
+            questMap.Go(Keys.West);
             NewZone();
         }
         private void Travel()
@@ -139,13 +137,11 @@ namespace ELEKSUNI
             if (time.NotNightTime())
             {
                 state.Message = Data.Localize(Keys.DirectionDialogMessage, language);
-                availableCommands.Clear();
-                availableCommands.AddRange(questMap.GetTravelDirections());
-                ProcceedInput = TravelDialog;
+                ResetOptions(questMap.GetTravelDirections());
             }
             else
             {
-                state.Message = Data.Localize(Keys.NightTime, language);
+                state.Message = $"{ Data.Localize(Keys.NightTime, language) } { Environment.NewLine } { Data.Localize(questMap.GetLocationDescription(), language) }";
             }
             state.PlayerState = Data.StateBuilder(player, language);
         }
@@ -153,11 +149,8 @@ namespace ELEKSUNI
         {
             state.Message = $"{ Data.Localize(Keys.NextZone, language) } { Environment.NewLine } { Data.Localize(questMap.GetLocationDescription(), language) }";
             time.ChangeTime(player.CalculateTimeNeededToTravel());
-            availableCommands.Clear();
-            availableCommands.AddRange(questMap.GetPossibleOptions());
             player.RecaculateStateDueToTraveling();
-            state.PlayerState = Data.StateBuilder(player, language);
-            state.Options = Data.Localize(availableCommands, language);
+            MainDialog();
         }
     }
 }

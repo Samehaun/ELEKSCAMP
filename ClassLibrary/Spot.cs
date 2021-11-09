@@ -47,7 +47,6 @@ namespace ELEKSUNI
         {
             List<Keys> options = new List<Keys>();
             options.AddRange(travelDirecionsAvailableFromThisSpot);
-            options.Add(Keys.Cancel);
             return options;
         }
         public List<Keys> GetListOfPossibleOptions()

@@ -130,7 +130,7 @@ namespace ELEKSUNI
         {
             if ((baseSpot != exit) && (nextSpot != exit))
             {
-                if (baseSpot.GetAvailableDirections().Count > 3 && nextSpot.GetAvailableDirections().Count > 3)
+                if (baseSpot.GetAvailableDirections().Count > 2 && nextSpot.GetAvailableDirections().Count > 2)
                 {
                     return true;
                 }
@@ -160,7 +160,7 @@ namespace ELEKSUNI
         public void Go(Keys direction)
         {
             PlayerSpot = GetNearestSpotInDirection(PlayerSpot, direction);
-            if (PlayerSpot == this.exit)
+            if (PlayerSpot == exit)
             {
                 ExitReached = true;
             }

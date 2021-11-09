@@ -20,7 +20,7 @@ namespace ConsoleQuest
             do
             {
                 ShowState(launcher.state);
-                launcher.state = launcher.quest.ProcceedInput(GetInput(launcher.state.Options.Count));
+                launcher.state = launcher.quest.ProceedInput(GetInput(launcher.state.Options.Count));
             } while (!launcher.quest.IsEnded);
             ShowState(launcher.state);
         }
@@ -46,11 +46,6 @@ namespace ConsoleQuest
         {
             Console.Clear();
             Output(state);
-        }
-        private void GameOver(string endMessage)
-        {
-            Console.WriteLine(endMessage);
-            Environment.Exit(0);
         }
         private static void Output(QuestState state)
         {
