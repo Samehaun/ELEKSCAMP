@@ -7,14 +7,12 @@ namespace ELEKSUNI
 {
     public class QuestState
     {
-        public string Message { get; private set; }
-        public string PlayerState { get; private set; }
-        public List<string> Options { get; private set; }
-        public QuestState(string message, string playerState, List<string> options)
+        public string Message { get;  set; }
+        public string PlayerState { get;  set; }
+        public List<string> Options { get; set; }
+        public QuestState()
         {
-            Message = message;
-            PlayerState = playerState;
-            Options = options;
+            Options = new List<string>();
         }
     }
 }

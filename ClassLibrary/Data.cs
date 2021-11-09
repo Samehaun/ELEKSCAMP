@@ -7,6 +7,7 @@ namespace ELEKSUNI
 {
     enum Keys
     {
+        EN, RU, UA,
         Clearing,
         OrdinaryForest,
         Oak,
