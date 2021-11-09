@@ -7,18 +7,20 @@ namespace ELEKSUNI
     {
         private double staminaRegenRate;
         private double stamina;
-        private double speed;
-        public int Coins { get; set; }
+        private double hunger, heat;
+        public Weapon CurrentWeapon { get; set; }
+        public Clothes CurrentClothes { get; set; }
+        public List<Keys> effects { get; private set; }
+        public Inventory inventory;
         public Player(string playerName)
         {
-            this.staminaRegenRate = 3;
-            this.Name = playerName;
-            this.Coins = 0;
-            this.Health = 100;
-            this.Defence = 0;
-            this.speed = (int)MainQuestConfig.BasePlayerSpeed;
-            this.stamina = 100;
-            this.Attack = 0;
+            staminaRegenRate = 3;
+            Name = playerName;
+            Health = 100;
+            stamina = 100;
+            heat = 100;
+            hunger = 0;
+            inventory = new Inventory();
         }
         public double Rest()
         {
@@ -39,7 +41,7 @@ namespace ELEKSUNI
         }
         public double CalculateTimeNeededToTravel()
         {
-            double time = (int)MainQuestConfig.BaseTimeToChangeLocation * ((int)MainQuestConfig.BasePlayerSpeed / speed);
+            double time = (int)MainQuestConfig.BaseTimeToChangeLocation * ( (int)MainQuestConfig.BasePlayerSpeed / Speed() );
             return time;
         }
         public double CalculateStaminaNeededToTravel()
@@ -49,6 +51,20 @@ namespace ELEKSUNI
         public void RecaculateStateDueToTraveling()
         {
             stamina -= CalculateStaminaNeededToTravel();
+        }
+        private double Speed()
+        {
+            double speed = (int)MainQuestConfig.BasePlayerSpeed;
+            double maxWeight = (int)MainQuestConfig.MaxWeigtPlayerCanCarry;
+            if(maxWeight < inventory.Weight)
+            {
+                speed *= Math.Sqrt(maxWeight / inventory.Weight);
+            }
+            return speed;
+        }
+        private void innerStateProcess()
+        {
+
         }
     }
 }

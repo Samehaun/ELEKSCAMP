@@ -8,6 +8,9 @@ namespace ELEKSUNI
     enum Keys
     {
         EN, RU, UA,
+        Bleeding, Poison, Injure, Sturve, Cold,
+        Weight, Coins, Attack, Defence, Equip, Eat, Drop, Drink,
+        Inventory, Buy, Sell, Trade, Search,
         Clearing,
         OrdinaryForest,
         Oak,
@@ -53,6 +56,10 @@ namespace ELEKSUNI
     {
         private static Dictionary<Keys, string> enText = new Dictionary<Keys, string>()
         {
+            {Keys.Coins, "coins" }, {Keys.Weight, "Kg" }, {Keys.Attack, "attack" }, {Keys.Defence, "def" },
+            {Keys.Equip, "Equip" }, {Keys.Drop, "Drop" }, {Keys.Eat, "Eat" }, {Keys.Drink, "Drink" },
+            {Keys.Inventory, "Inventory" }, {Keys.Buy, "Buy" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
+            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "sturving" }, {Keys.Cold, "freeze" },
             {Keys.North, "North"}, {Keys.South, "South"}, {Keys.East, "East"}, {Keys.West, "West"}, {Keys.Rest, "Rest"}, {Keys.Sleep, "Sleep"}, 
             {Keys.NightTime, "Too dark to go"}, {Keys.RestNeeded, "You are falling off your feet. Can't go any further"}, {Keys.NextZone, "You have reached new zone"}, {Keys.DirectionDialogMessage, "Choose direction"},
             {Keys.StaminaRecovered, "You rested a bit"}, {Keys.DayTimeSleep, "Sleep during the day?! What are you going to do at night?"}, {Keys.WakeUp, "You are full of energy"},
@@ -166,11 +173,11 @@ namespace ELEKSUNI
             switch (languageSettings)
             {
                 case "EN":
-                    return $"Player {player.Name} has {player.Coins} and {player.Health}";
+                    return $"Player {player.Name} has {player.Health} hp";
                 case "RU":
-                    return $"У {player.Name} {player.Coins} монет и {player.Health} хп";
+                    return $"У {player.Name} {player.Health} хп";
                 case "UA":
-                    return $"У {player.Name} {player.Coins} монет та {player.Health} хп";
+                    return $"У {player.Name} {player.Health} хп";
                 default:
                     return $"Wrong language settings";
             }

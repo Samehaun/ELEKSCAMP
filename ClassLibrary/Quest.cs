@@ -45,6 +45,10 @@ namespace ELEKSUNI
                 { Keys.EN, EN},
                 { Keys.RU, RU},
                 { Keys.UA, UA},
+                { Keys.Drop, player.inventory.Drop },
+                { Keys.Sell, player.inventory.Sell },
+                { Keys.Buy, player.inventory.Buy },
+                { Keys.Equip, Equip },
             };
             availableCommands = new List<Keys>();
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
@@ -151,6 +155,26 @@ namespace ELEKSUNI
             time.ChangeTime(player.CalculateTimeNeededToTravel());
             player.RecaculateStateDueToTraveling();
             MainDialog();
+        }
+        private void Equip()
+        {
+            if(player.inventory.CurrentItem is Weapon)
+            {
+                player.CurrentWeapon = (Weapon)player.inventory.CurrentItem;
+            }
+            else
+            {
+                player.CurrentClothes = (Clothes)player.inventory.CurrentItem;
+            }
+        }
+        private void Search()
+        {
+            Item newItem = questMap.PlayerSpot.item;
+            if(newItem != null)
+            {
+                player.inventory.Add(newItem);
+                questMap.PlayerSpot.item = null;
+            }
         }
     }
 }
