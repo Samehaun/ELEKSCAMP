@@ -3,37 +3,26 @@ using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
-    public class Item
+    class Item
     {
-        private List<Keys> options;
         public Keys Name { get; }
         public int Price { get; }
-        public double Weight { get; set; }
-        protected string onUseMessage;
-        public string Description { get; }
-        public Item(Keys name, int price, double weight, string description, string useEffect)
+        public double Weight { get; }
+        public Keys Use { get; }
+        public Item(Keys name, int price, double weight, Keys useMethod)
         {
-            this.Name = name;
-            this.Price = price;
-            this.Weight = weight;
-            this.onUseMessage = useEffect;
-            this.Description = description;
-            options = new List<Keys>();
-            options.Add(Keys.Use);
-            options.Add(Keys.Drop);
-            options.Add(Keys.Cancel);
+            Name = name;
+            Price = price;
+            Weight = weight;
+            Use = useMethod;
         }
         public virtual string GetItemSpecs(string language)
         {
             return $" { Data.Localize(Name, language) } { Weight } {Data.Localize(Keys.Weight, language)}";
         }
-        public virtual string UseThisItem()
+        public virtual string GetItemSpecsForTrade(string language)
         {
-            return onUseMessage;
-        }
-        public virtual List<Keys> PossibleActions()
-        {
-            return this.options;
+            return $" { GetItemSpecs(language) } { Price } {Data.Localize(Keys.Coins, language)}";
         }
     }
 }

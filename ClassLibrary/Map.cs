@@ -17,9 +17,8 @@ namespace ELEKSUNI
         };
         private List<Spot> spots;
         private Dictionary<(int x, int y), Spot> map;
-        private DateTime currentTime, night, morning;
         private Player player;
-        private Spot playerSpot;
+        public Spot PlayerSpot { get; private set; }
         private Spot exit;
         public bool ExitReached { get; private set; }
         public Map(Player player)
@@ -28,9 +27,6 @@ namespace ELEKSUNI
             randomizer = new Random(DateTime.Now.Millisecond);
             map = new Dictionary<(int x, int y), Spot>();
             spots = new List<Spot>(prefabs.GetPrefabs());
-            currentTime = DateTime.Today.AddHours(12);
-            night = DateTime.Today.AddHours(21);
-            morning = DateTime.Today.AddHours(6);
             this.player = player;
             CreateNewMap((int)MainQuestConfig.MapSize, player);
             ExitReached = false;
@@ -39,51 +35,17 @@ namespace ELEKSUNI
         {
             map.Add(newSpot.Coordinates, newSpot);
         }
-        public bool NotNightTime()
-        {
-            return ((currentTime.Hour >= morning.Hour) && (currentTime.Hour <= night.Hour));
-        }
         public void SetPlayerLocation((int, int) index)
         {
-            playerSpot = map[index];
+            PlayerSpot = map[index];
         }
         public List<Keys> GetPossibleOptions()
         {
-            return playerSpot.GetListOfPossibleOptions();
-        }
-        public Keys Travel(Keys input)
-        {
-            if (!directionVectors.ContainsKey(input))
-            {
-                return playerSpot.Description;
-            }
-            else if (!NotNightTime())
-            {
-                return Keys.NightTime;
-            }
-            else if (player.GetPlayerStamina() < player.CalculateStaminaNeededToTravel())
-            {
-                return Keys.RestNeeded;
-            }
-            else
-            {
-                playerSpot = GetNearestSpotInDirection(playerSpot, input);
-                ChangeTime(player.CalculateTimeNeededToTravel());
-                player.RecaculateStateDueToTraveling();
-                if (playerSpot == this.exit)
-                {
-                    ExitReached = true;
-                }
-                return Keys.NextZone;
-            }
+            return PlayerSpot.GetListOfPossibleOptions();
         }
         public Keys GetLocationDescription()
         {
-            return playerSpot.Description;
-        }
-        public void ChangeTime(double timeSpent)
-        {
-            this.currentTime = currentTime.AddHours(timeSpent);
+            return PlayerSpot.Description;
         }
         private void CreateNewMap(int mapSize, Player player)
         {
@@ -144,7 +106,7 @@ namespace ELEKSUNI
         private void CreateMaze()
         {
             int mazeWallCounter = 0;
-            while(mazeWallCounter < (int)MainQuestConfig.MapSize * (int)MainQuestConfig.MazeDifficulty)
+            while (mazeWallCounter < (int)MainQuestConfig.MapSize * (int)MainQuestConfig.MazeDifficulty)
             {
                 Spot baseSpot = GetRandomSpotOnTheMap();
                 Keys direction = GetRandomAvailableDirection(baseSpot);
@@ -168,7 +130,7 @@ namespace ELEKSUNI
         {
             if ((baseSpot != exit) && (nextSpot != exit))
             {
-                if (baseSpot.GetAvailableDirections().Count > 3 && nextSpot.GetAvailableDirections().Count > 3)
+                if (baseSpot.GetAvailableDirections().Count > 2 && nextSpot.GetAvailableDirections().Count > 2)
                 {
                     return true;
                 }
@@ -183,19 +145,26 @@ namespace ELEKSUNI
         private void SeparateSpots(Spot baseSpot, Spot nextSpot, Keys direction)
         {
             baseSpot.RemoveAvailableTravelDirection(direction);
-            nextSpot.RemoveAvailableTravelDirection(GetOppositeDirection(direction));     
+            nextSpot.RemoveAvailableTravelDirection(GetOppositeDirection(direction));
         }
         private Keys GetOppositeDirection(Keys direction)
         {
             (int, int) vector = directionVectors[direction];
-            (int, int) inversVector = (vector.Item1 * -1, vector.Item2 * -1);
-            return directionNames[inversVector];
+            (int, int) inverseVector = (vector.Item1 * -1, vector.Item2 * -1);
+            return directionNames[inverseVector];
         }
         public List<Keys> GetTravelDirections()
         {
-            return playerSpot.GetAvailableDirections();
+            return PlayerSpot.GetAvailableDirections();
         }
-
+        public void Go(Keys direction)
+        {
+            PlayerSpot = GetNearestSpotInDirection(PlayerSpot, direction);
+            if (PlayerSpot == exit)
+            {
+                ExitReached = true;
+            }
+        }
 
     }
 }

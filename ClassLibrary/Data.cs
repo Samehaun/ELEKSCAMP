@@ -5,8 +5,12 @@ using System.Threading.Tasks;
 
 namespace ELEKSUNI
 {
-    public enum Keys
+    enum Keys
     {
+        EN, RU, UA,
+        Bleeding, Poison, Injure, Sturve, Cold,
+        Weight, Coins, Attack, Defence, Equip, Eat, Drop, Drink,
+        Inventory, Buy, Sell, Trade, Search,
         Clearing,
         OrdinaryForest,
         Oak,
@@ -46,23 +50,20 @@ namespace ELEKSUNI
         WakeUp,
         Exit,
         Cancel,
-        Travel,
-        Drop,
-        Use,
-        Defence,
-        Weight,
-        Attack,
-        Inventory,
-        Search
+        Travel
     }
     static class Data
     {
         private static Dictionary<Keys, string> enText = new Dictionary<Keys, string>()
         {
-            {Keys.North, "North"}, {Keys.South, "South"}, {Keys.East, "East"}, {Keys.West, "West"}, {Keys.Rest, "Rest"}, {Keys.Sleep, "Sleep"}, 
+            {Keys.Coins, "coins" }, {Keys.Weight, "Kg" }, {Keys.Attack, "attack" }, {Keys.Defence, "def" },
+            {Keys.Equip, "Equip" }, {Keys.Drop, "Drop" }, {Keys.Eat, "Eat" }, {Keys.Drink, "Drink" },
+            {Keys.Inventory, "Inventory" }, {Keys.Buy, "Buy" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
+            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "sturving" }, {Keys.Cold, "freeze" },
+            {Keys.North, "North"}, {Keys.South, "South"}, {Keys.East, "East"}, {Keys.West, "West"}, {Keys.Rest, "Rest"}, {Keys.Sleep, "Sleep"},
             {Keys.NightTime, "Too dark to go"}, {Keys.RestNeeded, "You are falling off your feet. Can't go any further"}, {Keys.NextZone, "You have reached new zone"}, {Keys.DirectionDialogMessage, "Choose direction"},
             {Keys.StaminaRecovered, "You rested a bit"}, {Keys.DayTimeSleep, "Sleep during the day?! What are you going to do at night?"}, {Keys.WakeUp, "You are full of energy"},
-            {Keys.InitialMessage, "You have come to your senses in an unfamiliar place. It is unknown how you got here, but at least you are safe and sound ... for now"}, 
+            {Keys.InitialMessage, "You have come to your senses in an unfamiliar place. It is unknown how you got here, but at least you are safe and sound ... for now"},
             {Keys.Clearing, "Clearing. Many fallen trees"},
             {Keys.OrdinaryForest, "Ordinary forest. Nothing to look at except fallen leaves"},
             {Keys.Oak, "Old oak. There is a big hollow, it seems that you can get to it"},
@@ -87,7 +88,7 @@ namespace ELEKSUNI
             {Keys.Monolith, "Absolutely black monolith. It looks like metal, but warm."},
             {Keys.ThermalSprings, "Thermal springs"},
             {Keys.Exit, "Road! It will lead somewhere. You got out!" },
-            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}, {Keys.Drop, ""}, {Keys.Use, ""}, {Keys.Search, ""}, {Keys.Inventory, ""}, {Keys.Weight, ""}, {Keys.Defence, ""}, {Keys.Attack, ""}
+            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}
         };
         private static Dictionary<Keys, string> ruText = new Dictionary<Keys, string>()
         {
@@ -119,7 +120,7 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно черный монолит. Похоже на металл, но теплый."},
             {Keys.ThermalSprings, "Термальный источник"},
             {Keys.Exit, "Дорога! Куда-то она да приведет. Вы выбрались!" },
-            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"}, {Keys.Drop, ""}, {Keys.Use, ""}
+            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"}
         };
         private static Dictionary<Keys, string> uaText = new Dictionary<Keys, string>()
         {
@@ -151,7 +152,7 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно чорний моноліт. Схоже на метал, але теплий."},
             {Keys.ThermalSprings, "Термальне джерело"},
             {Keys.Exit, "Дорога! Кудись вона та приведе. Ви вибралися!" },
-            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"}, {Keys.Drop, ""}, {Keys.Use, ""}
+            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"}
         };
         public static string Localize(Keys text, string languageSettings)
         {
@@ -172,11 +173,11 @@ namespace ELEKSUNI
             switch (languageSettings)
             {
                 case "EN":
-                    return $"Player {player.Name} has {player.Coins} and {player.Health}";
+                    return $"Player {player.Name} has {player.Health} hp";
                 case "RU":
-                    return $"У {player.Name} {player.Coins} монет и {player.Health} хп";
+                    return $"У {player.Name} {player.Health} хп";
                 case "UA":
-                    return $"У {player.Name} {player.Coins} монет та {player.Health} хп";
+                    return $"У {player.Name} {player.Health} хп";
                 default:
                     return $"Wrong language settings";
             }

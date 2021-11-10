@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
-    enum MainQuestConfig 
+    enum MainQuestConfig
     {
         BasePlayerSpeed = 5,
         BasePlayerStaminaConsuption = 5,
@@ -14,96 +14,167 @@ namespace ELEKSUNI
     }
     public class Quest
     {
-        private Map questMap;
-        private Player player;
-        public delegate QuestState InputHandler(int input);
-        public InputHandler ProcceedInput;
+        Dictionary<Keys, Action> commands;
+        Time time;
+        Map questMap;
+        Player player;
+        private List<Keys> availableCommands;
         private string language;
         public bool IsEnded { get; private set; }
-        private List<string> languages = new List<string>() { "EN", "RU", "UA" };
-        private void Rest()
+        QuestState state;
+        public QuestState ProceedInput(int input)
         {
-            questMap.ChangeTime(player.Rest());
-        }
-        private void Sleep()
-        {
-            questMap.ChangeTime(player.Sleep());
-        }
-        private QuestState LocationMainDialog(int input)
-        {
-            string info;
-            List<Keys> options = questMap.GetPossibleOptions();
-            switch (input)
-            {
-                case 0:
-                    info = Data.Localize(Keys.DirectionDialogMessage, language);
-                    options = questMap.GetTravelDirections();
-                    ProcceedInput = TravelDialog;
-                    break;
-                case 1:
-                    Rest();
-                    info = $"{Data.Localize(Keys.StaminaRecovered, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
-                    break;
-                case 2:
-                    if (questMap.NotNightTime())
-                    {
-                        info = $"{Data.Localize(Keys.DayTimeSleep, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
-                    }
-                    else
-                    {
-                        Sleep();
-                        info = $"{Data.Localize(Keys.WakeUp, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
-                    }
-                    break;
-                default:
-                    info = "incorrect input";
-                    break;
-            }
-            return new QuestState(info, Data.StateBuilder(player, language), Data.Localize(options, language));
+            commands[availableCommands[input]].Invoke();
+            return state;
         }
         public QuestState Start(string name)
         {
             player = new Player(name);
             questMap = new Map(player);
+            time = new Time();
+            state = new QuestState();
+            commands = new Dictionary<Keys, Action>()
+            {
+                { Keys.North, GoNorth },
+                { Keys.South, GoSouth },
+                { Keys.East, GoEast },
+                { Keys.West, GoWest },
+                { Keys.Travel, Travel},
+                { Keys.Sleep, Sleep},
+                { Keys.Rest, Rest},
+                { Keys.EN, EN},
+                { Keys.RU, RU},
+                { Keys.UA, UA},
+                { Keys.Drop, player.inventory.Drop },
+                { Keys.Sell, player.inventory.Sell },
+                { Keys.Buy, player.inventory.Buy },
+                { Keys.Equip, Equip },
+            };
+            availableCommands = new List<Keys>();
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
-            ProcceedInput = SetLanguage;
-            return new QuestState($"Select prefered language:", null, languages);         
+            state.Message = $"Select prefered language:";
+            availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
+            state.Options.AddRange(new List<string>() { "EN", "RU", "UA" });
+            return state;
         }
-        private QuestState TravelDialog(int input)
+        private void MainDialog()
         {
-            string info = $"{ Data.Localize(questMap.Travel(questMap.GetTravelDirections()[input]), language) } {Environment.NewLine} {Data.Localize(questMap.GetLocationDescription(), language)}";
-            ProcceedInput = LocationMainDialog;
             if (!questMap.ExitReached)
             {
-                return new QuestState(info, Data.StateBuilder(player, language), Data.Localize(questMap.GetPossibleOptions(), language));
+                state.PlayerState = Data.StateBuilder(player, language);
+                ResetOptions(questMap.GetPossibleOptions());
             }
             else
             {
                 IsEnded = true;
-                return new QuestState(info, null, null);
+                state.PlayerState = null;
+                state.Options = null;
             }
         }
-        private QuestState SetLanguage(int input)
+        private void ResetOptions(List<Keys> options)
         {
-            switch (input)
-            {
-                case 0:
-                    language = "EN";
-                    break;
-                case 1:
-                    language = "RU";
-                    break;
-                case 2:
-                    language = "UA";
-                    break;
-                default:
-                    break;
-            }
+            availableCommands.Clear();
+            availableCommands.AddRange(options);
+            state.Options.Clear();
+            state.Options.AddRange(Data.Localize(options, language));
+        }
+        private void Start()
+        {
             string initialMessage = Data.Localize(Keys.InitialMessage, language);
-            ProcceedInput = LocationMainDialog;
-            return new QuestState($"{ initialMessage } {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }",
-                Data.StateBuilder(player, language), Data.Localize(questMap.GetPossibleOptions(), language));
+            state.Message = $"{ initialMessage } {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+            MainDialog();
+        }
+        private void EN()
+        {
+            language = "EN";
+            Start();
+        }
+        private void RU()
+        {
+            language = "RU";
+            Start();
+        }
+        private void UA()
+        {
+            language = "UA";
+            Start();
+        }
+        private void Sleep()
+        {
+            if (time.NotNightTime())
+            {
+                state.Message = $"{Data.Localize(Keys.DayTimeSleep, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+            }
+            else
+            {
+                time.ChangeTime(player.Sleep());
+                state.Message = $"{Data.Localize(Keys.WakeUp, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+            }
+        }
+        private void Rest()
+        {
+            time.ChangeTime(player.Rest());
+            state.Message = $"{Data.Localize(Keys.StaminaRecovered, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+        }
+        private void GoNorth()
+        {
+            questMap.Go(Keys.North);
+            NewZone();
+        }
+        private void GoSouth()
+        {
+            questMap.Go(Keys.South);
+            NewZone();
+        }
+        private void GoEast()
+        {
+            questMap.Go(Keys.East);
+            NewZone();
+        }
+        private void GoWest()
+        {
+            questMap.Go(Keys.West);
+            NewZone();
+        }
+        private void Travel()
+        {
+            if (time.NotNightTime())
+            {
+                state.Message = Data.Localize(Keys.DirectionDialogMessage, language);
+                ResetOptions(questMap.GetTravelDirections());
+            }
+            else
+            {
+                state.Message = $"{ Data.Localize(Keys.NightTime, language) } { Environment.NewLine } { Data.Localize(questMap.GetLocationDescription(), language) }";
+            }
+            state.PlayerState = Data.StateBuilder(player, language);
+        }
+        private void NewZone()
+        {
+            state.Message = $"{ Data.Localize(Keys.NextZone, language) } { Environment.NewLine } { Data.Localize(questMap.GetLocationDescription(), language) }";
+            time.ChangeTime(player.CalculateTimeNeededToTravel());
+            player.RecaculateStateDueToTraveling();
+            MainDialog();
+        }
+        private void Equip()
+        {
+            if (player.inventory.CurrentItem is Weapon)
+            {
+                player.CurrentWeapon = (Weapon)player.inventory.CurrentItem;
+            }
+            else
+            {
+                player.CurrentClothes = (Clothes)player.inventory.CurrentItem;
+            }
+        }
+        private void Search()
+        {
+            Item newItem = questMap.PlayerSpot.item;
+            if (newItem != null)
+            {
+                player.inventory.Add(newItem);
+                questMap.PlayerSpot.item = null;
+            }
         }
     }
-
 }

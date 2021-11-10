@@ -1,18 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace ELEKSUNI
 {
-    public class Clothes : Item
+    class Clothes : Item
     {
-        public int Warmth { get; set; }
-        public int Defence { get; set; }
-        public Clothes(Keys name, int warmth, int defence, int price, double weight, string description, string useEffect) : base(name, price, weight, description, useEffect)
+        public int Defence { get; private set; }
+        public int Warmth { get; private set; }
+        public Clothes(Keys name, int price, double weight, Keys useMethod, int deffence, int warmth) : base(name, price, weight, useMethod)
         {
-            this.Warmth = warmth;
-            this.Defence = defence;
+            Defence = deffence;
+            Warmth = warmth;
         }
         public override string GetItemSpecs(string language)
         {
-            return $" { Data.Localize(Name, language) } {Defence} {Data.Localize(Keys.Defence, language)} { Weight } {Data.Localize(Keys.Weight, language)}";
+            return $" { Data.Localize(Name, language) } { Defence } { Data.Localize(Keys.Defence, language) } { Weight } { Data.Localize(Keys.Weight, language) }";
+        }
+        public override string GetItemSpecsForTrade(string language)
+        {
+            return $" { GetItemSpecs(language) } { Price } { Data.Localize(Keys.Coins, language) }";
         }
     }
 }
