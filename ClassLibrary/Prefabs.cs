@@ -4,6 +4,8 @@ namespace ELEKSUNI
 {
     class Prefabs
     {
+        public Clothes simpleClothes = new Clothes(Keys.SimpleClothes, 5, 2, Keys.Equip, 0, 10);
+        public Clothes heavyClothes = new Clothes(Keys.HeavyClothes, 40, 3.5, Keys.Equip, 20, 30);
         private List<Spot> spots;
         public List<Spot> GetPrefabs()
         {

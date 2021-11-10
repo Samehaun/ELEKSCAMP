@@ -28,6 +28,8 @@ namespace ELEKSUNI
             map = new Dictionary<(int x, int y), Spot>();
             spots = new List<Spot>(prefabs.GetPrefabs());
             this.player = player;
+            player.inventory.Add(prefabs.simpleClothes);
+            player.CurrentClothes = prefabs.simpleClothes;
             CreateNewMap((int)MainQuestConfig.MapSize, player);
             ExitReached = false;
         }

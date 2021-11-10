@@ -7,7 +7,7 @@ namespace ELEKSUNI
     {
         private double staminaRegenRate;
         private double stamina;
-        private double hunger, heat;
+        private double hunger;
         public string Name { get; private set; }
         public int Health { get; private set; }
         public Weapon CurrentWeapon { get; set; }
@@ -21,7 +21,6 @@ namespace ELEKSUNI
             Name = playerName;
             Health = 100;
             stamina = 100;
-            heat = 100;
             hunger = 0;
             inventory = new Inventory();
         }

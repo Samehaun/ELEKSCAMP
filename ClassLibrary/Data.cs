@@ -7,6 +7,7 @@ namespace ELEKSUNI
 {
     enum Keys
     {
+        SimpleClothes, HeavyClothes,
         EN, RU, UA, Equiped,
         Bleeding, Poison, Injure, Sturve, Cold,
         Weight, Coins, Attack, Defence, Equip, Eat, Drop, Drink,
@@ -56,6 +57,8 @@ namespace ELEKSUNI
     {
         private static Dictionary<Keys, string> enText = new Dictionary<Keys, string>()
         {
+            {Keys.Equiped, "Equiped" },
+            {Keys.SimpleClothes, "Simple clothes" }, {Keys.HeavyClothes, "Heavy clothes" },
             {Keys.Coins, "coins" }, {Keys.Weight, "Kg" }, {Keys.Attack, "attack" }, {Keys.Defence, "def" },
             {Keys.Equip, "Equip" }, {Keys.Drop, "Drop" }, {Keys.Eat, "Eat" }, {Keys.Drink, "Drink" },
             {Keys.Inventory, "Inventory" }, {Keys.Buy, "Buy" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
@@ -92,6 +95,12 @@ namespace ELEKSUNI
         };
         private static Dictionary<Keys, string> ruText = new Dictionary<Keys, string>()
         {
+            {Keys.Equiped, "Эипировано" },
+            {Keys.SimpleClothes, "Простая одежда" }, {Keys.HeavyClothes, "Теплая одежда" },
+            {Keys.Coins, "монет" }, {Keys.Weight, "Кг" }, {Keys.Attack, "атака" }, {Keys.Defence, "защита" },
+            {Keys.Equip, "Надть" }, {Keys.Drop, "Выбросить" }, {Keys.Eat, "Съесть" }, {Keys.Drink, "Выпить" },
+            {Keys.Inventory, "Инвентарь" }, {Keys.Buy, "Купить" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
+            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "sturving" }, {Keys.Cold, "freeze" },
             {Keys.North, "Север"}, {Keys.South, "Юг"}, {Keys.East, "Восток"}, {Keys.West, "Запад"}, {Keys.Rest, "Отдыхать"}, {Keys.Sleep, "Спать"},
             {Keys.NightTime, "Слишком темно чтобы идти"}, {Keys.RestNeeded, "Вы слишком устали, нужен отдых"}, {Keys.NextZone, "Вы благополучно добрались до следующей зоны"}, {Keys.DirectionDialogMessage, "Выберите направление"},
             {Keys.StaminaRecovered, "Вы немного отдохнули"}, {Keys.DayTimeSleep, "Спать днем?! А что собираетесь делать ночью?"}, {Keys.WakeUp, "Вы полны энергии"},
@@ -124,6 +133,12 @@ namespace ELEKSUNI
         };
         private static Dictionary<Keys, string> uaText = new Dictionary<Keys, string>()
         {
+            {Keys.Equiped, "Equiped" },
+            {Keys.SimpleClothes, "Simple clothes" }, {Keys.HeavyClothes, "Heavy clothes" },
+            {Keys.Coins, "coins" }, {Keys.Weight, "Kg" }, {Keys.Attack, "attack" }, {Keys.Defence, "def" },
+            {Keys.Equip, "Equip" }, {Keys.Drop, "Drop" }, {Keys.Eat, "Eat" }, {Keys.Drink, "Drink" },
+            {Keys.Inventory, "Inventory" }, {Keys.Buy, "Buy" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
+            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "sturving" }, {Keys.Cold, "freeze" },
             {Keys.North, "Північ"}, {Keys.South, "Південь"}, {Keys.East, "Схід"}, {Keys.West, "Захід"}, {Keys.Rest, "Відпочити"}, {Keys.Sleep, "Спати"},
             {Keys.NightTime, "Занадто темно задля подорожі"}, {Keys.RestNeeded, "Ви надто втомилися, потрібен відпочинок"}, {Keys.NextZone, "Ви дісталися наступної зони"}, {Keys.DirectionDialogMessage, "Оберіть напрямок"},
             {Keys.StaminaRecovered, "Ви трохи відпочили"}, {Keys.DayTimeSleep, "Спати вдень?! А що збираєтесь робити вночі?"}, {Keys.WakeUp, "Ви сповнені сил"},

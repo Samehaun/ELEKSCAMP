@@ -31,10 +31,11 @@ namespace ELEKSUNI
         }
         public QuestState InventoryDialog(int input)
         {
-
-
-
-
+            if(input == state.Options.Count - 1)
+            {
+                state.Message = Data.Localize(questMap.GetLocationDescription(), language);
+                MainDialog();
+            }
             return state;
         }
         public QuestState Start(string name)
@@ -83,6 +84,7 @@ namespace ELEKSUNI
                 state.PlayerState = null;
                 state.Options = null;
             }
+            ProceedInput = NonInventoryDialog;
         }
         private void ResetOptions(List<Keys> options)
         {
@@ -213,8 +215,8 @@ namespace ELEKSUNI
                 {
                     inventory.Add(item.GetItemSpecs(language));
                 }
-
             }
+            inventory.Add(Data.Localize(Keys.Cancel, language));
             ResetOptions(inventory);
             ProceedInput = InventoryDialog;
         }
