@@ -35,7 +35,7 @@ namespace WebQuest.Pages
         {
             this.id = id;
             quest = ActiveQuests.quests[id];
-            state = quest.ProcceedInput(selectedOptionId);
+            state = quest.ProceedInput(selectedOptionId);
             Message = state.Message;
             PlayerState = state.PlayerState;
             Options = state.Options;

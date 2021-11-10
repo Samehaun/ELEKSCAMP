@@ -22,9 +22,19 @@ namespace ELEKSUNI
         private string language;
         public bool IsEnded { get; private set; }
         QuestState state;
-        public QuestState ProceedInput(int input)
+        public delegate QuestState InputHandler(int input);
+        public InputHandler ProceedInput;
+        public QuestState NonInventoryDialog(int input)
         {
             commands[availableCommands[input]].Invoke();
+            return state;
+        }
+        public QuestState InventoryDialog(int input)
+        {
+
+
+
+
             return state;
         }
         public QuestState Start(string name)
@@ -49,12 +59,15 @@ namespace ELEKSUNI
                 { Keys.Sell, player.inventory.Sell },
                 { Keys.Buy, player.inventory.Buy },
                 { Keys.Equip, Equip },
+                { Keys.Search, Search },
+                { Keys.Inventory, ShowInventory }
             };
             availableCommands = new List<Keys>();
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
             state.Message = $"Select prefered language:";
             availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
             state.Options.AddRange(new List<string>() { "EN", "RU", "UA" });
+            ProceedInput = NonInventoryDialog;
             return state;
         }
         private void MainDialog()
@@ -77,6 +90,11 @@ namespace ELEKSUNI
             availableCommands.AddRange(options);
             state.Options.Clear();
             state.Options.AddRange(Data.Localize(options, language));
+        }
+        private void ResetOptions(List<string> options)
+        {
+            state.Options.Clear();
+            state.Options.AddRange(options);
         }
         private void Start()
         {
@@ -109,12 +127,14 @@ namespace ELEKSUNI
             {
                 time.ChangeTime(player.Sleep());
                 state.Message = $"{Data.Localize(Keys.WakeUp, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+                state.PlayerState = Data.StateBuilder(player, language);
             }
         }
         private void Rest()
         {
             time.ChangeTime(player.Rest());
             state.Message = $"{Data.Localize(Keys.StaminaRecovered, language)} {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+            state.PlayerState = Data.StateBuilder(player, language);
         }
         private void GoNorth()
         {
@@ -147,7 +167,6 @@ namespace ELEKSUNI
             {
                 state.Message = $"{ Data.Localize(Keys.NightTime, language) } { Environment.NewLine } { Data.Localize(questMap.GetLocationDescription(), language) }";
             }
-            state.PlayerState = Data.StateBuilder(player, language);
         }
         private void NewZone()
         {
@@ -175,6 +194,29 @@ namespace ELEKSUNI
                 player.inventory.Add(newItem);
                 questMap.PlayerSpot.item = null;
             }
+        }
+        private void Select(int input)
+        {
+            player.inventory.CurrentItem = player.inventory.Items[input];
+        }
+        private void ShowInventory()
+        {
+            state.Message = Data.Localize(Keys.Inventory, language);
+            List<string> inventory = new List<string>();
+            foreach (var item in player.inventory.Items)
+            {
+                if(item == player.CurrentClothes || item == player.CurrentWeapon)
+                {
+                    inventory.Add($"{ item.GetItemSpecs(language) } *{Data.Localize(Keys.Equiped, language)}*");
+                }
+                else
+                {
+                    inventory.Add(item.GetItemSpecs(language));
+                }
+
+            }
+            ResetOptions(inventory);
+            ProceedInput = InventoryDialog;
         }
     }
 }

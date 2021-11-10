@@ -58,7 +58,6 @@ namespace ELEKSUNI
             posibilities.Add(Keys.Travel);
             posibilities.Add(Keys.Rest);
             posibilities.Add(Keys.Sleep);
-            posibilities.Add(Keys.Search);
             return posibilities;
         }
         public void RemoveAvailableTravelDirection(Keys direction)

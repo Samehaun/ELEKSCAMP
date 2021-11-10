@@ -7,7 +7,7 @@ namespace ELEKSUNI
 {
     enum Keys
     {
-        EN, RU, UA,
+        EN, RU, UA, Equiped,
         Bleeding, Poison, Injure, Sturve, Cold,
         Weight, Coins, Attack, Defence, Equip, Eat, Drop, Drink,
         Inventory, Buy, Sell, Trade, Search,

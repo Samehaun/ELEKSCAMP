@@ -9,20 +9,20 @@ namespace ELEKSUNI
         public double Weight { get; private set; }
         public int Coins { get; private set; }
         public Item CurrentItem { get; set; }
-        private List<Item> items;
+        public List<Item> Items { get; private set; }
         public Inventory()
         {
             Weight = 0;
             Coins = 0;
-            items = new List<Item>();
+            Items = new List<Item>();
         }
         public Inventory(List<Item> items) : this()
         {
-            this.items = items;
+            this.Items.AddRange(items);
         }
         public void Drop()
         {
-            items.Remove(CurrentItem);
+            Items.Remove(CurrentItem);
             Weight -= CurrentItem.Weight;
             CurrentItem = null;
         }
@@ -33,17 +33,13 @@ namespace ELEKSUNI
         }
         public void Add(Item newItem)
         {
-            items.Add(newItem);
+            Items.Add(newItem);
             Weight += newItem.Weight;
         }
         public void Buy()
         {
             Coins -= CurrentItem.Price;
-            items.Add(CurrentItem);
-        }
-        public void Show()
-        {
-
+            Items.Add(CurrentItem);
         }
     }
 }
