@@ -65,7 +65,7 @@ namespace ELEKSUNI
         private double Speed()
         {
             double speed = (int)MainQuestConfig.BasePlayerSpeed;
-            double maxWeight = (int)MainQuestConfig.MaxWeigtPlayerCanCarry;
+            double maxWeight = (int)MainQuestConfig.MaxWeightPlayerCanCarry;
             if (maxWeight < inventory.Weight)
             {
                 speed *= Math.Sqrt(maxWeight / inventory.Weight);

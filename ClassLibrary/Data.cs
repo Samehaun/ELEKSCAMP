@@ -51,18 +51,19 @@ namespace ELEKSUNI
         WakeUp,
         Exit,
         Cancel,
-        Travel
+        Travel,
+        Death
     }
     static class Data
     {
         private static Dictionary<Keys, string> enText = new Dictionary<Keys, string>()
         {
-            {Keys.Equiped, "Equiped" },
+            {Keys.Equiped, "Equipped" },
             {Keys.SimpleClothes, "Simple clothes" }, {Keys.HeavyClothes, "Heavy clothes" },
             {Keys.Coins, "coins" }, {Keys.Weight, "Kg" }, {Keys.Attack, "attack" }, {Keys.Defence, "def" },
-            {Keys.Equip, "Equip" }, {Keys.Drop, "Drop" }, {Keys.Eat, "Eat" }, {Keys.Drink, "Drink" },
+            {Keys.Equip, "Equip" }, {Keys.Drop, "Drop" }, {Keys.Eat, "Eat" }, {Keys.Drink, "Drink" }, 
             {Keys.Inventory, "Inventory" }, {Keys.Buy, "Buy" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
-            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "sturving" }, {Keys.Cold, "freeze" },
+            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "starving" }, {Keys.Cold, "freeze" },
             {Keys.North, "North"}, {Keys.South, "South"}, {Keys.East, "East"}, {Keys.West, "West"}, {Keys.Rest, "Rest"}, {Keys.Sleep, "Sleep"},
             {Keys.NightTime, "Too dark to go"}, {Keys.RestNeeded, "You are falling off your feet. Can't go any further"}, {Keys.NextZone, "You have reached new zone"}, {Keys.DirectionDialogMessage, "Choose direction"},
             {Keys.StaminaRecovered, "You rested a bit"}, {Keys.DayTimeSleep, "Sleep during the day?! What are you going to do at night?"}, {Keys.WakeUp, "You are full of energy"},
@@ -91,16 +92,17 @@ namespace ELEKSUNI
             {Keys.Monolith, "Absolutely black monolith. It looks like metal, but warm."},
             {Keys.ThermalSprings, "Thermal springs"},
             {Keys.Exit, "Road! It will lead somewhere. You got out!" },
-            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"}
+            {Keys.Cancel, "Cancel" }, {Keys.Travel, "Walk"},
+            {Keys.Death, "You didn't managed to survive" }
         };
         private static Dictionary<Keys, string> ruText = new Dictionary<Keys, string>()
         {
             {Keys.Equiped, "Эипировано" },
             {Keys.SimpleClothes, "Простая одежда" }, {Keys.HeavyClothes, "Теплая одежда" },
             {Keys.Coins, "монет" }, {Keys.Weight, "Кг" }, {Keys.Attack, "атака" }, {Keys.Defence, "защита" },
-            {Keys.Equip, "Надть" }, {Keys.Drop, "Выбросить" }, {Keys.Eat, "Съесть" }, {Keys.Drink, "Выпить" },
-            {Keys.Inventory, "Инвентарь" }, {Keys.Buy, "Купить" }, {Keys.Sell, "Sell" }, {Keys.Trade, "Trade" }, {Keys.Search, "Search" },
-            {Keys.Bleeding, "bleeding" }, {Keys.Poison, "poisoned" }, {Keys.Injure, "injured" }, {Keys.Sturve, "sturving" }, {Keys.Cold, "freeze" },
+            {Keys.Equip, "Экипировать" }, {Keys.Drop, "Выбросить" }, {Keys.Eat, "Съесть" }, {Keys.Drink, "Выпить" },
+            {Keys.Inventory, "Инвентарь" }, {Keys.Buy, "Купить" }, {Keys.Sell, "Продать" }, {Keys.Trade, "Торговать" }, {Keys.Search, "Обследовать" },
+            {Keys.Bleeding, "кровотечение" }, {Keys.Poison, "отравление" }, {Keys.Injure, "травма" }, {Keys.Sturve, "голод" }, {Keys.Cold, "обморожение" },
             {Keys.North, "Север"}, {Keys.South, "Юг"}, {Keys.East, "Восток"}, {Keys.West, "Запад"}, {Keys.Rest, "Отдыхать"}, {Keys.Sleep, "Спать"},
             {Keys.NightTime, "Слишком темно чтобы идти"}, {Keys.RestNeeded, "Вы слишком устали, нужен отдых"}, {Keys.NextZone, "Вы благополучно добрались до следующей зоны"}, {Keys.DirectionDialogMessage, "Выберите направление"},
             {Keys.StaminaRecovered, "Вы немного отдохнули"}, {Keys.DayTimeSleep, "Спать днем?! А что собираетесь делать ночью?"}, {Keys.WakeUp, "Вы полны энергии"},
@@ -129,7 +131,8 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно черный монолит. Похоже на металл, но теплый."},
             {Keys.ThermalSprings, "Термальный источник"},
             {Keys.Exit, "Дорога! Куда-то она да приведет. Вы выбрались!" },
-            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"}
+            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"},
+            {Keys.Death, "You didn't managed to survive" }
         };
         private static Dictionary<Keys, string> uaText = new Dictionary<Keys, string>()
         {
@@ -167,7 +170,8 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно чорний моноліт. Схоже на метал, але теплий."},
             {Keys.ThermalSprings, "Термальне джерело"},
             {Keys.Exit, "Дорога! Кудись вона та приведе. Ви вибралися!" },
-            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"}
+            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"},
+            {Keys.Death, "You didn't managed to survive" }
         };
         public static string Localize(Keys text, string languageSettings)
         {
