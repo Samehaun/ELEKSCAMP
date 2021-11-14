@@ -7,6 +7,12 @@ namespace ELEKSUNI
 {
     enum Keys
     {
+        Remains,
+        Witch, Forester, Leprechaun, Wolf, Bear,
+        Steal, Fight, Run,
+        Found, NotFound,
+        Trap, HornetNest, Cure, Bondage,
+        CurePoison, StopBleeding,
         SimpleClothes, HeavyClothes,
         EN, RU, UA, Equiped,
         Bleeding, Poison, Injure, Sturve, Cold,
@@ -58,6 +64,13 @@ namespace ELEKSUNI
     {
         private static Dictionary<Keys, string> enText = new Dictionary<Keys, string>()
         {
+            {Keys.Remains, "You have " }
+            {Keys.Found, "Steal"}, {Keys.Fight, "Fight"}, {Keys.Run, "Run"},
+            {Keys.Found, "You have found "}, {Keys.NotFound, "You didn't find anything interesting"},
+            {Keys.Trap, "You have triggered a trap! Managed to get out but injured"}, 
+            {Keys.HornetNest, "Ouch! You disturebed a hornet nest got a lot of stings"}, 
+            {Keys.Cure, "Botle of strong antidote"},{Keys.Bondage, "Bondage"},
+            {Keys.CurePoison, "You are feeling better"},{Keys.StopBleeding, "It still hurts, but bleeding is stoped"},
             {Keys.Equiped, "Equipped" },
             {Keys.SimpleClothes, "Simple clothes" }, {Keys.HeavyClothes, "Heavy clothes" },
             {Keys.Coins, "coins" }, {Keys.Weight, "Kg" }, {Keys.Attack, "attack" }, {Keys.Defence, "def" },

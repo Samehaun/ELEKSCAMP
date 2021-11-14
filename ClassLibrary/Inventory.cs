@@ -40,6 +40,7 @@ namespace ELEKSUNI
         {
             Coins -= CurrentItem.Price;
             Items.Add(CurrentItem);
+            CurrentItem = null;
         }
     }
 }

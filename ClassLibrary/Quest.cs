@@ -25,34 +25,6 @@ namespace ELEKSUNI
         public delegate QuestState InputHandler(int input);
         public InputHandler ProceedInput;
         private Stack<Action> menuCallChain;
-        private void StartHandlingIntInput()
-        {
-            string initialMessage = Data.Localize(Keys.InitialMessage, language);
-            state.Message = $"{ initialMessage } {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
-            menuCallChain = new Stack<Action>();
-            LaunchMainDialog();
-        }
-        public QuestState NonInventoryDialogInputHandler(int input)
-        {
-            commands[availableCommands[input]].Invoke();
-            return state;
-        }
-        public QuestState OpenInventoryDialogInputHandler(int input)
-        {
-            if(input == state.Options.Count - 1)
-            {
-                state.Message = Data.Localize(questMap.GetLocationDescription(), language);
-                Cancel();
-            }
-            else
-            {
-                Select(input);
-                ResetAvailableOptions(new List<Keys>() { { player.inventory.CurrentItem.Use }, { Keys.Drop }, { Keys.Cancel } });
-                menuCallChain.Push(LaunchOpenInventoryDialog);
-                ProceedInput = NonInventoryDialogInputHandler;
-            }
-            return state;
-        }
         public QuestState Start(string name)
         {
             player = new Player(name);
@@ -72,15 +44,17 @@ namespace ELEKSUNI
                 { Keys.RU, SetRussianAsQuestLanguage},
                 { Keys.UA, SetUkrainianAsQuestLanguage},
                 { Keys.Drop, DropSelectedItem },
-                { Keys.Sell, player.inventory.Sell },
-                { Keys.Buy, player.inventory.Buy },
                 { Keys.Equip, Equip },
                 { Keys.Search, SearchSpotForHiddenItem },
                 { Keys.Inventory, LaunchOpenInventoryDialog },
                 { Keys.Cancel, Cancel },
+                { Keys.Trade, LaunchTradeDialog },
+                { Keys.Sell, LaunchSellDialog },
+                { Keys.Buy, LaunchBuyDialog },
                 { Keys.Eat, Eat },
-                { Keys.Drink, Drink }
-
+                { Keys.Drink, Drink },
+                { Keys.Fight, Fight },
+                { Keys.Drink, Run }
             };
             availableCommands = new List<Keys>();
             questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
@@ -90,9 +64,59 @@ namespace ELEKSUNI
             ProceedInput = NonInventoryDialogInputHandler;
             return state;
         }
-        private void Cancel()
+        private void StartHandlingIntInput()
         {
-            menuCallChain.Pop().Invoke();
+            string initialMessage = Data.Localize(Keys.InitialMessage, language);
+            state.Message = $"{ initialMessage } {Environment.NewLine} { Data.Localize(questMap.GetLocationDescription(), language) }";
+            menuCallChain = new Stack<Action>();
+            LaunchMainDialog();
+        }
+        public QuestState NonInventoryDialogInputHandler(int input)
+        {
+            commands[availableCommands[input]].Invoke();
+            return state;
+        }
+        public QuestState OpenInventoryDialogInputHandler(int input)
+        {
+            if (input == state.Options.Count - 1)
+            {
+                state.Message = Data.Localize(Keys.Trade, language);
+                Cancel();
+            }
+            else
+            {
+                SelectItemInPlayerInventory(input);
+                ResetAvailableOptions(new List<Keys>() { { player.inventory.CurrentItem.Use }, { Keys.Drop }, { Keys.Cancel } });
+                menuCallChain.Push(LaunchOpenInventoryDialog);
+                ProceedInput = NonInventoryDialogInputHandler;
+            }
+            return state;
+        }
+        public QuestState SellDialogInputHandler(int input)
+        {
+            if (input == state.Options.Count - 1)
+            {
+                state.Message = Data.Localize(Keys.Trade, language);
+                Cancel();
+            }
+            else
+            {
+                Sell(input);
+            }
+            return state;
+        }
+        public QuestState BuyDialogInputHandler(int input)
+        {
+            if (input == state.Options.Count - 1)
+            {
+                state.Message = Data.Localize(Keys.Trade, language);
+                Cancel();
+            }
+            else
+            {
+                TryPurchase(input);
+            }
+            return state;
         }
         private void LaunchMainDialog()
         {
@@ -101,7 +125,7 @@ namespace ELEKSUNI
                 state.PlayerState = Data.StateBuilder(player, language);
                 ResetAvailableOptions(questMap.GetPossibleOptions());
             }
-            else if(player.Health <= 0)
+            else if (player.Health <= 0)
             {
                 Loss();
             }
@@ -111,17 +135,6 @@ namespace ELEKSUNI
             }
             ResetMenuCallsChain();
             ProceedInput = NonInventoryDialogInputHandler;
-        }
-        private void EndQuest()
-        {
-            IsEnded = true;
-            state.PlayerState = null;
-            state.Options = null;
-        }
-        private void Loss()
-        {
-            state.Message = Data.Localize(Keys.Death, language);
-            EndQuest();
         }
         private void LaunchTravelDialog()
         {
@@ -154,6 +167,84 @@ namespace ELEKSUNI
             itemsDescriptions.Add(Data.Localize(Keys.Cancel, language));
             ResetAvailableOptions(itemsDescriptions);
             ProceedInput = OpenInventoryDialogInputHandler;
+        }
+        private void LaunchNpcDialog()
+        {
+            state.Message = Data.Localize(questMap.PlayerSpot.npc.Name, language);
+            ResetAvailableOptions(questMap.PlayerSpot.npc.GetListOfPossibleOptions());
+        }
+        private void LaunchTradeDialog()
+        {
+            state.Message = Data.Localize(questMap.PlayerSpot.npc.Name, language);
+            ResetAvailableOptions(new List<Keys>() { Keys.Sell, Keys.Buy, Keys.Cancel });
+            menuCallChain.Push(LaunchNpcDialog);
+        }
+        private void LaunchSellDialog()
+        {
+            menuCallChain.Push(LaunchTradeDialog);
+            state.Message = Data.Localize(Keys.Sell, language);
+            List<string> itemsDescriptions = new List<string>();
+            foreach (var item in player.inventory.Items)
+            {
+                if (item == player.CurrentClothes || item == player.CurrentWeapon)
+                {
+                    itemsDescriptions.Add($"{ item.GetItemSpecsForTrade(language) } *{Data.Localize(Keys.Equiped, language)}*");
+                }
+                else
+                {
+                    itemsDescriptions.Add(item.GetItemSpecsForTrade(language));
+                }
+            }
+            state.PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.inventory.Coins } { Data.Localize(Keys.Coins, language) }";
+            itemsDescriptions.Add(Data.Localize(Keys.Cancel, language));
+            ResetAvailableOptions(itemsDescriptions);
+            ProceedInput = SellDialogInputHandler;
+        }
+        private void LaunchBuyDialog()
+        {
+            menuCallChain.Push(LaunchTradeDialog);
+            state.Message = Data.Localize(Keys.Buy, language);
+            List<string> itemsDescriptions = new List<string>();
+            foreach (var item in questMap.PlayerSpot.npc.inventory.Items)
+            {
+                itemsDescriptions.Add(item.GetItemSpecsForTrade(language));
+            }
+            state.PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.inventory.Coins } { Data.Localize(Keys.Coins, language) }";
+            itemsDescriptions.Add(Data.Localize(Keys.Cancel, language));
+            ResetAvailableOptions(itemsDescriptions);
+            ProceedInput = BuyDialogInputHandler;
+        }
+        private void EndQuest()
+        {
+            IsEnded = true;
+            state.PlayerState = null;
+            state.Options = null;
+        }
+        private void Loss()
+        {
+            state.Message = Data.Localize(Keys.Death, language);
+            EndQuest();
+        }
+        private void Sell(int input)
+        {
+            SelectItemInPlayerInventory(input);
+            UnequipSelectedItem();
+            player.inventory.Sell();
+            LaunchSellDialog();
+        }
+        private void TryPurchase(int input)
+        {
+            SelectItemInNpcInventory(input);
+            if (player.inventory.Coins >= player.inventory.CurrentItem.Price)
+            {
+                questMap.PlayerSpot.npc.inventory.Items.Remove(player.inventory.CurrentItem);
+                player.inventory.Buy();
+                LaunchBuyDialog();
+            }
+        }
+        private void Cancel()
+        {
+            menuCallChain.Pop().Invoke();
         }
         private void ResetMenuCallsChain()
         {
@@ -225,7 +316,7 @@ namespace ELEKSUNI
         {
             questMap.Go(Keys.West);
             PlayerReachedNewZone();
-        }  
+        }
         private void Equip()
         {
             if (player.inventory.CurrentItem is Weapon)
@@ -252,17 +343,41 @@ namespace ELEKSUNI
             {
                 player.inventory.Add(newItem);
                 questMap.PlayerSpot.item = null;
+                state.Message = $"{ Data.Localize(Keys.Found, language) } {Data.Localize(Keys.SimpleClothes, language)}";
             }
+            else
+            {
+                state.Message = $" {Data.Localize(Keys.NotFound, language)}";
+            }
+            time.ChangeTime(1);
+            player.RecaculateStateDueToTraveling();
+            LaunchMainDialog();
         }
-        private void Select(int input)
+        private void SelectItemInPlayerInventory(int input)
         {
             player.inventory.CurrentItem = player.inventory.Items[input];
             state.PlayerState = state.Options[input];
         }
+        private void SelectItemInNpcInventory(int input)
+        {
+            player.inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
+        }
         private void DropSelectedItem()
         {
+            UnequipSelectedItem();
             player.inventory.Drop();
             Cancel();
+        }
+        private void UnequipSelectedItem()
+        {
+            if (player.CurrentClothes == player.inventory.CurrentItem)
+            {
+                player.CurrentClothes = null;
+            }
+            else if (player.CurrentWeapon == player.inventory.CurrentItem)
+            {
+                player.CurrentWeapon = null;
+            }
         }
         private void Eat()
         {
