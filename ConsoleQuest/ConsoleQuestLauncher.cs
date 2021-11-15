@@ -50,9 +50,9 @@ namespace ConsoleQuest
         private static void Output(QuestState state)
         {
             Console.WriteLine(state.Message);
-            if (state.PlayerState != null)
+            if (state.PlayerStateOrAdditionalInformation != null)
             {
-                Console.WriteLine(state.PlayerState);
+                Console.WriteLine(state.PlayerStateOrAdditionalInformation);
             }
             if (state.Options != null)
             {

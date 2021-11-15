@@ -26,7 +26,7 @@ namespace WebQuest.Pages
             quest = new Quest();
             state = quest.Start(name);
             Message = state.Message;
-            PlayerState = state.PlayerState;
+            PlayerState = state.PlayerStateOrAdditionalInformation;
             Options = state.Options;
             id = Guid.NewGuid();
             ActiveQuests.quests.Add(id, quest);
@@ -37,7 +37,7 @@ namespace WebQuest.Pages
             quest = ActiveQuests.quests[id];
             state = quest.ProceedInput(selectedOptionId);
             Message = state.Message;
-            PlayerState = state.PlayerState;
+            PlayerState = state.PlayerStateOrAdditionalInformation;
             Options = state.Options;
         }
     }

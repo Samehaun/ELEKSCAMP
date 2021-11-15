@@ -8,7 +8,7 @@ namespace ELEKSUNI
     public class QuestState
     {
         public string Message { get; set; }
-        public string PlayerState { get; set; }
+        public string PlayerStateOrAdditionalInformation { get; set; }
         public List<string> Options { get; set; }
         public QuestState()
         {

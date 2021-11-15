@@ -11,7 +11,7 @@ namespace QuestTesting
         {
             Quest quest = new Quest();
             var result = quest.Start("Test");
-            Assert.Null(result.PlayerState);
+            Assert.Null(result.PlayerStateOrAdditionalInformation);
         }
     }
 }
