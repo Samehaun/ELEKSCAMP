@@ -32,7 +32,7 @@ namespace ELEKSUNI
                 stamina += CalculateStaminaNeededToTravel();
             }
             hungerModifier = 1.3;
-            innerStateProcess(time);
+            InnerStateProcess(time);
             return time;
         }
         public double Sleep()
@@ -40,7 +40,7 @@ namespace ELEKSUNI
             stamina = 100;
             double time = 100 / (staminaRegenRate * 3);
             hungerModifier = 1;
-            innerStateProcess(time);
+            InnerStateProcess(time);
             return time;
         }
         public double GetPlayerStamina()
@@ -56,11 +56,11 @@ namespace ELEKSUNI
         {
             return CalculateTimeNeededToTravel() * (int)MainQuestConfig.BasePlayerStaminaConsuption;
         }
-        public void RecaculateStateDueToTraveling()
+        public void RecaculateStateDueToTraveling(int additionalStaminaConsumptionModifier = 1)
         {
-            stamina -= CalculateStaminaNeededToTravel();
+            stamina -= CalculateStaminaNeededToTravel() * additionalStaminaConsumptionModifier;
             hungerModifier = 2;
-            innerStateProcess(CalculateTimeNeededToTravel());
+            InnerStateProcess(CalculateTimeNeededToTravel() * additionalStaminaConsumptionModifier);
         }
         private double Speed()
         {
@@ -72,10 +72,21 @@ namespace ELEKSUNI
             }
             return speed;
         }
-        private void innerStateProcess(double time)
+        public void InnerStateProcess(double time)
         {
             hunger += time * hungerModifier;
             Health -= (int)((hunger / 100) * time);
+        }
+        public void TakeHit(int attack)
+        {
+            if(CurrentClothes == null)
+            {
+                Health -= attack;
+            }
+            else if(CurrentClothes.Defence < attack)
+            {
+                Health -= (attack - CurrentClothes.Defence);
+            }
         }
     }
 }

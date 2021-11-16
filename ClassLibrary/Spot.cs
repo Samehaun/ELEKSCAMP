@@ -25,6 +25,7 @@ namespace ELEKSUNI
             item = hidden;
             this.npc = npc;
         }
+        public Spot(Keys description, NPC npc = null) : this(description, null, npc) {}
         public void AddAvailableTravelDirection(Keys direction)
         {
             travelDirecionsAvailableFromThisSpot.Add(direction);
@@ -62,6 +63,16 @@ namespace ELEKSUNI
             posibilities.Add(Keys.Sleep);
             posibilities.Add(Keys.Search);
             posibilities.Add(Keys.Inventory);
+            if(npc != null && npc.IsHostile)
+            {
+                posibilities.Clear();
+                posibilities.Add(Keys.Fight);
+                posibilities.Add(Keys.Run);
+            }
+            else if(npc != null)
+            {
+                posibilities.Add(Keys.NPC);
+            }
             return posibilities;
         }
         public void RemoveAvailableTravelDirection(Keys direction)

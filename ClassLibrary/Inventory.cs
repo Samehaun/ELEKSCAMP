@@ -42,5 +42,9 @@ namespace ELEKSUNI
             Items.Add(CurrentItem);
             CurrentItem = null;
         }
+        public void AddMoney(int amount)
+        {
+            Coins += amount;
+        }
     }
 }

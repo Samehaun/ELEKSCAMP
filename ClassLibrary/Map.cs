@@ -30,8 +30,16 @@ namespace ELEKSUNI
             this.player = player;
             player.inventory.Add(prefabs.simpleClothes);
             player.CurrentClothes = prefabs.simpleClothes;
-            CreateNewMap((int)MainQuestConfig.MapSize, player);
             ExitReached = false;
+            if (player.Name == "Test" || player.Name == "test")
+            {
+                player.inventory.AddMoney(500);
+                CreateTestMap();
+            }
+            else
+            {
+                CreateNewMap((int)MainQuestConfig.MapSize);
+            }
         }
         private void AddSpot(Spot newSpot)
         {
@@ -41,15 +49,7 @@ namespace ELEKSUNI
         {
             PlayerSpot = map[index];
         }
-        public List<Keys> GetPossibleOptions()
-        {
-            return PlayerSpot.GetListOfPossibleOptions();
-        }
-        public Keys GetLocationDescription()
-        {
-            return PlayerSpot.Description;
-        }
-        private void CreateNewMap(int mapSize, Player player)
+        private void CreateNewMap(int mapSize)
         {
             for (int i = 0; i <= mapSize; i++)
             {
@@ -57,7 +57,7 @@ namespace ELEKSUNI
                 {
                     Spot nextSpot = PickRandomSpotFromSpotPrefabs(spots);
                     nextSpot.SetPosition((i, j));
-                    this.AddSpot(nextSpot);
+                    AddSpot(nextSpot);
                 }
             }
             CreateExit();
@@ -120,7 +120,7 @@ namespace ELEKSUNI
                 }
             }
         }
-        private Keys GetRandomAvailableDirection(Spot baseSpot)
+        public Keys GetRandomAvailableDirection(Spot baseSpot)
         {
             return baseSpot.GetAvailableDirections()[randomizer.Next(0, baseSpot.GetAvailableDirections().Count - 1)];
         }
@@ -155,10 +155,6 @@ namespace ELEKSUNI
             (int, int) inverseVector = (vector.Item1 * -1, vector.Item2 * -1);
             return directionNames[inverseVector];
         }
-        public List<Keys> GetTravelDirections()
-        {
-            return PlayerSpot.GetAvailableDirections();
-        }
         public void Go(Keys direction)
         {
             PlayerSpot = GetNearestSpotInDirection(PlayerSpot, direction);
@@ -167,6 +163,38 @@ namespace ELEKSUNI
                 ExitReached = true;
             }
         }
-
+        private void CreateTestMap()
+        {
+            List<Spot> spotsToTest = new List<Spot>();
+            spotsToTest.Add(spots[23]);
+            spotsToTest.Add(spots[15]);
+            spotsToTest.Add(spots[14]);
+            spotsToTest.Add(spots[2]);
+            spotsToTest.Add(spots[22]);
+            spotsToTest.Add(spots[24]);
+            spotsToTest.Add(spots[28]);
+            spotsToTest.Add(spots[4]);
+            spotsToTest.Add(spots[19]);
+            spotsToTest.Add(spots[18]);
+            spotsToTest.Add(spots[21]);
+            spotsToTest.Add(spots[5]);
+            spotsToTest.Add(spots[11]);
+            spotsToTest.Add(spots[6]);
+            spotsToTest.Add(spots[7]);
+            spotsToTest.Add(spots[26]);
+            int n = 0;
+            for (int i = 0; i <= 3; i++)
+            {
+                for (int j = 0; j <= 3; j++)
+                {
+                    spotsToTest[n].SetPosition((i, j));
+                    AddSpot(spotsToTest[n]);
+                    n++;
+                }
+            }
+            exit = new Spot((0, -1), Keys.Exit);
+            map[(0, 0)].AddAvailableTravelDirection(Keys.West);
+            AddSpot(exit);
+        }
     }
 }

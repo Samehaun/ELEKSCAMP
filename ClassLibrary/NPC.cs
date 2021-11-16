@@ -8,15 +8,20 @@ namespace ELEKSUNI
     class NPC
     {
         public Keys Name { get; private set; }
-        public int Healt { get; set; }
+        public int Health { get; private set; }
         public int Defence { get; private set; }
         public int Attack { get; private set; }
         public Inventory inventory;
-        public bool IsHostile { get; private set; }
+        public bool IsHostile { get; set; }
         public List<Keys> GetListOfPossibleOptions()
         {
             List<Keys> posibilities = new List<Keys>();
-            if (IsHostile)
+            if(Health < 0)
+            {
+                posibilities.Add(Keys.Loot);
+                posibilities.Add(Keys.Cancel);
+            }
+            else if (IsHostile)
             {
                 posibilities.Add(Keys.Fight);
                 posibilities.Add(Keys.Run);
@@ -24,9 +29,8 @@ namespace ELEKSUNI
             else
             {
                 posibilities.Add(Keys.Trade);
-                posibilities.Add(Keys.Buy);
-                posibilities.Add(Keys.Sell);
                 posibilities.Add(Keys.Steal);
+                posibilities.Add(Keys.Fight);
                 posibilities.Add(Keys.Cancel);
             }
             return posibilities;
@@ -34,16 +38,22 @@ namespace ELEKSUNI
         public NPC(Keys name, int health, int defence, int attack, bool isHostile, List<Item> items = null)
         {
             Name = name;
-            Healt = health;
+            Health = health;
             Defence = defence;
             Attack = attack;
             IsHostile = isHostile;
             inventory = new Inventory();
-            if(items != null)
+            if (items != null)
             {
                 inventory.Items.AddRange(items);
             }
         }
-
+        public void TakeHit(int attack)
+        {
+            if (Defence < attack)
+            {
+                Health -= (attack - Defence);
+            }
+        }
     }
 }
