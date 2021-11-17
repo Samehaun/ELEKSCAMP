@@ -5,7 +5,7 @@ namespace ELEKSUNI
 {
     class Map
     {
-        private Prefabs prefabs;
+        public Prefabs prefabs;
         private Random randomizer;
         public static Dictionary<Keys, (int, int)> directionVectors = new Dictionary<Keys, (int, int)>()
         {
@@ -26,6 +26,7 @@ namespace ELEKSUNI
             prefabs = new Prefabs();
             randomizer = new Random(DateTime.Now.Millisecond);
             map = new Dictionary<(int x, int y), Spot>();
+            prefabs.GenerateSpotPrefabs();
             spots = new List<Spot>(prefabs.GetPrefabs());
             this.player = player;
             player.inventory.Add(prefabs.simpleClothes);
@@ -165,23 +166,8 @@ namespace ELEKSUNI
         }
         private void CreateTestMap()
         {
-            List<Spot> spotsToTest = new List<Spot>();
-            spotsToTest.Add(spots[23]);
-            spotsToTest.Add(spots[15]);
-            spotsToTest.Add(spots[14]);
-            spotsToTest.Add(spots[2]);
-            spotsToTest.Add(spots[22]);
-            spotsToTest.Add(spots[24]);
-            spotsToTest.Add(spots[28]);
-            spotsToTest.Add(spots[4]);
-            spotsToTest.Add(spots[19]);
-            spotsToTest.Add(spots[18]);
-            spotsToTest.Add(spots[21]);
-            spotsToTest.Add(spots[5]);
-            spotsToTest.Add(spots[11]);
-            spotsToTest.Add(spots[6]);
-            spotsToTest.Add(spots[7]);
-            spotsToTest.Add(spots[26]);
+            prefabs.GenerateTestSpotPrefabs();
+            List<Spot> spotsToTest = prefabs.GetPrefabs();
             int n = 0;
             for (int i = 0; i <= 3; i++)
             {

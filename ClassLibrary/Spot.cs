@@ -7,6 +7,7 @@ namespace ELEKSUNI
     {
         private List<Keys> travelDirecionsAvailableFromThisSpot;
         public Keys Description { get; }
+        public bool searched;
         public (int x, int y) Coordinates { get; private set; }
         public Item item;
         public NPC npc;
@@ -14,6 +15,7 @@ namespace ELEKSUNI
         {
             travelDirecionsAvailableFromThisSpot = new List<Keys>();
             this.Description = description;
+            searched = false;
         }
         public Spot((int, int) index, Keys description) : this(description)
         {
@@ -69,7 +71,7 @@ namespace ELEKSUNI
                 posibilities.Add(Keys.Fight);
                 posibilities.Add(Keys.Run);
             }
-            else if(npc != null)
+            else if(npc != null && npc.Health > 0)
             {
                 posibilities.Add(Keys.NPC);
             }

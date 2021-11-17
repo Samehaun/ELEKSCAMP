@@ -45,19 +45,20 @@ namespace ELEKSUNI
                 { Keys.UA, SetUkrainianAsQuestLanguage},
                 { Keys.Drop, DropSelectedItem },
                 { Keys.Equip, Equip },
-                { Keys.Search, SearchSpotForHiddenItem },
+                { Keys.Search, Search },
                 { Keys.Inventory, LaunchOpenInventoryDialog },
                 { Keys.Cancel, Cancel },
                 { Keys.Trade, LaunchTradeDialog },
                 { Keys.Sell, LaunchSellDialog },
                 { Keys.Buy, LaunchBuyDialog },
                 { Keys.Eat, Eat },
-                { Keys.Drink, Drink },
                 { Keys.Fight, Fight },
                 { Keys.Run, Run },
                 { Keys.NPC, LaunchNpcDialog },
                 { Keys.Steal, LaunchStealDialog },
-                { Keys.Loot, LaunchLootDialog }
+                { Keys.Loot, LaunchLootDialog },
+
+
             };
             availableCommands = new List<Keys>();
             if(player.Name == "Test" || player.Name == "test")
@@ -93,7 +94,6 @@ namespace ELEKSUNI
         {
             if (input == state.Options.Count - 1)
             {
-                state.Message = Data.Localize(Keys.Trade, language);
                 Cancel();
             }
             else
@@ -109,7 +109,6 @@ namespace ELEKSUNI
         {
             if (input == state.Options.Count - 1)
             {
-                state.Message = Data.Localize(Keys.Trade, language);
                 Cancel();
             }
             else
@@ -122,7 +121,6 @@ namespace ELEKSUNI
         {
             if (input == state.Options.Count - 1)
             {
-                state.Message = Data.Localize(Keys.Trade, language);
                 Cancel();
             }
             else
@@ -146,6 +144,7 @@ namespace ELEKSUNI
             if (input < state.Options.Count - 1)
             {
                 StealOrLoot(input);
+                LaunchLootDialog();
             }
             else
             {
@@ -302,7 +301,8 @@ namespace ELEKSUNI
         {
             SelectItemInPlayerInventory(input);
             UnequipSelectedItem();
-            player.inventory.Sell();
+            questMap.PlayerSpot.npc.inventory.Add(player.inventory.CurrentItem);
+            player.inventory.Sell();           
             LaunchSellDialog();
         }
         private void TryPurchase(int input)
@@ -424,6 +424,32 @@ namespace ELEKSUNI
             questMap.Go(questMap.GetRandomAvailableDirection(questMap.PlayerSpot));
             PlayerReachedNewZone(2);
         }
+        private void Search()
+        {
+            if (questMap.PlayerSpot.Description == Keys.Burrow && !questMap.PlayerSpot.searched)
+            {
+                if(player.CurrentWeapon != null)
+                {
+                    Hunt();
+                }
+                else
+                {
+                    state.Message = Data.Localize(Keys.HuntFailed, language);
+                }
+                questMap.PlayerSpot.searched = true;
+            }
+            else
+            {
+                SearchSpotForHiddenItem();
+            }
+        }
+        private void Hunt()
+        {
+            state.Message = Data.Localize(Keys.HuntSucceed, language);
+            questMap.PlayerSpot.npc = questMap.prefabs.hare;
+            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.inventory);
+            ProceedInput = LootDialogInputHandler;
+        }
         private void SearchSpotForHiddenItem()
         {
             Item newItem = questMap.PlayerSpot.item;
@@ -456,7 +482,7 @@ namespace ELEKSUNI
         private void SelectItemInNpcInventory(int input)
         {
             player.inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
-            questMap.PlayerSpot.npc.inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
+            questMap.PlayerSpot.npc.inventory.CurrentItem = player.inventory.CurrentItem;
         }
         private void DropSelectedItem()
         {

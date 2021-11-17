@@ -4,26 +4,45 @@ namespace ELEKSUNI
 {
     class Prefabs
     {
-        public Clothes simpleClothes = new Clothes(Keys.SimpleClothes, 5, 2, Keys.Equip, 0, 10);
-        public Clothes heavyClothes = new Clothes(Keys.HeavyClothes, 40, 3.5, Keys.Equip, 20, 30);
+        public Clothes simpleClothes;
+        public Clothes heavyClothes;
 
-        public Weapon sharpStick = new Weapon(Keys.SharpStick, 2, 0.7, Keys.Equip, 15);
-        public Weapon knife = new Weapon(Keys.Knife, 15, 0.2, Keys.Equip, 30);
-        public Weapon sharpKnife = new Weapon(Keys.SharpKnife, 25, 0.2, Keys.Equip, 45);
-        public Weapon oldAxe = new Weapon(Keys.OldAxe, 20, 3.0, Keys.Equip, 40);
-        public Weapon axe = new Weapon(Keys.Axe, 55, 3.3, Keys.Equip, 60);
+        public Weapon sharpStick;
+        public Weapon knife;
+        public Weapon sharpKnife;
+        public Weapon oldAxe;
+        public Weapon axe;
 
-        public NPC witch = new NPC(Keys.Witch, 250, 10, 35, false, new List<Item>() { Consumable.CreateCure(15, 0.2)});
-        public NPC forester = new NPC(Keys.Forester, 100, 30, 20, false, new List<Item>() { Consumable.CreateBandage(10, 0.2) , new Weapon(Keys.Axe, 55, 3.3, Keys.Equip, 60), new Clothes(Keys.HeavyClothes, 40, 3.5, Keys.Equip, 20, 30) } );
-        public NPC leprechaun = new NPC(Keys.Leprechaun, 50, 10, 10, false);
-        public NPC bear = new NPC(Keys.Bear, 500, 80, 80, true);
-        public NPC wolf = new NPC(Keys.Wolf, 70, 25, 30, true);
+        public Item meteor;
+        public Item wolfSkin;
+        public Item wolfTeeth;
+        public Item leftShoe;
+        public Item flint;
+        public Item harePaw;
+
+        public Consumable antidote;
+        public Consumable bondage;
+        public Consumable meat;
+        public Consumable berries;
+        public Consumable poisonBerries;
+        public Consumable mushrooms;
+        public Consumable poisonMushrooms;
+        public Consumable trap;
+        public Consumable hornetNest;
+
+        public NPC witch;
+        public NPC forester;
+        public NPC leprechaun;
+        public NPC bear;
+        public NPC wolf;
+        public NPC hare;
+
         private List<Spot> spots;
         public List<Spot> GetPrefabs()
         {
             return spots;
         }
-        private void GenerateSpotPrefabs()
+        public void GenerateSpotPrefabs()
         {
             spots = new List<Spot>()
             {
@@ -59,9 +78,66 @@ namespace ELEKSUNI
             { new Spot(Keys.Monolith) },
             };
         }
+        public void GenerateTestSpotPrefabs()
+        {
+            spots = new List<Spot>()
+            {
+            { new Spot(Keys.Glade) },
+            { new Spot(Keys.Crater) },
+            { new Spot(Keys.WolfPit, sharpStick) },
+            { new Spot(Keys.OrdinaryForest) },
+            { new Spot(Keys.Hanged) },
+            { new Spot(Keys.WolfPit, sharpStick) },
+            { new Spot(Keys.ForesterHouse, forester) },
+            { new Spot(Keys.Oak) },
+            { new Spot(Keys.SwordInStone) },
+            { new Spot(Keys.Stump, leprechaun) },
+            { new Spot(Keys.Burrow) },
+            { new Spot(Keys.Oak) },
+            { new Spot(Keys.Lake, bear) },
+            { new Spot(Keys.Berries) },
+            { new Spot(Keys.Berries) },
+            { new Spot(Keys.GingerbreadHouse, witch) },
+            };
+        }
         public Prefabs()
         {
-            GenerateSpotPrefabs();
+            //Clothes
+            simpleClothes = new Clothes(Keys.SimpleClothes, 5, 2, Keys.Equip, 5, 10);
+            heavyClothes = new Clothes(Keys.HeavyClothes, 20, 3.5, Keys.Equip, 20, 30);
+            //Weapons
+            sharpStick = new Weapon(Keys.SharpStick, 2, 0.7, Keys.Equip, 15);
+            knife = new Weapon(Keys.Knife, 10, 0.2, Keys.Equip, 30);
+            sharpKnife = new Weapon(Keys.SharpKnife, 20, 0.2, Keys.Equip, 45);
+            oldAxe = new Weapon(Keys.OldAxe, 17, 3.0, Keys.Equip, 40);
+            axe = new Weapon(Keys.Axe, 27, 3.3, Keys.Equip, 60);
+            //Items
+            meteor = new Item(Keys.Meteor, 150, 12.5, Keys.Unusable);
+            wolfSkin = new Item(Keys.WolfSkin, 15, 1.5, Keys.Unusable);
+            wolfTeeth = new Item(Keys.WolfTeeth, 3, 0.2, Keys.Unusable);
+            leftShoe = new Item(Keys.Shoe, 2, 0.5, Keys.Unusable);
+            flint = new Item(Keys.Flint, 12, 0.1, Keys.Fire);
+            harePaw = new Item(Keys.HarePaw, 7, 0.1, Keys.Unusable);
+            //Consumables
+            antidote = Consumable.CreateCure(9, 0.2);
+            bondage = Consumable.CreateBandage(4, 0.2);
+            meat = Consumable.CreateFood(Keys.Meat, 5, 1.7, 150);
+            berries = Consumable.CreateFood(Keys.Berries, 1, 0.3, 20);
+            poisonBerries = Consumable.CreatePoisoned(Keys.Berries, 1, 0.3, 20);
+            mushrooms = Consumable.CreateFood(Keys.Mushrooms, 2, 0.3, 40);
+            mushrooms = Consumable.CreatePoisoned(Keys.Mushrooms, 2, 0.3, 40);
+            trap = Consumable.CreateTrap(40);
+            hornetNest = Consumable.CreateHornetNest(30);
+            //NPC
+            witch = new NPC(Keys.Witch, 250, 10, 35, false, new List<Item>() { antidote });
+            forester = new NPC(Keys.Forester, 100, 30, 20, false, new List<Item>() { axe, heavyClothes, bondage });
+            leprechaun = new NPC(Keys.Leprechaun, 50, 10, 10, false);
+            bear = new NPC(Keys.Bear, 500, 80, 80, true);
+            wolf = new NPC(Keys.Wolf, 70, 25, 30, true, new List<Item>() { wolfSkin });
+            hare = new NPC(Keys.Hare, 0, 0, 0, false, new List<Item>() { meat, harePaw } );
+            
+
         }
     }
 }
+
