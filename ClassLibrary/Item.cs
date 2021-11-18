@@ -8,13 +8,21 @@ namespace ELEKSUNI
         public Keys Name { get; }
         public int Price { get; }
         public double Weight { get; }
-        public Keys Use { get; }
-        public Item(Keys name, int price, double weight, Keys useMethod)
+        public List<Keys> Options { get; }
+        public Item(Keys name, int price, double weight)
         {
             Name = name;
             Price = price;
             Weight = weight;
-            Use = useMethod;
+            Options = new List<Keys>() { Keys.Drop, Keys.Cancel };
+        }
+        public Item(Keys name, int price, double weight, Keys useMethod) : this (name, price, weight)
+        {
+            Options.Insert(0, useMethod);
+        }
+        public Keys Use()
+        {
+            return Options[0];
         }
         public virtual string GetItemSpecs(string language)
         {

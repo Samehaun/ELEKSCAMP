@@ -14,7 +14,7 @@ namespace ELEKSUNI
             night = DateTime.Today.AddHours(21);
             morning = DateTime.Today.AddHours(6);
         }
-        public bool NotNightTime()
+        public bool DayTime()
         {
             return ((currentTime.Hour >= morning.Hour) && (currentTime.Hour <= night.Hour));
         }
