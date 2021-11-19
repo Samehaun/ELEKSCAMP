@@ -7,7 +7,9 @@ namespace ELEKSUNI
 {
     enum Keys
     {
-        Unusable,
+        PoisonedFood,
+        Purse,
+        Open,
         Hare,
         HarePaw,
         Meat,
@@ -113,7 +115,9 @@ namespace ELEKSUNI
     {
         private static Dictionary<Keys, string> enText = new Dictionary<Keys, string>()
         {
-            {Keys.Unusable, "" },
+            {Keys.PoisonedFood, "You feel sick" },
+            {Keys.Purse, "Old leather purse" },
+            {Keys.Open, "Open" },
             {Keys.Hare, "Hare" },
             {Keys.HarePaw, "Hare paw" },
             {Keys.Meat, "Meat" },
@@ -357,17 +361,30 @@ namespace ELEKSUNI
         }
         public static string StateBuilder(Player player, string languageSettings)
         {
+            string actualState;
             switch (languageSettings)
             {
                 case "EN":
-                    return $"Player {player.Name} has {player.Health} hp";
+                    actualState = $"Player {player.Name} has {player.Health} hp";
+                    break;
                 case "RU":
-                    return $"У {player.Name} {player.Health} хп";
+                    actualState = $"У {player.Name} {player.Health} хп";
+                    break;
                 case "UA":
-                    return $"У {player.Name} {player.Health} хп";
+                    actualState = $"У {player.Name} {player.Health} хп";
+                    break;
                 default:
-                    return $"Wrong language settings";
+                    actualState = $"Wrong language settings";
+                    break;
             }
+            if(player.Effects.Count > 0)
+            {
+                foreach (var effect in player.Effects)
+                {
+                    actualState = $"{ actualState } { Localize(effect, languageSettings) }";
+                }
+            }
+            return actualState;
         }
         public static List<string> Localize(List<Keys> options, string languageSettings)
         {

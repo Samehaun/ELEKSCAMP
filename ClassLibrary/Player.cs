@@ -12,7 +12,7 @@ namespace ELEKSUNI
         public int Health { get; private set; }
         public Weapon CurrentWeapon { get; set; }
         public Clothes CurrentClothes { get; set; }
-        public List<Keys> effects { get; private set; }
+        public List<Keys> Effects { get; private set; }
         public Inventory inventory;
         private double hungerModifier;
         public Player(string playerName)
@@ -23,6 +23,7 @@ namespace ELEKSUNI
             stamina = 100;
             hunger = 0;
             inventory = new Inventory();
+            Effects = new List<Keys>();
         }
         public double Rest()
         {
@@ -75,6 +76,10 @@ namespace ELEKSUNI
         public void InnerStateProcess(double time)
         {
             hunger += time * hungerModifier;
+            if(hunger >= 100 && Effects.Contains(Keys.Sturve))
+            {
+
+            }
             Health -= (int)((hunger / 100) * time);
         }
         public void TakeHit(int attack)
@@ -87,6 +92,28 @@ namespace ELEKSUNI
             {
                 Health -= (attack - CurrentClothes.Defence);
             }
+        }
+        public void Eat(bool isPoisoned)
+        {
+            if (!isPoisoned)
+            {
+                Consumable food = (Consumable)inventory.CurrentItem;
+                hunger -= food.EffectPower;
+                if(hunger < 100 && Effects.Contains(Keys.Sturve))
+                {
+                    Effects.Remove(Keys.Sturve);
+                }
+            }
+            else
+            {
+                Effects.Add(Keys.Poison);
+            }
+            inventory.Drop();
+        }
+        public void TakeAntidote()
+        {
+            Effects.Remove(Keys.Poison);
+            inventory.Drop();
         }
     }
 }

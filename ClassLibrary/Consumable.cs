@@ -21,9 +21,9 @@ namespace ELEKSUNI
         {
             return $" { GetItemSpecs(language) } { Price } { Data.Localize(Keys.Coins, language) }";
         }
-        public static Consumable CreatePoisoned(Keys name, int price, double weight, int effect)
+        public static Consumable CreatePoisoned(Keys name, int price, double weight)
         {
-            return new Consumable(name, price, weight, Keys.Poison, effect, false);
+            return new Consumable(name, price, weight, Keys.Poison, 0, false);
         }
         public static Consumable CreateFood(Keys name, int price, double weight, int effect)
         {
