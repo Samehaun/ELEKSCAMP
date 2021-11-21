@@ -16,9 +16,11 @@ namespace ELEKSUNI
             Coins = 0;
             Items = new List<Item>();
         }
-        public Inventory(List<Item> items) : this()
+        public Inventory(List<Item> items, int coins = 0) : this()
         {
             this.Items.AddRange(items);
+            Weight = CalculateWeight();
+            Coins = coins;
         }
         public void Drop()
         {
@@ -45,6 +47,15 @@ namespace ELEKSUNI
         public void AddMoney(int amount)
         {
             Coins += amount;
+        }
+        private double CalculateWeight()
+        {
+            double weight = 0;
+            foreach (var item in Items)
+            {
+                weight += item.Weight;
+            }
+            return weight;
         }
     }
 }

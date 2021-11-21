@@ -3,7 +3,7 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <link rel="stylesheet" href="~/css/site.css" />
 <h4 class="message">@Model.Message</h4>
-<h4>@Model.PlayerState</h4>
+<h4 class="message">@Model.PlayerState</h4>
 @if (Model.Options != null)
 {
     for (int i = 0; i < Model.Options.Count; i++)

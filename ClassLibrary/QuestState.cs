@@ -7,12 +7,13 @@ namespace ELEKSUNI
 {
     public class QuestState
     {
-        public string Message { get; set; }
-        public string PlayerStateOrAdditionalInformation { get; set; }
-        public List<string> Options { get; set; }
-        public QuestState()
+        public DateTime QuestTime { get;  }
+        public Stack<Action> MenuCallHistory { get; }
+        public QuestState(DateTime time, Stack<Action> stack)
         {
-            Options = new List<string>();
+            QuestTime = time;
+            MenuCallHistory = stack;
         }
+        
     }
 }

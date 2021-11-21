@@ -15,11 +15,11 @@ namespace ELEKSUNI
         }
         public override string GetItemSpecs(string language)
         {
-            return $" { Data.Localize(Name, language) } { Defence } { Data.Localize(Keys.Defence, language) } { Weight } { Data.Localize(Keys.Weight, language) }";
+            return $"{ Data.Localize(Name, language) } { Defence } { Data.Localize(Keys.Defence, language) } { Weight } { Data.Localize(Keys.Weight, language) }";
         }
         public override string GetItemSpecsForTrade(string language)
         {
-            return $" { GetItemSpecs(language) } { Price } { Data.Localize(Keys.Coins, language) }";
+            return $"{ GetItemSpecs(language) } { Price } { Data.Localize(Keys.Coins, language) }";
         }
     }
 }

@@ -23,7 +23,7 @@ namespace ELEKSUNI
         }
         public static Consumable CreatePoisoned(Keys name, int price, double weight)
         {
-            return new Consumable(name, price, weight, Keys.Poison, 0, false);
+            return new Consumable(name, price, weight, Keys.EatPoison, 0, false);
         }
         public static Consumable CreateFood(Keys name, int price, double weight, int effect)
         {
@@ -39,11 +39,11 @@ namespace ELEKSUNI
         }
         public static Consumable CreateBandage(int price, double weight)
         {
-            return new Consumable(Keys.Bondage, price, weight, Keys.StopBleeding, 0, false);
+            return new Consumable(Keys.Bandage, price, weight, Keys.StopBleeding, 0, false);
         }
         public static Consumable CreateCure(int price, double weight)
         {
-            return new Consumable(Keys.Cure, price, weight, Keys.CurePoison, 0, false);
+            return new Consumable(Keys.Cure, price, weight, Keys.Drink, 0, false);
         }
     }
 }

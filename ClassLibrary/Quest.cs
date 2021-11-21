@@ -21,16 +21,16 @@ namespace ELEKSUNI
         private List<Keys> availableCommands;
         private string language;
         public bool IsEnded { get; private set; }
-        QuestState state;
-        public delegate QuestState InputHandler(int input);
+        Report report;
+        public delegate Report InputHandler(int input);
         public InputHandler ProceedInput;
         private Stack<Action> menuCallChain;
-        public QuestState Start(string name)
+        public Report Start(string name)
         {
             player = new Player(name);
             questMap = new Map(player);
             time = new Time();
-            state = new QuestState();
+            report = new Report();
             commands = new Dictionary<Keys, Action>()
             {
                 { Keys.North, GoNorth },
@@ -57,9 +57,8 @@ namespace ELEKSUNI
                 { Keys.NPC, LaunchNpcDialog },
                 { Keys.Steal, LaunchStealDialog },
                 { Keys.Loot, LaunchLootDialog },
-               // { Keys.Fire, MakeABonfire },
                 { Keys.Open, Open },
-                { Keys.Poison, Poison },
+                { Keys.EatPoison, Poison },
                 { Keys.Drink, CurePoison },
                 { Keys.Trap, TriggerTrap },
                 { Keys.HornetNest, TriggerHornetNest }
@@ -75,12 +74,12 @@ namespace ELEKSUNI
             {
                 questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
             }
-            state.Message = $"Select preferred language:";
+            report.Message = $"Select preferred language:";
             availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
-            state.Options.AddRange(new List<string>() { "EN", "RU", "UA" });
+            report.Options.AddRange(new List<string>() { "EN", "RU", "UA" });
             menuCallChain = new Stack<Action>();
             ProceedInput = NonInventoryDialogInputHandler;
-            return state;
+            return report;
         }
         private void StartHandlingIntInput()
         {
@@ -91,29 +90,29 @@ namespace ELEKSUNI
             }
             LaunchMainDialog();
         }
-        public QuestState NonInventoryDialogInputHandler(int input)
+        public Report NonInventoryDialogInputHandler(int input)
         {
             commands[availableCommands[input]].Invoke();
-            return state;
+            return report;
         }
-        public QuestState OpenInventoryDialogInputHandler(int input)
+        public Report OpenInventoryDialogInputHandler(int input)
         {
-            if (input == state.Options.Count - 1)
+            if (input == report.Options.Count - 1)
             {
                 Cancel();
             }
             else
             {
                 SelectItemInPlayerInventory(input);
-                ResetAvailableOptions(player.inventory.CurrentItem.Options);
-                menuCallChain.Push(LaunchOpenInventoryDialog);
+                ResetAvailableOptions(player.Inventory.CurrentItem.Options);
+                AddUniqueCallInMenueCallHistory(LaunchOpenInventoryDialog);
                 ProceedInput = NonInventoryDialogInputHandler;
             }
-            return state;
+            return report;
         }
-        public QuestState SellDialogInputHandler(int input)
+        public Report SellDialogInputHandler(int input)
         {
-            if (input == state.Options.Count - 1)
+            if (input == report.Options.Count - 1)
             {
                 Cancel();
             }
@@ -121,11 +120,11 @@ namespace ELEKSUNI
             {
                 Sell(input);
             }
-            return state;
+            return report;
         }
-        public QuestState BuyDialogInputHandler(int input)
+        public Report BuyDialogInputHandler(int input)
         {
-            if (input == state.Options.Count - 1)
+            if (input == report.Options.Count - 1)
             {
                 Cancel();
             }
@@ -133,21 +132,21 @@ namespace ELEKSUNI
             {
                 TryPurchase(input);
             }
-            return state;
+            return report;
         }
-        public QuestState StealDialogInputHandler(int input)
+        public Report StealDialogInputHandler(int input)
         {
-            if (input < state.Options.Count - 1)
+            if (input < report.Options.Count - 1)
             {
                 StealOrLoot(input);
                 questMap.PlayerSpot.npc.IsHostile = true;
             }
             Cancel();
-            return state;
+            return report;
         }
-        public QuestState LootDialogInputHandler(int input)
+        public Report LootDialogInputHandler(int input)
         {
-            if (input < state.Options.Count - 1)
+            if (input < report.Options.Count - 1)
             {
                 StealOrLoot(input);
                 LaunchLootDialog();
@@ -156,7 +155,7 @@ namespace ELEKSUNI
             {
                 LaunchMainDialog();
             }
-            return state;
+            return report;
         }
         private bool IsQuestEnded()
         {
@@ -202,7 +201,7 @@ namespace ELEKSUNI
                 {
                     AppendStateMessage(Keys.Enemy, questMap.PlayerSpot.npc.Name);
                 }
-                state.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
+                report.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
                 ResetAvailableOptions(questMap.PlayerSpot.GetListOfPossibleOptions());
                 ResetMenuCallsChain();
                 ProceedInput = NonInventoryDialogInputHandler;
@@ -224,8 +223,7 @@ namespace ELEKSUNI
         private void LaunchOpenInventoryDialog()
         {
             SetStateMessage(Keys.Inventory);
-            ListInventoryForUseAndLoot(player.inventory);
-            state.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
+            ListInventoryForUseAndLoot(player.Inventory);
             ProceedInput = OpenInventoryDialogInputHandler;
         }
         private void LaunchNpcDialog()
@@ -245,8 +243,8 @@ namespace ELEKSUNI
         {
             AddUniqueCallInMenueCallHistory(LaunchTradeDialog);
             SetStateMessage(Keys.Sell);
-            ListInventoryForTrading(player.inventory);
-            state.PlayerStateOrAdditionalInformation = $"{ Data.Localize(Keys.Remains, language) } { player.inventory.Coins } { Data.Localize(Keys.Coins, language) }";
+            ListInventoryForTrading(player.Inventory);
+            report.PlayerStateOrAdditionalInformation = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
             ProceedInput = SellDialogInputHandler;
         }
         private void LaunchBuyDialog()
@@ -254,7 +252,7 @@ namespace ELEKSUNI
             AddUniqueCallInMenueCallHistory(LaunchTradeDialog);
             SetStateMessage(Keys.Buy);
             ListInventoryForTrading(questMap.PlayerSpot.npc.inventory);
-            state.PlayerStateOrAdditionalInformation = $"{ Data.Localize(Keys.Remains, language) } { player.inventory.Coins } { Data.Localize(Keys.Coins, language) }";
+            report.PlayerStateOrAdditionalInformation = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
             ProceedInput = BuyDialogInputHandler;
         }
         private void LaunchStealDialog()
@@ -309,8 +307,8 @@ namespace ELEKSUNI
         private void EndQuest()
         {
             IsEnded = true;
-            state.PlayerStateOrAdditionalInformation = null;
-            state.Options = null;
+            report.PlayerStateOrAdditionalInformation = null;
+            report.Options = null;
         }
         private void Loss()
         {
@@ -321,29 +319,29 @@ namespace ELEKSUNI
         {
             SelectItemInPlayerInventory(input);
             UnequipSelectedItem();
-            questMap.PlayerSpot.npc.inventory.Add(player.inventory.CurrentItem);
-            player.inventory.Sell();
+            questMap.PlayerSpot.npc.inventory.Add(player.Inventory.CurrentItem);
+            player.Inventory.Sell();
             LaunchSellDialog();
         }
         private void TryPurchase(int input)
         {
             SelectItemInNpcInventory(input);
-            if (player.inventory.Coins >= player.inventory.CurrentItem.Price)
+            if (player.Inventory.Coins >= player.Inventory.CurrentItem.Price)
             {
                 questMap.PlayerSpot.npc.inventory.Drop();
-                player.inventory.Buy();
+                player.Inventory.Buy();
                 LaunchBuyDialog();
             }
         }
         private void Cancel()
         {
-            state.Message = null;
+            report.Message = null;
             menuCallChain.Pop().Invoke();
         }
         private void StealOrLoot(int input)
         {
             SelectItemInNpcInventory(input);
-            player.inventory.Add(player.inventory.CurrentItem);
+            player.Inventory.Add(player.Inventory.CurrentItem);
             questMap.PlayerSpot.npc.inventory.Drop();
         }
         private void ResetMenuCallsChain()
@@ -355,13 +353,13 @@ namespace ELEKSUNI
         {
             availableCommands.Clear();
             availableCommands.AddRange(options);
-            state.Options.Clear();
-            state.Options.AddRange(Data.Localize(options, language));
+            report.Options.Clear();
+            report.Options.AddRange(Data.Localize(options, language));
         }
         private void ResetAvailableOptions(List<string> options)
         {
-            state.Options.Clear();
-            state.Options.AddRange(options);
+            report.Options.Clear();
+            report.Options.AddRange(options);
         }
         private void SetEnglishAsQuestLanguage()
         {
@@ -388,7 +386,7 @@ namespace ELEKSUNI
             {
                 time.ChangeTime(player.Sleep());
                 SetStateMessage(Keys.WakeUp);
-                state.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
+                report.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
             }
             LaunchMainDialog();
         }
@@ -420,13 +418,13 @@ namespace ELEKSUNI
         }
         private void Equip()
         {
-            if (player.inventory.CurrentItem is Weapon)
+            if (player.Inventory.CurrentItem is Weapon)
             {
-                player.CurrentWeapon = (Weapon)player.inventory.CurrentItem;
+                player.CurrentWeapon = (Weapon)player.Inventory.CurrentItem;
             }
             else
             {
-                player.CurrentClothes = (Clothes)player.inventory.CurrentItem;
+                player.CurrentClothes = (Clothes)player.Inventory.CurrentItem;
             }
             Cancel();
         }
@@ -479,11 +477,8 @@ namespace ELEKSUNI
                 }
                 else
                 {
-                    player.inventory.Add(newItem);
-                    questMap.PlayerSpot.item = null;
+                    FoundHiddenItem(newItem);
                 }
-                state.Message = null;
-                AppendStateMessage(Keys.Found, newItem.Name);
             }
             else
             {
@@ -493,29 +488,38 @@ namespace ELEKSUNI
             player.InnerStateProcess(1);
             LaunchMainDialog();
         }
+
+        private void FoundHiddenItem(Item newItem)
+        {
+            player.Inventory.Add(newItem);
+            questMap.PlayerSpot.item = null;
+            report.Message = null;
+            AppendStateMessage(Keys.Found, newItem.Name);
+        }
+
         private void SelectItemInPlayerInventory(int input)
         {
-            player.inventory.CurrentItem = player.inventory.Items[input];
-            state.PlayerStateOrAdditionalInformation = state.Options[input];
+            player.Inventory.CurrentItem = player.Inventory.Items[input];
+            report.PlayerStateOrAdditionalInformation = report.Options[input];
         }
         private void SelectItemInNpcInventory(int input)
         {
-            player.inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
-            questMap.PlayerSpot.npc.inventory.CurrentItem = player.inventory.CurrentItem;
+            player.Inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
+            questMap.PlayerSpot.npc.inventory.CurrentItem = player.Inventory.CurrentItem;
         }
         private void DropSelectedItem()
         {
             UnequipSelectedItem();
-            player.inventory.Drop();
+            player.Inventory.Drop();
             Cancel();
         }
         private void UnequipSelectedItem()
         {
-            if (player.CurrentClothes == player.inventory.CurrentItem)
+            if (player.CurrentClothes == player.Inventory.CurrentItem)
             {
                 player.CurrentClothes = null;
             }
-            else if (player.CurrentWeapon == player.inventory.CurrentItem)
+            else if (player.CurrentWeapon == player.Inventory.CurrentItem)
             {
                 player.CurrentWeapon = null;
             }
@@ -523,35 +527,41 @@ namespace ELEKSUNI
         private void Eat()
         {
             player.Eat(false);
-            LaunchOpenInventoryDialog();
+            Cancel();
         }
         private void Poison()
         {
-            SetStateMessage(Keys.PoisonedFood);
             player.Eat(true);
-            LaunchOpenInventoryDialog();
+            ComplexStateReport(Keys.GetPoisonMessage);
+            Cancel();
         }
         private void TriggerTrap()
         {
             SetStateMessage(Keys.Trap);
-            player.TakeHit(questMap.prefabs.trap.EffectPower);
-            player.Effects.Add(Keys.Injure);
+            DisableTrigger(Keys.Bleeding);
         }
         private void TriggerHornetNest()
         {
             SetStateMessage(Keys.HornetNest);
-            player.TakeHit(questMap.prefabs.hornetNest.EffectPower);
-            player.Effects.Add(Keys.Poison);
+            DisableTrigger(Keys.IsPoisoned);
+        }
+        private void DisableTrigger(Keys effect)
+        {
+            Consumable trigger = (Consumable)questMap.PlayerSpot.item;
+            player.TakeHit(trigger.EffectPower);
+            player.Effects.Add(effect);
+            questMap.PlayerSpot.item = null;
         }
         private void CurePoison()
         {
-            SetStateMessage(Keys.CurePoison);
-            LaunchOpenInventoryDialog();
+            player.TakeAntidote();
+            ComplexStateReport(Keys.CurePoison);
+            Cancel();
         }
         private void Open()
         {
-            player.inventory.AddMoney(player.inventory.CurrentItem.Price * 2);
-            player.inventory.Drop();
+            player.Inventory.AddMoney(player.Inventory.CurrentItem.Price * 2);
+            player.Inventory.Drop();
             LaunchOpenInventoryDialog();
         }
         private void AddUniqueCallInMenueCallHistory(Action recentMenu)
@@ -563,16 +573,19 @@ namespace ELEKSUNI
         }
         private void SetStateMessage(Keys key)
         {
-            state.Message = $"{ Data.Localize(key, language) }";
+            report.Message = $"{ Data.Localize(key, language) }";
         }
         private void AppendStateMessage(Keys key)
         {
-            state.Message = $"{ state.Message }{ Environment.NewLine }{ Data.Localize(key, language) }";
+            report.Message = $"{ report.Message }{ Environment.NewLine }{ Data.Localize(key, language) }";
         }
         private void AppendStateMessage(Keys firstKey, Keys secondKey)
         {
-            state.Message = $"{ state.Message }{ Environment.NewLine }{ Data.Localize(firstKey, language) }{ Data.Localize(secondKey, language) }";
+            report.Message = $"{ report.Message }{ Environment.NewLine }{ Data.Localize(firstKey, language) }{ Data.Localize(secondKey, language) }";
         }
-
+        private void ComplexStateReport(Keys key)
+        {
+            report.PlayerStateOrAdditionalInformation = $"{ Data.Localize(key, language) }{ Environment.NewLine }{ Data.StateBuilder(player, language) }";
+        }
     }
 }

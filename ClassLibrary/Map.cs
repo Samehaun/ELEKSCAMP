@@ -29,12 +29,12 @@ namespace ELEKSUNI
             prefabs.GenerateSpotPrefabs();
             spots = new List<Spot>(prefabs.GetPrefabs());
             this.player = player;
-            player.inventory.Add(prefabs.simpleClothes);
+            player.Inventory.Add(prefabs.simpleClothes);
             player.CurrentClothes = prefabs.simpleClothes;
             ExitReached = false;
             if (player.Name == "Test" || player.Name == "test")
             {
-                player.inventory.AddMoney(500);
+                player.Inventory.AddMoney(500);
                 CreateTestMap();
             }
             else

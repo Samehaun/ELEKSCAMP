@@ -17,9 +17,9 @@ namespace ELEKSUNI
         public Item wolfSkin;
         public Item wolfTeeth;
         public Item leftShoe;
-        public Item flint;
         public Item harePaw;
         public Item purse;
+        public Item oldKey;
 
         public Consumable antidote;
         public Consumable bondage;
@@ -53,9 +53,9 @@ namespace ELEKSUNI
             { new Spot(Keys.OrdinaryForest) },
             { new Spot(Keys.Oak) },
             { new Spot(Keys.Oak) },
-            { new Spot(Keys.Berries) },
-            { new Spot(Keys.Berries) },
-            { new Spot(Keys.Berries) },
+            { new Spot(Keys.MixedForestWithBerries) },
+            { new Spot(Keys.MixedForestWithBerries) },
+            { new Spot(Keys.MixedForestWithBerries) },
             { new Spot(Keys.Oak) },
             { new Spot(Keys.Cave) },
             { new Spot(Keys.Lake, bear) },
@@ -87,7 +87,7 @@ namespace ELEKSUNI
             { new Spot(Keys.Crater, meteor) },
             { new Spot(Keys.Creek, wolf) },
             { new Spot(Keys.OrdinaryForest, trap) },
-            { new Spot(Keys.Hanged, flint) },
+            { new Spot(Keys.Hanged) },
             { new Spot(Keys.WolfPit, sharpStick) },
             { new Spot(Keys.ForesterHouse, forester) },
             { new Spot(Keys.Oak, purse) },
@@ -96,8 +96,8 @@ namespace ELEKSUNI
             { new Spot(Keys.Burrow) },
             { new Spot(Keys.Oak, hornetNest) },
             { new Spot(Keys.Lake, bear) },
-            { new Spot(Keys.Berries, berries) },
-            { new Spot(Keys.Berries, poisonBerries) },
+            { new Spot(Keys.MixedForestWithBerries, berries) },
+            { new Spot(Keys.MixedForestWithBerries, poisonBerries) },
             { new Spot(Keys.GingerbreadHouse, witch) },
             };
         }
@@ -117,13 +117,13 @@ namespace ELEKSUNI
             wolfSkin = new Item(Keys.WolfSkin, 15, 1.5);
             wolfTeeth = new Item(Keys.WolfTeeth, 3, 0.2);
             leftShoe = new Item(Keys.Shoe, 2, 0.5);
-            flint = new Item(Keys.Flint, 12, 0.1, Keys.Fire);
             harePaw = new Item(Keys.HarePaw, 7, 0.1);
+            oldKey = new Item(Keys.OldKey, 1, 0.1);
             purse = new Item(Keys.Purse, 6, 0.2, Keys.Open);
             //Consumables
             antidote = Consumable.CreateCure(9, 0.2);
             bondage = Consumable.CreateBandage(4, 0.2);
-            meat = Consumable.CreateFood(Keys.Meat, 5, 1.7, 150);
+            meat = Consumable.CreateFood(Keys.Meat, 5, 1.7, 90);
             berries = Consumable.CreateFood(Keys.Berries, 1, 0.3, 20);
             poisonBerries = Consumable.CreatePoisoned(Keys.Berries, 1, 0.3);
             mushrooms = Consumable.CreateFood(Keys.Mushrooms, 2, 0.3, 40);

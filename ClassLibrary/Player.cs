@@ -13,8 +13,9 @@ namespace ELEKSUNI
         public Weapon CurrentWeapon { get; set; }
         public Clothes CurrentClothes { get; set; }
         public List<Keys> Effects { get; private set; }
-        public Inventory inventory;
+        public Inventory Inventory { get; private set; }
         private double hungerModifier;
+        public bool hasFire;
         public Player(string playerName)
         {
             staminaRegenRate = 3;
@@ -22,7 +23,7 @@ namespace ELEKSUNI
             Health = 100;
             stamina = 100;
             hunger = 0;
-            inventory = new Inventory();
+            Inventory = new Inventory();
             Effects = new List<Keys>();
         }
         public double Rest()
@@ -67,20 +68,20 @@ namespace ELEKSUNI
         {
             double speed = (int)MainQuestConfig.BasePlayerSpeed;
             double maxWeight = (int)MainQuestConfig.MaxWeightPlayerCanCarry;
-            if (maxWeight < inventory.Weight)
+            if (maxWeight < Inventory.Weight)
             {
-                speed *= Math.Sqrt(maxWeight / inventory.Weight);
+                speed *= Math.Sqrt(maxWeight / Inventory.Weight);
             }
             return speed;
         }
         public void InnerStateProcess(double time)
         {
             hunger += time * hungerModifier;
-            if(hunger >= 100 && Effects.Contains(Keys.Sturve))
+            if(hunger >= 100 && !Effects.Contains(Keys.Starve))
             {
-
+                Effects.Add(Keys.Starve);
             }
-            Health -= (int)((hunger / 100) * time);
+            Health -= (hunger < 100) ? 0 : (int) (hunger / 100 * time);
         }
         public void TakeHit(int attack)
         {
@@ -97,23 +98,23 @@ namespace ELEKSUNI
         {
             if (!isPoisoned)
             {
-                Consumable food = (Consumable)inventory.CurrentItem;
+                Consumable food = (Consumable)Inventory.CurrentItem;
                 hunger -= food.EffectPower;
-                if(hunger < 100 && Effects.Contains(Keys.Sturve))
+                if(hunger < 100 && Effects.Contains(Keys.Starve))
                 {
-                    Effects.Remove(Keys.Sturve);
+                    Effects.Remove(Keys.Starve);
                 }
             }
             else
             {
-                Effects.Add(Keys.Poison);
+                Effects.Add(Keys.IsPoisoned);
             }
-            inventory.Drop();
+            Inventory.Drop();
         }
         public void TakeAntidote()
         {
-            Effects.Remove(Keys.Poison);
-            inventory.Drop();
+            Effects.Remove(Keys.IsPoisoned);
+            Inventory.Drop();
         }
     }
 }

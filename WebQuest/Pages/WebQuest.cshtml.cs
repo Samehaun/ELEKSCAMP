@@ -16,7 +16,7 @@ namespace WebQuest.Pages
     {
         public Guid id;
         private Quest quest;
-        private QuestState state;
+        private Report state;
         public string Message { get; private set; }
         public string PlayerState { get; private set; }
         public List<string> Options { get; private set; }
