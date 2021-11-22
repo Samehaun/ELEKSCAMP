@@ -201,7 +201,7 @@ namespace ELEKSUNI
                 {
                     AppendStateMessage(Keys.Enemy, questMap.PlayerSpot.npc.Name);
                 }
-                report.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
+                report.PlayerStateOrAdditionalInformation = Data.PlayerStateBuilder(player, language);
                 ResetAvailableOptions(questMap.PlayerSpot.GetListOfPossibleOptions());
                 ResetMenuCallsChain();
                 ProceedInput = NonInventoryDialogInputHandler;
@@ -386,7 +386,7 @@ namespace ELEKSUNI
             {
                 time.ChangeTime(player.Sleep());
                 SetStateMessage(Keys.WakeUp);
-                report.PlayerStateOrAdditionalInformation = Data.StateBuilder(player, language);
+                report.PlayerStateOrAdditionalInformation = Data.PlayerStateBuilder(player, language);
             }
             LaunchMainDialog();
         }
@@ -585,7 +585,7 @@ namespace ELEKSUNI
         }
         private void ComplexStateReport(Keys key)
         {
-            report.PlayerStateOrAdditionalInformation = $"{ Data.Localize(key, language) }{ Environment.NewLine }{ Data.StateBuilder(player, language) }";
+            report.PlayerStateOrAdditionalInformation = $"{ Data.Localize(key, language) }{ Environment.NewLine }{ Data.PlayerStateBuilder(player, language) }";
         }
     }
 }

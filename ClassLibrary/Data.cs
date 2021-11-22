@@ -353,7 +353,7 @@ namespace ELEKSUNI
                     return $"Wrong language settings";
             }
         }
-        public static string StateBuilder(Player player, string languageSettings)
+        public static string PlayerStateBuilder(Player player, string languageSettings)
         {
             string actualState;
             switch (languageSettings)
