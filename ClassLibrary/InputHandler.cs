@@ -7,17 +7,35 @@ namespace ELEKSUNI
 {
     class InputHandler
     {
-        List<ICommand> commands;
-
-        public InputHandler() { }
-        public void SetCommand(List<ICommand> commands)
+        List<Command> commands;
+        Stack<Command> history;
+        public InputHandler() 
+        {
+            history = new Stack<Command>();
+        }
+        public void SetCommand(List<Command> commands)
         {
             this.commands = commands;
         }
-
         public void PoceedInput(int i)
         {
             commands[i].Execute();
+        }
+        public void ResetCommandsHistory(Command command)
+        {
+            history.Clear();
+            history.Push(command);
+        }
+        public void DiveInNestedMenu(Command command)
+        {
+            if(history.Peek() != command)
+            {
+                history.Push(command);
+            }
+        }
+        public void PreviousMenu()
+        {
+            history.Pop().Execute();
         }
     }
 }
