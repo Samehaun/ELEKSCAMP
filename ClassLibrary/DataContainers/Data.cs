@@ -7,9 +7,12 @@ namespace ELEKSUNI
 {
     enum Keys
     {
+        Main,
+        Item,
         OldKey,
         GetPoisonMessage,
         Berries,
+        PoisonBerries,
         EatPoison,
         Purse,
         Open,
@@ -23,6 +26,7 @@ namespace ELEKSUNI
         WolfSkin,
         WolfTeeth,
         Mushrooms,
+        PoisonMushrooms,
         NPC,
         Enemy,
         SharpStick,
@@ -117,6 +121,7 @@ namespace ELEKSUNI
             {Keys.OldKey, "Old rusty key" },
             {Keys.GetPoisonMessage, "You feel sick" },
             {Keys.Berries, "Berries" },
+            {Keys.PoisonBerries, "Berries" },
             {Keys.EatPoison, "Eat" },
             {Keys.Purse, "Old leather purse" },
             {Keys.Open, "Open" },
@@ -130,6 +135,7 @@ namespace ELEKSUNI
             {Keys.WolfSkin, "Wolf skin" },
             {Keys.WolfTeeth, "Wolf teeth" },
             {Keys.Mushrooms, "Mushrooms" },
+            {Keys.PoisonMushrooms, "Mushrooms" },
             {Keys.NPC, "Interact with owner" },
             {Keys.Enemy, "Watch out! Enemy spotted - " },
             {Keys.SharpStick, "Sharp stick" },
@@ -353,7 +359,7 @@ namespace ELEKSUNI
                     return $"Wrong language settings";
             }
         }
-        public static string StateBuilder(Player player, string languageSettings)
+        public static string PlayerStateBuilder(Player player, string languageSettings)
         {
             string actualState;
             switch (languageSettings)
@@ -371,7 +377,7 @@ namespace ELEKSUNI
                     actualState = $"Wrong language settings";
                     break;
             }
-            if(player.Effects.Count > 0)
+            if (player.Effects.Count > 0)
             {
                 foreach (var effect in player.Effects)
                 {

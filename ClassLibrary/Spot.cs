@@ -6,16 +6,19 @@ namespace ELEKSUNI
     class Spot
     {
         private List<Keys> travelDirecionsAvailableFromThisSpot;
-        public Keys Description { get; }
+        public Keys Description { get; private set; }
         public bool searched;
         public (int x, int y) Coordinates { get; private set; }
         public Item item;
         public NPC npc;
-        public Spot(Keys description)
+        public Spot()
         {
             travelDirecionsAvailableFromThisSpot = new List<Keys>();
-            this.Description = description;
             searched = false;
+        }
+        public Spot(Keys description) : this()
+        {
+            this.Description = description;
         }
         public Spot((int, int) index, Keys description) : this(description)
         {
@@ -85,6 +88,59 @@ namespace ELEKSUNI
         {
             Coordinates = index;
             SetAvailableTravelDirections(index);
+        }
+        public SpotSave Save()
+        {
+            return new SpotSave(this);
+        }
+        public void Load(SpotSave save, Prefabs prefabs)
+        {
+            travelDirecionsAvailableFromThisSpot.AddRange(save.AvailableDirections);
+            Description = save.Description;
+            searched = save.Searched;
+            Coordinates = save.Coordinates;
+            if(save.Item != null)
+            {
+                item = prefabs.GetItemByKey((Keys)save.Item);
+            }
+            if (save.Npc != null)
+            {
+                npc = new NPC();
+                npc.Load((NPCSave)save.Npc, prefabs);
+            }
+        }
+    }
+    struct SpotSave
+    {
+        public List<Keys> AvailableDirections { get; set; }
+        public Keys Description { get; set; }
+        public bool Searched { get; set; }
+        public (int x, int y) Coordinates { get; set; }
+        public Keys? Item { get; set; }
+        public NPCSave? Npc { get; set; }
+        public SpotSave(Spot spot)
+        {
+            AvailableDirections = new List<Keys>();
+            AvailableDirections.AddRange(spot.GetAvailableDirections());
+            Description = spot.Description;
+            Searched = spot.searched;
+            Coordinates = spot.Coordinates;
+            if (spot.item != null)
+            {
+                Item = spot.item.Name;
+            }
+            else
+            {
+                Item = null;
+            }
+            if(spot.npc != null)
+            {
+                Npc = spot.npc.Save();
+            }
+            else
+            {
+                Npc = null;
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ namespace ELEKSUNI
 {
     class Prefabs
     {
+        private Dictionary<Keys, Item> items;
         public Clothes simpleClothes;
         public Clothes heavyClothes;
 
@@ -22,7 +23,7 @@ namespace ELEKSUNI
         public Item oldKey;
 
         public Consumable antidote;
-        public Consumable bondage;
+        public Consumable bandage;
         public Consumable meat;
         public Consumable berries;
         public Consumable poisonBerries;
@@ -122,23 +123,52 @@ namespace ELEKSUNI
             purse = new Item(Keys.Purse, 6, 0.2, Keys.Open);
             //Consumables
             antidote = Consumable.CreateCure(9, 0.2);
-            bondage = Consumable.CreateBandage(4, 0.2);
+            bandage = Consumable.CreateBandage(4, 0.2);
             meat = Consumable.CreateFood(Keys.Meat, 5, 1.7, 90);
             berries = Consumable.CreateFood(Keys.Berries, 1, 0.3, 20);
-            poisonBerries = Consumable.CreatePoisoned(Keys.Berries, 1, 0.3);
+            poisonBerries = Consumable.CreatePoisoned(Keys.PoisonBerries, 1, 0.3);
             mushrooms = Consumable.CreateFood(Keys.Mushrooms, 2, 0.3, 40);
-            poisonMushrooms = Consumable.CreatePoisoned(Keys.Mushrooms, 2, 0.3);
+            poisonMushrooms = Consumable.CreatePoisoned(Keys.PoisonMushrooms, 2, 0.3);
             trap = Consumable.CreateTrap(40);
             hornetNest = Consumable.CreateHornetNest(30);
             //NPC
             witch = new NPC(Keys.Witch, 250, 10, 35, false, new List<Item>() { antidote });
-            forester = new NPC(Keys.Forester, 100, 30, 20, false, new List<Item>() { axe, heavyClothes, bondage });
+            forester = new NPC(Keys.Forester, 100, 30, 20, false, new List<Item>() { axe, heavyClothes, bandage });
             leprechaun = new NPC(Keys.Leprechaun, 50, 10, 10, false);
             bear = new NPC(Keys.Bear, 500, 80, 80, true);
             wolf = new NPC(Keys.Wolf, 70, 25, 30, true, new List<Item>() { wolfSkin });
             hare = new NPC(Keys.Hare, 0, 0, 0, false, new List<Item>() { meat, harePaw } );
-            
 
+            items = new Dictionary<Keys, Item>()
+            {
+                { Keys.SimpleClothes, simpleClothes },
+                { Keys.HeavyClothes, heavyClothes },
+                { Keys.SharpStick, sharpStick },
+                { Keys.SharpKnife, sharpKnife },
+                { Keys.Knife, knife },
+                { Keys.OldAxe, oldAxe },
+                { Keys.Axe, axe },
+                { Keys.Meteor, meteor },
+                { Keys.WolfSkin, wolfSkin },
+                { Keys.WolfTeeth, wolfTeeth },
+                { Keys.Shoe, leftShoe },
+                { Keys.HarePaw, harePaw },
+                { Keys.OldKey, oldKey },
+                { Keys.Purse, purse },
+                { Keys.Cure, antidote },
+                { Keys.Bandage, bandage },
+                { Keys.Meat, meat },
+                { Keys.Berries, berries },
+                { Keys.PoisonBerries, poisonBerries },
+                { Keys.Mushrooms, mushrooms },
+                { Keys.PoisonMushrooms, poisonMushrooms },
+                { Keys.Trap, trap },
+                { Keys.HornetNest, hornetNest }
+            };
+        }
+        public Item GetItemByKey(Keys key)
+        {
+            return items[key];
         }
     }
 }

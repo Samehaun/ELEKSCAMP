@@ -15,16 +15,18 @@ namespace ELEKSUNI
         public List<Keys> Effects { get; private set; }
         public Inventory Inventory { get; private set; }
         private double hungerModifier;
-        public bool hasFire;
-        public Player(string playerName)
+        public Player()
         {
             staminaRegenRate = 3;
-            Name = playerName;
             Health = 100;
             stamina = 100;
             hunger = 0;
             Inventory = new Inventory();
             Effects = new List<Keys>();
+        }
+        public Player(string playerName) : this()
+        {
+            Name = playerName;
         }
         public double Rest()
         {
@@ -115,6 +117,73 @@ namespace ELEKSUNI
         {
             Effects.Remove(Keys.IsPoisoned);
             Inventory.Drop();
+        }
+        public PlayerSave Save()
+        {
+            return new PlayerSave(this, stamina, hunger);
+        }
+        public void Load(PlayerSave save, Prefabs prefabs)
+        {
+            stamina = save.Stamina;
+            hunger = save.Hunger;
+            Name = save.Name;
+            Health = save.Health;
+            if(save.CurrentClothes != null)
+            {
+                CurrentClothes = (Clothes)prefabs.GetItemByKey((Keys)save.CurrentClothes);
+            }
+            if(save.CurrentWeapon != null)
+            {
+                CurrentWeapon = (Weapon)prefabs.GetItemByKey((Keys)save.CurrentWeapon);
+            }
+            Effects.AddRange(save.Effects);
+            Inventory.Load(save.Inventory, prefabs);
+        }
+    }
+    struct PlayerSave
+    {
+        public double Stamina { get; set; }
+        public double Hunger { get; set; }
+        public string Name { get; set; }
+        public int Health { get; set; }
+        public Keys? CurrentWeapon { get; set; }
+        public Keys? CurrentClothes { get; set; }
+        public List<Keys> Effects { get; set; }
+        public InventorySave Inventory { get; set; }
+        public Keys? SelectedItem { get; set; }
+        public PlayerSave(Player player, double stamina, double hunger)
+        {
+            Hunger = hunger;
+            Stamina = stamina;
+            Name = player.Name;
+            Health = player.Health;
+            if (player.CurrentClothes != null)
+            {
+                CurrentClothes = player.CurrentClothes.Name;
+            }
+            else
+            {
+                CurrentClothes = null;
+            }
+            if(player.CurrentWeapon != null)
+            {
+                CurrentWeapon = player.CurrentWeapon.Name;
+            }
+            else
+            {
+                CurrentWeapon = null;
+            }
+            Effects = new List<Keys>();
+            Effects.AddRange(player.Effects);
+            Inventory = player.Inventory.Save();
+            if(player.Inventory.CurrentItem != null)
+            {
+                SelectedItem = player.Inventory.CurrentItem.Name;
+            }
+            else
+            {
+                SelectedItem = null;
+            }
         }
     }
 }

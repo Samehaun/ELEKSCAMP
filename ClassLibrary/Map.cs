@@ -17,21 +17,25 @@ namespace ELEKSUNI
         };
         private List<Spot> spots;
         private Dictionary<(int x, int y), Spot> map;
-        private Player player;
+        internal Player player;
         public Spot PlayerSpot { get; private set; }
         private Spot exit;
         public bool ExitReached { get; private set; }
-        public Map(Player player)
+        public Map()
         {
             prefabs = new Prefabs();
             randomizer = new Random(DateTime.Now.Millisecond);
             map = new Dictionary<(int x, int y), Spot>();
+            ExitReached = false;
+            player = new Player();
+        }
+        public Map(Player player) : this()
+        {
             prefabs.GenerateSpotPrefabs();
             spots = new List<Spot>(prefabs.GetPrefabs());
             this.player = player;
             player.Inventory.Add(prefabs.simpleClothes);
             player.CurrentClothes = prefabs.simpleClothes;
-            ExitReached = false;
             if (player.Name == "Test" || player.Name == "test")
             {
                 player.Inventory.AddMoney(500);
@@ -181,6 +185,40 @@ namespace ELEKSUNI
             exit = new Spot((0, -1), Keys.Exit);
             map[(0, 0)].AddAvailableTravelDirection(Keys.West);
             AddSpot(exit);
+        }
+        public void Load(MapSave save)
+        {
+            foreach (var spotSave in save.Map)
+            {
+                Spot spot = new Spot();
+                spot.Load(spotSave, prefabs);
+                AddSpot(spot);
+            }
+            exit = map[save.Exit];
+            PlayerSpot = map[save.PlayerSpot];
+            player.Load(save.Player, prefabs);
+        }
+        public MapSave Save()
+        {
+            return new MapSave(map, exit, PlayerSpot, player);
+        }
+    }
+    struct MapSave
+    {
+        public PlayerSave Player { get; set; }
+        public List<SpotSave> Map { get; set; }
+        public (int x, int y) PlayerSpot { get; set; }
+        public (int x, int y) Exit { get; set; }
+        public MapSave(Dictionary<(int x, int y), Spot> map, Spot exit, Spot playerSpot, Player player)
+        {
+            Map = new List<SpotSave>();
+            PlayerSpot = playerSpot.Coordinates;
+            Exit = exit.Coordinates;
+            foreach (var spot in map.Values)
+            {
+                Map.Add(spot.Save());
+            }
+            Player = player.Save();
         }
     }
 }

@@ -50,9 +50,9 @@ namespace ConsoleQuest
         private static void Output(Report state)
         {
             Console.WriteLine(state.Message);
-            if (state.PlayerStateOrAdditionalInformation != null)
+            if (state.PlayerState != null)
             {
-                Console.WriteLine(state.PlayerStateOrAdditionalInformation);
+                Console.WriteLine(state.PlayerState);
             }
             if (state.Options != null)
             {

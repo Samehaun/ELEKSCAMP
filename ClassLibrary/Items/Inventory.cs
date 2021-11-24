@@ -57,5 +57,47 @@ namespace ELEKSUNI
             }
             return weight;
         }
+        public InventorySave Save()
+        {
+            return new InventorySave(this);
+        }
+        public void Load(InventorySave save, Prefabs prefabs)
+        {
+            Weight = save.Weight;
+            Coins = save.Coins;
+            if(CurrentItem != null)
+            {
+                CurrentItem = prefabs.GetItemByKey((Keys)save.CurrentItem);
+            }
+            foreach (var key in save.Items)
+            {
+                Items.Add(prefabs.GetItemByKey(key));
+            }
+        }
+    }
+    struct InventorySave
+    {
+        public double Weight { get; set; }
+        public int Coins { get; set; }
+        public Keys? CurrentItem { get; set; }
+        public List<Keys> Items { get; set; }
+        public InventorySave(Inventory inventory)
+        {
+            Weight = inventory.Weight;
+            Coins = inventory.Coins;
+            if(inventory.CurrentItem != null)
+            {
+                CurrentItem = inventory.CurrentItem.Name;
+            }
+            else
+            {
+                CurrentItem = null;
+            }
+            Items = new List<Keys>();
+            foreach (var item in inventory.Items)
+            {
+                Items.Add(item.Name);
+            }
+        }
     }
 }
