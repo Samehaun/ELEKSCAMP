@@ -18,6 +18,7 @@ namespace ELEKSUNI
         internal Map questMap;
         internal Player player;
         internal InputHandler inputProcessor;
+        internal Commands commands;
         public bool IsEnded { get; private set; }
         internal Report report;
         public Report Start(string name)
@@ -26,6 +27,8 @@ namespace ELEKSUNI
             questMap = new Map(player);
             time = new Time();
             report = new Report();
+            inputProcessor = new InputHandler();
+            commands = new Commands(this);
             if (player.Name == "Test" || player.Name == "test")
             {
                 questMap.SetPlayerLocation((0, 0));
@@ -36,8 +39,7 @@ namespace ELEKSUNI
             }
             report.SetReportMessage($"Select preferred language:");
             report.ResetOptions(new List<string>() { "EN", "RU", "UA" });
-            SetEnglishCommand english = new SetEnglishCommand(this);
-            inputProcessor.SetCommand(new List<Command>() { new SetEnglishCommand(this), new SetRussianCommand(this), new SetUkrainianCommand(this) });
+            inputProcessor.SetCommands(new List<Command>() { commands.GetCommand(Keys.EN), commands.GetCommand(Keys.RU), commands.GetCommand(Keys.UA) });
             return report;
         }
         public Report ProceedInput(int input)
@@ -190,7 +192,7 @@ namespace ELEKSUNI
         {
             AddUniqueCallInMenueCallHistory(LaunchTradeDialog);
             SetStateMessage(Keys.Buy);
-            ListInventoryForTrading(questMap.PlayerSpot.npc.inventory);
+            ListInventoryForTrading(questMap.PlayerSpot.npc.Inventory);
             report.PlayerStateOrAdditionalInformation = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
             ProceedInput = BuyDialogInputHandler;
         }
@@ -199,14 +201,14 @@ namespace ELEKSUNI
             AddUniqueCallInMenueCallHistory(LaunchNpcDialog);
             SetStateMessage(questMap.PlayerSpot.npc.Name);
             AppendStateMessage(Keys.Steal);
-            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.inventory);
+            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.Inventory);
             ProceedInput = StealDialogInputHandler;
         }
         private void LaunchLootDialog()
         {
             SetStateMessage(questMap.PlayerSpot.npc.Name);
             AppendStateMessage(Keys.Loot);
-            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.inventory);
+            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.Inventory);
             ProceedInput = LootDialogInputHandler;
         }
         internal bool IsQuestEnded()
@@ -235,7 +237,7 @@ namespace ELEKSUNI
         {
             SelectItemInPlayerInventory(input);
             UnequipSelectedItem();
-            questMap.PlayerSpot.npc.inventory.Add(player.Inventory.CurrentItem);
+            questMap.PlayerSpot.npc.Inventory.Add(player.Inventory.CurrentItem);
             player.Inventory.Sell();
             LaunchSellDialog();
         }
@@ -244,40 +246,28 @@ namespace ELEKSUNI
             SelectItemInNpcInventory(input);
             if (player.Inventory.Coins >= player.Inventory.CurrentItem.Price)
             {
-                questMap.PlayerSpot.npc.inventory.Drop();
+                questMap.PlayerSpot.npc.Inventory.Drop();
                 player.Inventory.Buy();
                 LaunchBuyDialog();
             }
-        }
-        private void Cancel()
-        {
-            report.Message = null;
-            menuCallChain.Pop().Invoke();
         }
         private void StealOrLoot(int input)
         {
             SelectItemInNpcInventory(input);
             player.Inventory.Add(player.Inventory.CurrentItem);
-            questMap.PlayerSpot.npc.inventory.Drop();
+            questMap.PlayerSpot.npc.Inventory.Drop();
         }
-        private void Equip()
+
+        internal void UnequipSelectedItem()
         {
-            if (player.Inventory.CurrentItem is Weapon)
+            if (player.CurrentClothes == player.Inventory.CurrentItem)
             {
-                player.CurrentWeapon = (Weapon)player.Inventory.CurrentItem;
+                player.CurrentClothes = null;
             }
-            else
+            else if (player.CurrentWeapon == player.Inventory.CurrentItem)
             {
-                player.CurrentClothes = (Clothes)player.Inventory.CurrentItem;
+                player.CurrentWeapon = null;
             }
-            Cancel();
-        }
-        private void PlayerReachedNewZone(int speedModifier = 1)
-        {
-            SetStateMessage(Keys.NextZone);
-            time.ChangeTime(player.CalculateTimeNeededToTravel());
-            player.RecaculateStateDueToTraveling(speedModifier);
-            LaunchMainDialog();
         }
         private void Run()
         {
@@ -303,21 +293,21 @@ namespace ELEKSUNI
                 SearchSpotForHiddenItem();
             }
         }
-        private void Hunt()
+        internal void Hunt()
         {
-            SetStateMessage(Keys.HuntSucceed);
+            report.SetReportMessage(Keys.HuntSucceed);
             questMap.PlayerSpot.npc = questMap.prefabs.hare;
-            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.inventory);
-            ProceedInput = LootDialogInputHandler;
+            report.ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.Inventory, player);
+            ListInventoryForUseAndLoot(questMap.PlayerSpot.npc.Inventory);
         }
-        private void SearchSpotForHiddenItem()
+        internal void SearchSpotForHiddenItem()
         {
             Item newItem = questMap.PlayerSpot.item;
             if (newItem != null)
             {
                 if ((newItem is Consumable) && (newItem as Consumable).AutoConsume)
                 {
-                    commands[newItem.Use()].Invoke();
+                    commands.GetCommand(newItem.Use()).Execute();
                 }
                 else
                 {
@@ -326,11 +316,11 @@ namespace ELEKSUNI
             }
             else
             {
-                SetStateMessage(Keys.NotFound);
+                report.SetReportMessage(Keys.NotFound);
             }
             time.ChangeTime(1);
             player.InnerStateProcess(1);
-            LaunchMainDialog();
+            Commands.MainDialog(this);
         }
 
         private void FoundHiddenItem(Item newItem)
@@ -348,8 +338,8 @@ namespace ELEKSUNI
         }
         private void SelectItemInNpcInventory(int input)
         {
-            player.Inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
-            questMap.PlayerSpot.npc.inventory.CurrentItem = player.Inventory.CurrentItem;
+            player.Inventory.CurrentItem = questMap.PlayerSpot.npc.Inventory.Items[input];
+            questMap.PlayerSpot.npc.Inventory.CurrentItem = player.Inventory.CurrentItem;
         }
         private void Eat()
         {

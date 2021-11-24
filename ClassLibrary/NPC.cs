@@ -11,7 +11,7 @@ namespace ELEKSUNI
         public int Health { get; private set; }
         public int Defence { get; private set; }
         public int Attack { get; private set; }
-        public Inventory inventory;
+        public Inventory Inventory { get; private set; };
         public bool IsHostile { get; set; }
         public List<Keys> GetListOfPossibleOptions()
         {
@@ -42,10 +42,10 @@ namespace ELEKSUNI
             Defence = defence;
             Attack = attack;
             IsHostile = isHostile;
-            inventory = new Inventory();
+            Inventory = new Inventory();
             if (items != null)
             {
-                inventory.Items.AddRange(items);
+                Inventory.Items.AddRange(items);
             }
         }
         public void TakeHit(int attack)

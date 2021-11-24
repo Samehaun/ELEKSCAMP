@@ -13,7 +13,7 @@ namespace ELEKSUNI
         {
             history = new Stack<Command>();
         }
-        public void SetCommand(List<Command> commands)
+        public void SetCommands(List<Command> commands)
         {
             this.commands = commands;
         }

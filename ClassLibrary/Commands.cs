@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
@@ -13,6 +10,7 @@ namespace ELEKSUNI
         protected Quest quest;
         protected Time time;
         protected Player player;
+        protected Commands commands;
         public Command(Quest quest)
         {
             this.report = quest.report;
@@ -21,6 +19,7 @@ namespace ELEKSUNI
             this.quest = quest;
             this.time = quest.time;
             this.player = quest.player;
+            this.commands = quest.commands;
         }
         abstract public void Execute();
     }
@@ -42,52 +41,226 @@ namespace ELEKSUNI
                 { Keys.RU, new SetRussianCommand(quest)},
                 { Keys.UA, new SetUkrainianCommand(quest)},
                 { Keys.Drop, new DropCommand(quest) },
-                { Keys.Equip, Equip },
-                { Keys.Search, Search },
-                { Keys.Inventory, LaunchOpenInventoryDialog },
-                { Keys.Cancel, Cancel },
-                { Keys.Trade, LaunchTradeDialog },
-                { Keys.Sell, LaunchSellDialog },
-                { Keys.Buy, LaunchBuyDialog },
-                { Keys.Eat, Eat },
-                { Keys.Fight, Fight },
-                { Keys.Run, Run },
-                { Keys.NPC, LaunchNpcDialog },
-                { Keys.Steal, LaunchStealDialog },
-                { Keys.Loot, LaunchLootDialog },
-                { Keys.Open, Open },
-                { Keys.EatPoison, Poison },
-                { Keys.Drink, CurePoison },
-                { Keys.Trap, TriggerTrap },
-                { Keys.HornetNest, TriggerHornetNest }
+                { Keys.Equip, new EquipCommand(quest) },
+                { Keys.Search, new SearchCommand(quest) },
+                { Keys.Inventory, new LauncOpenInventoryDialogCommand(quest) },
+                { Keys.Cancel, new CancelCommand(quest) },
+                { Keys.Trade, new LaunchTradeDialogCommand(quest) },
+                { Keys.Sell, new LaunchSellDialogCommand(quest) },
+                { Keys.Buy, new LaunchBuyDialogCommand(quest) },
+                { Keys.Eat, new EatCommand(quest) },
+                { Keys.Fight, new FightCommand(quest) },
+                { Keys.Run, new RunCommand(quest) },
+                { Keys.NPC, new LaunchNpcDialogCommand(quest) },
+                { Keys.Steal, new LaunchStealDialogCommand(quest) },
+                { Keys.Loot, new LaunchLootDialogCommand(quest) },
+                { Keys.Open, new OpenCommand(quest) },
+                { Keys.EatPoison, new PoisonCommand(quest) },
+                { Keys.Drink, new CurePoison(quest) },
+                { Keys.Trap, new TriggerTrap(quest) },
+                { Keys.HornetNest, new TriggerHornetNest(quest) }
             };
         }
-        public void ExecuteCommand(Keys key)
+        public Command GetCommand(Keys key)
         {
-            commands[key].Execute();
+            return commands[key];
         }
         public static void MainDialog(Quest quest)
         {
             LaunchMainDialogCommand main = new LaunchMainDialogCommand(quest);
             main.Execute();
         }
-        public static void NewZone(Quest quest)
+        public static void NewZone(Quest quest, int speedModifier)
         {
             quest.report.SetReportMessage(Keys.NextZone);
+            quest.time.ChangeTime(quest.player.CalculateTimeNeededToTravel());
+            quest.player.RecaculateStateDueToTraveling(speedModifier);
             MainDialog(quest);
         }
-        public static void UnequipSelectedItem(Player player)
+        public List<Command> GetCommandList(List<Keys> keys)
         {
-            if (player.CurrentClothes == player.Inventory.CurrentItem)
+            List<Command> options = new List<Command>();
+            foreach (var key in keys)
             {
-                player.CurrentClothes = null;
+                options.Add(commands[key]);
             }
-            else if (player.CurrentWeapon == player.Inventory.CurrentItem)
+            return options;
+        }
+        public static List<Command> GetListOfSelectionPlayerItemsCommand(Inventory inventory)
+        {
+            List<Command> options = new List<Command>();
+            foreach (var item in inventory.Items)
             {
-                player.CurrentWeapon = null;
+                options.Add(new SelectItemInPlayerInventoryCommand())
             }
         }
     }
+
+    internal class TriggerHornetNest : Command
+    {
+        public TriggerHornetNest(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class TriggerTrap : Command
+    {
+        public TriggerTrap(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class CurePoison : Command
+    {
+        public CurePoison(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class PoisonCommand : Command
+    {
+        public PoisonCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class OpenCommand : Command
+    {
+        public OpenCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LaunchLootDialogCommand : Command
+    {
+        public LaunchLootDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LaunchStealDialogCommand : Command
+    {
+        public LaunchStealDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LaunchNpcDialogCommand : Command
+    {
+        public LaunchNpcDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class RunCommand : Command
+    {
+        public RunCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class FightCommand : Command
+    {
+        public FightCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class EatCommand : Command
+    {
+        public EatCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LaunchBuyDialogCommand : Command
+    {
+        public LaunchBuyDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LaunchSellDialogCommand : Command
+    {
+        public LaunchSellDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LaunchTradeDialogCommand : Command
+    {
+        public LaunchTradeDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class LauncOpenInventoryDialogCommand : Command
+    {
+        public LauncOpenInventoryDialogCommand(Quest quest) : base(quest)
+        {
+        }
+        public override void Execute()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
     class SetEnglishCommand : Command
     {
         public SetEnglishCommand(Quest current) : base(current) { }
@@ -145,6 +318,7 @@ namespace ELEKSUNI
                 }
                 report.RefreshPlayerState(quest.player);
                 report.ResetOptions(map.PlayerSpot.GetListOfPossibleOptions());
+                proceedInput.SetCommands(commands.GetCommandList(map.PlayerSpot.GetListOfPossibleOptions()));
                 proceedInput.ResetCommandsHistory(this);
             }
         }
@@ -158,6 +332,7 @@ namespace ELEKSUNI
             {
                 report.SetReportMessage(Keys.DirectionDialogMessage);
                 report.ResetOptions(map.PlayerSpot.GetAvailableDirections());
+                proceedInput.SetCommands(commands.GetCommandList(map.PlayerSpot.GetListOfPossibleOptions()));
             }
             else
             {
@@ -173,7 +348,7 @@ namespace ELEKSUNI
         public override void Execute()
         {
             map.Go(Keys.North);
-            Commands.NewZone(quest);
+            Commands.NewZone(quest, 1);
         }
     }
     class GoSouthCommand : Command
@@ -182,7 +357,7 @@ namespace ELEKSUNI
         public override void Execute()
         {
             map.Go(Keys.South);
-            Commands.NewZone(quest);
+            Commands.NewZone(quest, 1);
         }
     }
     class GoEastCommand : Command
@@ -191,7 +366,7 @@ namespace ELEKSUNI
         public override void Execute()
         {
             map.Go(Keys.East);
-            Commands.NewZone(quest);
+            Commands.NewZone(quest, 1);
         }
     }
     class GoWestCommand : Command
@@ -200,7 +375,7 @@ namespace ELEKSUNI
         public override void Execute()
         {
             map.Go(Keys.North);
-            Commands.NewZone(quest);
+            Commands.NewZone(quest, 1);
         }
     }
     class SleepCommand : Command
@@ -236,10 +411,50 @@ namespace ELEKSUNI
         public DropCommand(Quest quest) : base(quest) { }
         public override void Execute()
         {
-            Commands.UnequipSelectedItem(player);
+            quest.UnequipSelectedItem();
             player.Inventory.Drop();
             report.ClearReportMessage();
             proceedInput.PreviousMenu();
+        }
+    }
+    class SelectItemInPlayerInventoryCommand : Command
+    {
+        int itemIndex;
+        public SelectItemInPlayerInventoryCommand(Quest quest, int itemIndex) : base(quest)
+        {
+            this.itemIndex = itemIndex;
+        }
+        public override void Execute()
+        {
+            player.Inventory.CurrentItem = player.Inventory.Items[itemIndex];
+        }
+    }
+    class SelectItemInNPCInventoryCommand : Command
+    {
+        int itemIndex;
+        public SelectItemInNPCInventoryCommand(Quest quest, int itemIndex) : base(quest)
+        {
+            this.itemIndex = itemIndex;
+        }
+        public override void Execute()
+        {
+            player.Inventory.CurrentItem = map.PlayerSpot.npc.Inventory.Items[itemIndex];
+        }
+    }
+    class EquipCommand : Command
+    {
+        public EquipCommand(Quest quest) : base(quest) { }
+        public override void Execute()
+        {
+            if (player.Inventory.CurrentItem is Weapon)
+            {
+                player.CurrentWeapon = (Weapon)player.Inventory.CurrentItem;
+            }
+            else
+            {
+                player.CurrentClothes = (Clothes)player.Inventory.CurrentItem;
+            }
+            new CancelCommand(quest).Execute();
         }
     }
     class CancelCommand : Command
@@ -249,6 +464,29 @@ namespace ELEKSUNI
         {
             report.ClearReportMessage();
             proceedInput.PreviousMenu();
+        }
+    }
+    class SearchCommand : Command
+    {
+        public SearchCommand(Quest quest) : base(quest) { }
+        public override void Execute()
+        {
+            if (map.PlayerSpot.Description == Keys.Burrow && !map.PlayerSpot.searched)
+            {
+                if (player.CurrentWeapon != null)
+                {
+                    quest.Hunt();
+                }
+                else
+                {
+                    report.SetReportMessage(Keys.HuntFailed);
+                }
+                map.PlayerSpot.searched = true;
+            }
+            else
+            {
+                quest.SearchSpotForHiddenItem();
+            }
         }
     }
 }
