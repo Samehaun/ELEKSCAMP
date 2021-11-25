@@ -10,6 +10,7 @@ namespace ELEKSUNI
         public string Map { get; set; }
         public string History { get; set; }
         public string Options { get; set; }
+        public string ActiveHandler { get; set; }
  
     }
 }

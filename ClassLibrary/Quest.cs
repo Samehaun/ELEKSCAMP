@@ -18,6 +18,7 @@ namespace ELEKSUNI
     public class Quest
     {
         Dictionary<Keys, Action> commands;
+        Dictionary<Keys, InputHandler> handlers;
         Time time;
         Map questMap;
         Player player;
@@ -27,6 +28,7 @@ namespace ELEKSUNI
         public delegate Report InputHandler(int input);
         public InputHandler ProceedInput;
         private Stack<Keys> menuCallChain;
+        private Keys activeHandler;
         public Quest()
         {
             time = new Time();
@@ -66,18 +68,18 @@ namespace ELEKSUNI
                 { Keys.Trap, TriggerTrap },
                 { Keys.HornetNest, TriggerHornetNest }
             };
+            handlers = new Dictionary<Keys, InputHandler>() 
+            {
+                { Keys.Inventory, OpenInventoryDialogInputHandler },
+                { Keys.Sell, SellDialogInputHandler },
+                { Keys.Buy, BuyDialogInputHandler },
+                { Keys.Loot, LootDialogInputHandler },
+                { Keys.Steal, StealDialogInputHandler },
+                { Keys.Main, NonInventoryDialogInputHandler }
+            };
             availableCommands = new List<Keys>();
             menuCallChain = new Stack<Keys>();
-        }
-        public void Load(QuestState save)
-        {
-            menuCallChain = JsonConvert.DeserializeObject<Stack<Keys>>(save.History);
-            questMap.Load(JsonConvert.DeserializeObject<MapSave>(save.Map));
-            player = questMap.player;
-            time.Load(JsonConvert.DeserializeObject<TimeSave>(save.Time));
-            commands[JsonConvert.DeserializeObject<Keys>(save.LastCalled)].Invoke();
-            report.Load(JsonConvert.DeserializeObject<ReportSave>(save.Report));
-        }
+        }   
         public QuestState Save()
         {
             QuestState state = new QuestState();
@@ -85,8 +87,29 @@ namespace ELEKSUNI
             state.Map = JsonConvert.SerializeObject(questMap.Save());
             state.Time = JsonConvert.SerializeObject(time.Save());
             state.Report = JsonConvert.SerializeObject(report.Save());
-            state.LastCalled = JsonConvert.SerializeObject(lastMenu);
+            state.ActiveHandler = JsonConvert.SerializeObject(activeHandler);
+            state.Options = JsonConvert.SerializeObject(availableCommands);
             return state;
+        }
+        public void Load(QuestState save)
+        {
+            List<Keys> temp = JsonConvert.DeserializeObject<List<Keys>>(save.History);
+            temp.Reverse();
+            foreach (var key in temp)
+            {
+                menuCallChain.Push(key);
+            }
+            questMap.Load(JsonConvert.DeserializeObject<MapSave>(save.Map));
+            player = questMap.player;
+            time.Load(JsonConvert.DeserializeObject<TimeSave>(save.Time));
+            AssignInputHandler(JsonConvert.DeserializeObject<Keys>(save.ActiveHandler));
+            report.Load(JsonConvert.DeserializeObject<ReportSave>(save.Report));
+            availableCommands = JsonConvert.DeserializeObject<List<Keys>>(save.Options);
+        }
+        private void AssignInputHandler(Keys key)
+        {
+            ProceedInput = handlers[key];
+            activeHandler = key;
         }
         public Report Start(string name)
         {
@@ -107,7 +130,7 @@ namespace ELEKSUNI
             availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
             report.ResetOptions(new List<string>() { "EN", "RU", "UA" });
             menuCallChain = new Stack<Keys>();
-            ProceedInput = NonInventoryDialogInputHandler;
+            AssignInputHandler(Keys.Main);
             return report;
         }
         private void StartHandlingIntInput()
@@ -137,7 +160,7 @@ namespace ELEKSUNI
         {
             ResetAvailableOptions(player.Inventory.CurrentItem.Options);
             AddUniqueCallInMenueCallHistory(Keys.Inventory);
-            ProceedInput = NonInventoryDialogInputHandler;
+            AssignInputHandler(Keys.Main);
         }
         public Report SellDialogInputHandler(int input)
         {
@@ -234,7 +257,7 @@ namespace ELEKSUNI
                 report.RefreshPlayerState(player);
                 ResetAvailableOptions(questMap.PlayerSpot.GetListOfPossibleOptions());
                 ResetMenuCallsChain();
-                ProceedInput = NonInventoryDialogInputHandler;
+                AssignInputHandler(Keys.Main);
             }
         }
         private void LaunchTravelDialog()
@@ -254,34 +277,34 @@ namespace ELEKSUNI
         {
             report.SetReportMessage(Keys.Inventory);
             report.ShowInventoryForUseAndLoot(player.Inventory, player);
-            ProceedInput = OpenInventoryDialogInputHandler;
+            AssignInputHandler(Keys.Inventory);
         }
         private void LaunchNpcDialog()
         {
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             ResetAvailableOptions(questMap.PlayerSpot.npc.GetListOfPossibleOptions());
-            ProceedInput = NonInventoryDialogInputHandler;
+            AssignInputHandler(Keys.Main);
         }
         private void LaunchTradeDialog()
         {
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             ResetAvailableOptions(new List<Keys>() { Keys.Sell, Keys.Buy, Keys.Cancel });
             AddUniqueCallInMenueCallHistory(Keys.NPC);
-            ProceedInput = NonInventoryDialogInputHandler;
+            AssignInputHandler(Keys.Main);
         }
         private void LaunchSellDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.Trade);
             report.SetReportMessage(Keys.Sell);
             report.ShowInventoryForTrading(player.Inventory, player);
-            ProceedInput = SellDialogInputHandler;
+            AssignInputHandler(Keys.Sell);
         }
         private void LaunchBuyDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.Trade);
             report.SetReportMessage(Keys.Buy);
             report.ShowInventoryForTrading(questMap.PlayerSpot.npc.inventory, player);
-            ProceedInput = BuyDialogInputHandler;
+            AssignInputHandler(Keys.Buy);
         }
         private void LaunchStealDialog()
         {
@@ -289,14 +312,14 @@ namespace ELEKSUNI
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             report.AddNewLineMessage(Keys.Steal);
             report.ShowInventoryForUseAndLoot(questMap.PlayerSpot.npc.inventory, player);
-            ProceedInput = StealDialogInputHandler;
+            AssignInputHandler(Keys.Steal);
         }
         private void LaunchLootDialog()
         {
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             report.AddNewLineMessage(Keys.Loot);
             report.ShowInventoryForUseAndLoot(questMap.PlayerSpot.npc.inventory, player);
-            ProceedInput = LootDialogInputHandler;
+            AssignInputHandler(Keys.Loot);
         }
         private void EndQuest(Keys result)
         {

@@ -15,7 +15,7 @@ namespace ELEKSUNI
         }
         internal ReportSave Save()
         {
-            return new ReportSave(Message, language);
+            return new ReportSave(Message, language, Options);
         }
         internal void Load(ReportSave save)
         {
@@ -106,10 +106,14 @@ namespace ELEKSUNI
     {
         public string Message { get; set; }
         public string Language { get; set; }
-        public ReportSave(string message, string langSettings)
+        public List<string> Options { get; set; }
+        public ReportSave(string message, string langSettings, List<string> options)
         {
+            Options = new List<string>();
+            Options.AddRange(options);
             Message = message;
             Language = langSettings;
+
         }
     }
 }
