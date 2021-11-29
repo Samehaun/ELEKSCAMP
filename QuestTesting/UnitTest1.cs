@@ -11,26 +11,36 @@ namespace QuestTesting
         {
             Quest quest = new Quest();
             quest.Start("Test");
-            quest.ProceedInput(0);
-            quest.ProceedInput(0);
-            var result = quest.ProceedInput(2);
+            Report result = GoToExit(quest);
             Assert.Equal($"You have reached new zone{ Environment.NewLine }Road! It will lead somewhere. You got out!", result.Message);
+            static Report GoToExit(Quest quest)
+            {
+                quest.ProceedInput(0);
+                quest.ProceedInput(0);
+                var result = quest.ProceedInput(2);
+                return result;
+            }
         }
         [Fact]
         public void SearchCommandWorks()
         {
             Quest quest = new Quest();
             quest.Start("Test");
-            quest.ProceedInput(0);
-            quest.ProceedInput(0);
-            quest.ProceedInput(0);
-            quest.ProceedInput(0);
+            GoToSpotWithHiddenItem(quest);
             quest.ProceedInput(2);
             var result1 = quest.ProceedInput(4).Options.Count;
             quest.ProceedInput(1);
             quest.ProceedInput(3);
             var result2 = quest.ProceedInput(4).Options.Count;
             Assert.True(result1 < result2);
+
+            static void GoToSpotWithHiddenItem(Quest quest)
+            {
+                quest.ProceedInput(0);
+                quest.ProceedInput(0);
+                quest.ProceedInput(0);
+                quest.ProceedInput(0);
+            }
         }
         [Fact]
         public void SaveLoadSimpleTest()

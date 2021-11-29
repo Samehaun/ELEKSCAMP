@@ -7,6 +7,11 @@ namespace ELEKSUNI
 {
     enum Keys
     {
+        BuyItem,
+        SellItem,
+        LootItem,
+        StealItem,
+        Select,
         Main,
         Item,
         OldKey,
@@ -55,7 +60,7 @@ namespace ELEKSUNI
         SimpleClothes,
         HeavyClothes,
         EN, RU, UA,
-        Equiped,
+        Equipped,
         Bleeding,
         IsPoisoned,
         Starve,
@@ -161,7 +166,7 @@ namespace ELEKSUNI
             {Keys.Bandage, "Bondage"},
             {Keys.CurePoison, "You are feeling better"},
             {Keys.StopBleeding, "It still hurts, but bleeding is stopped"},
-            {Keys.Equiped, "Equipped" },
+            {Keys.Equipped, "Equipped" },
             {Keys.SimpleClothes, "Simple clothes" }, 
             {Keys.HeavyClothes, "Heavy clothes" },
             {Keys.Coins, "coins" },
@@ -223,7 +228,7 @@ namespace ELEKSUNI
         };
         private static Dictionary<Keys, string> ruText = new Dictionary<Keys, string>()
         {
-            {Keys.Equiped, "Эипировано" },
+            {Keys.Equipped, "Эипировано" },
             {Keys.SimpleClothes, "Простая одежда" },
             {Keys.HeavyClothes, "Теплая одежда" },
             {Keys.Coins, "монет" },
@@ -280,12 +285,13 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно черный монолит. Похоже на металл, но теплый."},
             {Keys.ThermalSprings, "Термальный источник"},
             {Keys.Exit, "Дорога! Куда-то она да приведет. Вы выбрались!" },
-            {Keys.Cancel, "Отмена" }, {Keys.Travel, "Идти"},
+            {Keys.Cancel, "Отмена" }, 
+            {Keys.Travel, "Идти"},
             {Keys.Death, "You didn't managed to survive" }
         };
         private static Dictionary<Keys, string> uaText = new Dictionary<Keys, string>()
         {
-            {Keys.Equiped, "Equiped" },
+            {Keys.Equipped, "Equipped" },
             {Keys.SimpleClothes, "Simple clothes" },
             {Keys.HeavyClothes, "Heavy clothes" },
             {Keys.Coins, "coins" },
@@ -342,7 +348,8 @@ namespace ELEKSUNI
             {Keys.Monolith, "Абсолютно чорний моноліт. Схоже на метал, але теплий."},
             {Keys.ThermalSprings, "Термальне джерело"},
             {Keys.Exit, "Дорога! Кудись вона та приведе. Ви вибралися!" },
-            {Keys.Cancel, "Відміна" }, {Keys.Travel, "Йти"},
+            {Keys.Cancel, "Відміна" }, 
+            {Keys.Travel, "Йти"},
             {Keys.Death, "You didn't managed to survive" }
         };
         public static string Localize(Keys text, string languageSettings)

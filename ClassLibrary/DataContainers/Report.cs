@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ELEKSUNI
 {
@@ -36,7 +37,15 @@ namespace ELEKSUNI
         }
         internal void AddNewLineMessage(Keys key)
         {
-            Message = $"{ Message }{ Environment.NewLine }{ Data.Localize(key, language) }";
+            if(Message != null)
+            {
+                Message = $"{ Message }{ Environment.NewLine }{ Data.Localize(key, language) }";
+            }
+            else
+            {
+                Message = $"{ Data.Localize(key, language) }";
+            }
+
         }
         internal void AppendRepportMessage(Keys key)
         {
@@ -66,40 +75,34 @@ namespace ELEKSUNI
             PlayerState = null;
             Options = null;
         }
-        internal void ShowInventoryForUseAndLoot(Inventory inventory, Player player)
+        internal void ShowInventory(Inventory inventory, Player player, Func<Item, string> itemSpecShowMode)
         {
             List<string> itemsDescriptions = new List<string>();
             foreach (var item in inventory.Items)
             {
                 if (item == player.CurrentClothes || item == player.CurrentWeapon)
                 {
-                    itemsDescriptions.Add($"{ item.GetItemSpecs(language) } *{Data.Localize(Keys.Equiped, language)}*");
+                    itemsDescriptions.Add($"{ itemSpecShowMode(item) } *{Data.Localize(Keys.Equipped, language)}*");
                 }
                 else
                 {
-                    itemsDescriptions.Add(item.GetItemSpecs(language));
+                    itemsDescriptions.Add(itemSpecShowMode(item));
                 }
+            }
+            if(itemSpecShowMode == ItemSpecsForTrading)
+            {
+                PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
             }
             itemsDescriptions.Add(Data.Localize(Keys.Cancel, language));
             ResetOptions(itemsDescriptions);
         }
-        internal void ShowInventoryForTrading(Inventory inventory, Player player)
+        internal string ItemSpecs(Item item)
         {
-            List<string> itemsDescriptions = new List<string>();
-            foreach (var item in inventory.Items)
-            {
-                if (item == player.CurrentClothes || item == player.CurrentWeapon)
-                {
-                    itemsDescriptions.Add($"{ item.GetItemSpecsForTrade(language) } *{Data.Localize(Keys.Equiped, language)}*");
-                }
-                else
-                {
-                    itemsDescriptions.Add(item.GetItemSpecsForTrade(language));
-                }
-            }
-            PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
-            itemsDescriptions.Add(Data.Localize(Keys.Cancel, language));
-            ResetOptions(itemsDescriptions);
+            return item.GetItemSpecs(language);
+        }
+        internal string ItemSpecsForTrading(Item item)
+        {
+            return item.GetItemSpecsForTrade(language);
         }
     }
     struct ReportSave

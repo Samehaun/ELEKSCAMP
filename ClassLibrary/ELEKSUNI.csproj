@@ -6,6 +6,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>  
     <ApplicationIcon />
     <StartupObject />
+    <AssemblyName>ELEKSUNI</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

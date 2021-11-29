@@ -150,7 +150,6 @@ namespace ELEKSUNI
         public Keys? CurrentClothes { get; set; }
         public List<Keys> Effects { get; set; }
         public InventorySave Inventory { get; set; }
-        public Keys? SelectedItem { get; set; }
         public PlayerSave(Player player, double stamina, double hunger)
         {
             Hunger = hunger;
@@ -176,14 +175,6 @@ namespace ELEKSUNI
             Effects = new List<Keys>();
             Effects.AddRange(player.Effects);
             Inventory = player.Inventory.Save();
-            if(player.Inventory.CurrentItem != null)
-            {
-                SelectedItem = player.Inventory.CurrentItem.Name;
-            }
-            else
-            {
-                SelectedItem = null;
-            }
         }
     }
 }

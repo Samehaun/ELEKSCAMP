@@ -65,7 +65,7 @@ namespace ELEKSUNI
         {
             Weight = save.Weight;
             Coins = save.Coins;
-            if(CurrentItem != null)
+            if(save.CurrentItem != null)
             {
                 CurrentItem = prefabs.GetItemByKey((Keys)save.CurrentItem);
             }

@@ -8,9 +8,9 @@ namespace ELEKSUNI
     {
         public int Defence { get; private set; }
         public int Warmth { get; private set; }
-        public Clothes(Keys name, int price, double weight, Keys useMethod, int deffence, int warmth) : base(name, price, weight, useMethod)
+        public Clothes(Keys name, int price, double weight, Keys useMethod, int defence, int warmth) : base(name, price, weight, useMethod)
         {
-            Defence = deffence;
+            Defence = defence;
             Warmth = warmth;
         }
         public override string GetItemSpecs(string language)
