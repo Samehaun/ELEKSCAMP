@@ -13,7 +13,7 @@ namespace ELEKSUNI
         public Weapon CurrentWeapon { get; set; }
         public Clothes CurrentClothes { get; set; }
         public List<Keys> Effects { get; private set; }
-        public Inventory Inventory { get; private set; }
+        public Inventory inventory;
         private double hungerModifier;
         public Player()
         {
@@ -21,7 +21,7 @@ namespace ELEKSUNI
             Health = 100;
             stamina = 100;
             hunger = 0;
-            Inventory = new Inventory();
+            inventory = new Inventory();
             Effects = new List<Keys>();
         }
         public Player(string playerName) : this()
@@ -70,11 +70,22 @@ namespace ELEKSUNI
         {
             double speed = (int)MainQuestConfig.BasePlayerSpeed;
             double maxWeight = (int)MainQuestConfig.MaxWeightPlayerCanCarry;
-            if (maxWeight < Inventory.Weight)
+            if (maxWeight < inventory.Weight)
             {
-                speed *= Math.Sqrt(maxWeight / Inventory.Weight);
+                speed *= Math.Sqrt(maxWeight / inventory.Weight);
             }
             return speed;
+        }
+        public void Equip()
+        {
+            if (inventory.CurrentItem is Weapon)
+            {
+                CurrentWeapon = (Weapon)inventory.CurrentItem;
+            }
+            else
+            {
+                CurrentClothes = (Clothes)inventory.CurrentItem;
+            }
         }
         public void InnerStateProcess(double time)
         {
@@ -100,7 +111,7 @@ namespace ELEKSUNI
         {
             if (!isPoisoned)
             {
-                Consumable food = (Consumable)Inventory.CurrentItem;
+                Consumable food = (Consumable)inventory.CurrentItem;
                 hunger -= food.EffectPower;
                 if(hunger < 100 && Effects.Contains(Keys.Starve))
                 {
@@ -111,16 +122,82 @@ namespace ELEKSUNI
             {
                 Effects.Add(Keys.IsPoisoned);
             }
-            Inventory.Drop();
+            inventory.DropSelected();
         }
         public void TakeAntidote()
         {
             Effects.Remove(Keys.IsPoisoned);
-            Inventory.Drop();
+            inventory.DropSelected();
+        }
+        public void Unequip()
+        {
+            if (CurrentClothes == inventory.CurrentItem)
+            {
+                CurrentClothes = null;
+            }
+            else if (CurrentWeapon == inventory.CurrentItem)
+            {
+                CurrentWeapon = null;
+            }
+        }
+        public void Drop()
+        {
+            Unequip();
+            inventory.DropSelected();
+        }
+        public void Sell(int itemToSellIndex, NPC buyer)
+        {
+            Item itemToSell = inventory.GetItem(itemToSellIndex);
+            inventory.AddMoney(itemToSell.Price);
+            inventory.CurrentItem = itemToSell;
+            Unequip();
+            buyer.Buy(itemToSell);
+            inventory.DropSelected();
+        }
+        public void Buy(int itemToBuyIndex, NPC owner)
+        {
+            Item itemToBuy = owner.GetItem(itemToBuyIndex);
+            if (inventory.Coins >= itemToBuy.Price)
+            {
+                inventory.AddMoney(-itemToBuy.Price);
+                Take(itemToBuyIndex, owner);
+            }
+        }
+        public void Take(int itemToTakeIndex, NPC owner)
+        {
+            Item itemToTake = owner.GetItem(itemToTakeIndex);
+            inventory.Add(itemToTake);
+            owner.Drop(itemToTake);
+        }
+        public void Steal(int itemToStealIndex, NPC owner)
+        {
+            Take(itemToStealIndex, owner);
+            owner.IsHostile = true;
+        }
+        public void PickItem(Item item)
+        {
+            inventory.Add(item);
+        }
+        public int HowMuchCoins()
+        {
+            return inventory.Coins;
+        }
+        public Item GetActiveItem()
+        {
+            return inventory.CurrentItem;
+        }
+        public List<Item> GetListOfItemsInInventory()
+        {
+            return inventory.GetItemList();
+        }
+        public Keys SelectItemToOperate(int index)
+        {
+            inventory.CurrentItem = inventory.GetItem(index);
+            return inventory.CurrentItem.Name;
         }
         public PlayerSave Save()
         {
-            return new PlayerSave(this, stamina, hunger);
+            return new PlayerSave(this, inventory, stamina, hunger);
         }
         public void Load(PlayerSave save, Prefabs prefabs)
         {
@@ -137,7 +214,7 @@ namespace ELEKSUNI
                 CurrentWeapon = (Weapon)prefabs.GetItemByKey((Keys)save.CurrentWeapon);
             }
             Effects.AddRange(save.Effects);
-            Inventory.Load(save.Inventory, prefabs);
+            inventory.Load(save.Inventory, prefabs);
         }
     }
     struct PlayerSave
@@ -150,7 +227,7 @@ namespace ELEKSUNI
         public Keys? CurrentClothes { get; set; }
         public List<Keys> Effects { get; set; }
         public InventorySave Inventory { get; set; }
-        public PlayerSave(Player player, double stamina, double hunger)
+        public PlayerSave(Player player, Inventory inventory, double stamina, double hunger)
         {
             Hunger = hunger;
             Stamina = stamina;
@@ -174,7 +251,7 @@ namespace ELEKSUNI
             }
             Effects = new List<Keys>();
             Effects.AddRange(player.Effects);
-            Inventory = player.Inventory.Save();
+            Inventory = inventory.Save();
         }
     }
 }

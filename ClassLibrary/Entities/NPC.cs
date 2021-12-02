@@ -49,7 +49,7 @@ namespace ELEKSUNI
             inventory = new Inventory();
             if (items != null)
             {
-                inventory.Items.AddRange(items);
+                inventory.items.AddRange(items);
             }
         }
         public void TakeHit(int attack)
@@ -59,9 +59,25 @@ namespace ELEKSUNI
                 Health -= (attack - Defence);
             }
         }
+        public void Buy(Item item)
+        {
+            inventory.Add(item);
+        }
+        public void Drop(Item item)
+        {
+            inventory.Drop(item);
+        }
+        public Item GetItem(int index)
+        {
+            return inventory.GetItem(index);
+        }
+        public List<Item> GetListOfItemsInInventory()
+        {
+            return inventory.GetItemList();
+        }
         public NPCSave Save()
         {
-            return new NPCSave(this);
+            return new NPCSave(this, inventory);
         }
         public void Load(NPCSave save, Prefabs prefabs)
         {
@@ -70,10 +86,7 @@ namespace ELEKSUNI
             Defence = save.Defence;
             Attack = save.Attack;
             IsHostile = save.IsHostile;
-            foreach (var key in save.Inventory)
-            {
-                inventory.Add(prefabs.GetItemByKey(key));
-            }
+            inventory.Load(save.Inventory, prefabs);
         }
     }
     struct NPCSave
@@ -82,20 +95,16 @@ namespace ELEKSUNI
         public int Health { get; set; }
         public int Defence { get; set; }
         public int Attack { get; set; }
-        public List<Keys> Inventory { get; set; }
+        public InventorySave Inventory { get; set; }
         public bool IsHostile { get; set; }
-        public NPCSave(NPC npc)
+        public NPCSave(NPC npc, Inventory inventory)
         {
             Name = npc.Name;
             Health = npc.Health;
             Defence = npc.Defence;
             Attack = npc.Attack;
             IsHostile = npc.IsHostile;
-            Inventory = new List<Keys>();
-            foreach (var item in npc.inventory.Items)
-            {
-                Inventory.Add(item.Name);
-            }
+            Inventory = inventory.Save();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace ELEKSUNI
         Time time;
         Map questMap;
         Player player;
+        Prefabs prefabs;
         private List<Keys> availableCommands;
         public bool IsEnded { get; private set; }
         Report report;
@@ -29,7 +30,9 @@ namespace ELEKSUNI
         {
             time = new Time();
             report = new Report();
-            questMap = new Map();
+            prefabs = new Prefabs();
+            questMap = new Map(prefabs);
+            player = new Player();
             commands = new Dictionary<Keys, Action>()
             {
                 { Keys.Main, LaunchMainDialog },
@@ -44,8 +47,8 @@ namespace ELEKSUNI
                 { Keys.EN, () => SetQuestLanguage("EN")},
                 { Keys.RU, () => SetQuestLanguage("EN")},
                 { Keys.UA, () => SetQuestLanguage("EN")},
-                { Keys.Drop, DropSelectedItem },
-                { Keys.Equip, Equip },
+                { Keys.Drop, player.Drop },
+                { Keys.Equip, player.Equip },
                 { Keys.Search, Search },
                 { Keys.Inventory, LaunchOpenInventoryDialog },
                 { Keys.Cancel, Cancel },
@@ -83,6 +86,7 @@ namespace ELEKSUNI
             state.Time = JsonConvert.SerializeObject(time.Save());
             state.Report = JsonConvert.SerializeObject(report.Save());
             state.Options = JsonConvert.SerializeObject(availableCommands);
+            state.Player = JsonConvert.SerializeObject(player.Save());
             return state;
         }
         public void Load(QuestState save)
@@ -94,7 +98,7 @@ namespace ELEKSUNI
                 menuCallChain.Push(key);
             }
             questMap.Load(JsonConvert.DeserializeObject<MapSave>(save.Map));
-            player = questMap.player;
+            player.Load(JsonConvert.DeserializeObject<PlayerSave>(save.Player), prefabs);
             time.Load(JsonConvert.DeserializeObject<TimeSave>(save.Time));
             report.Load(JsonConvert.DeserializeObject<ReportSave>(save.Report));
             availableCommands = JsonConvert.DeserializeObject<List<Keys>>(save.Options);
@@ -102,23 +106,23 @@ namespace ELEKSUNI
         public Report Start(string name)
         {
             player = new Player(name);
-            questMap = new Map(player);
-            time = new Time();
-            report = new Report();
+            player.PickItem(prefabs.simpleClothes);
+            player.CurrentClothes = prefabs.simpleClothes;
             availableCommands = new List<Keys>();
             if (player.Name == "Test" || player.Name == "test")
             {
+                questMap.CreateTestMap();
                 questMap.SetPlayerLocation((0, 0));
             }
             else
             {
+                questMap.CreateNewMap((int)MainQuestConfig.MapSize);
                 questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
             }
             report.SetReportMessage($"Select preferred language:");
             availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
             report.ResetOptions(new List<string>() { "EN", "RU", "UA" });
             menuCallChain = new Stack<Keys>();
-            //AssignInputHandler(Keys.Main);
             return report;
         }
         public Report ProceedInput(int input)
@@ -199,7 +203,7 @@ namespace ELEKSUNI
         }
         private void LaunchItemDialog()
         {
-            ResetAvailableOptions(player.Inventory.CurrentItem.Options);
+            ResetAvailableOptions(player.GetActiveItem().Options);
             AddUniqueCallInMenueCallHistory(Keys.Inventory);
         }
         private void LaunchNpcDialog()
@@ -241,44 +245,37 @@ namespace ELEKSUNI
             ResetAvailableOptions(new List<Keys>() { Keys.Sell, Keys.Buy, Keys.Cancel });
             AddUniqueCallInMenueCallHistory(Keys.NPC);
         }
-        private void OpenInventory(Inventory inventoryToShow, Keys operationToPerformOnItem, Keys backOption, Keys menuHeader, Func<Item, string> itemSpecsMode)
-        {
-            ResetAvailableOptions(Enumerable.Repeat(operationToPerformOnItem, inventoryToShow.Items.Count).ToList(), false);
-            availableCommands.Add(backOption);
-            report.SetReportMessage(menuHeader);
-            report.ShowInventory(inventoryToShow, player, itemSpecsMode);
-        }
         private void LaunchOpenInventoryDialog()
         {
-            ResetAvailableOptions(Enumerable.Repeat(Keys.Select, player.Inventory.Items.Count).ToList(), false);
+            ResetAvailableOptions(Enumerable.Repeat(Keys.Select, player.GetListOfItemsInInventory().Count).ToList(), false);
             availableCommands.Add(Keys.Cancel);
             report.SetReportMessage(Keys.Inventory);
-            report.ShowInventory(player.Inventory, player, report.ItemSpecs);
+            report.ShowInventory(player.GetListOfItemsInInventory(), player, report.ItemSpecs);
         }
         private void LaunchSellDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.Trade);
-            ResetAvailableOptions(Enumerable.Repeat(Keys.SellItem, player.Inventory.Items.Count).ToList(), false);
+            ResetAvailableOptions(Enumerable.Repeat(Keys.SellItem, player.GetListOfItemsInInventory().Count).ToList(), false);
             availableCommands.Add(Keys.Cancel);
             report.SetReportMessage(Keys.Sell);
-            report.ShowInventory(player.Inventory, player, report.ItemSpecsForTrading);
+            report.ShowInventory(player.GetListOfItemsInInventory(), player, report.ItemSpecsForTrading);
         }
         private void LaunchBuyDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.Trade);
-            ResetAvailableOptions(Enumerable.Repeat(Keys.BuyItem, questMap.PlayerSpot.npc.inventory.Items.Count).ToList(), false);
+            ResetAvailableOptions(Enumerable.Repeat(Keys.BuyItem, questMap.PlayerSpot.npc.GetListOfItemsInInventory().Count).ToList(), false);
             availableCommands.Add(Keys.Cancel);
             report.SetReportMessage(Keys.Buy);
-            report.ShowInventory(questMap.PlayerSpot.npc.inventory, player, report.ItemSpecsForTrading);
+            report.ShowInventory(questMap.PlayerSpot.npc.GetListOfItemsInInventory(), player, report.ItemSpecsForTrading);
         }
         private void LaunchStealDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.NPC);
-            ResetAvailableOptions(Enumerable.Repeat(Keys.StealItem, questMap.PlayerSpot.npc.inventory.Items.Count).ToList(), false);
+            ResetAvailableOptions(Enumerable.Repeat(Keys.StealItem, questMap.PlayerSpot.npc.GetListOfItemsInInventory().Count).ToList(), false);
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             report.AddNewLineMessage(Keys.Steal);
             availableCommands.Add(Keys.Cancel);
-            report.ShowInventory(questMap.PlayerSpot.npc.inventory, player, report.ItemSpecs);
+            report.ShowInventory(questMap.PlayerSpot.npc.GetListOfItemsInInventory(), player, report.ItemSpecs);
         }
         private void LaunchLootDialog()
         {
@@ -286,7 +283,7 @@ namespace ELEKSUNI
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             report.AddNewLineMessage(Keys.Loot);
             availableCommands.Add(Keys.Main);
-            report.ShowInventory(questMap.PlayerSpot.npc.inventory, player, report.ItemSpecs);
+            report.ShowInventory(questMap.PlayerSpot.npc.GetListOfItemsInInventory(), player, report.ItemSpecs);
         }
         private void EndQuest(Keys result)
         {
@@ -295,21 +292,13 @@ namespace ELEKSUNI
         }
         private void Sell(int input)
         {
-            SelectItemInPlayerInventory(input);
-            UnequipSelectedItem();
-            questMap.PlayerSpot.npc.inventory.Add(player.Inventory.CurrentItem);
-            player.Inventory.Sell();
+            player.Sell(input, questMap.PlayerSpot.npc);
             LaunchSellDialog();
         }
         private void TryPurchase(int input)
         {
-            SelectItemInNpcInventory(input);
-            if (player.Inventory.Coins >= player.Inventory.CurrentItem.Price)
-            {
-                questMap.PlayerSpot.npc.inventory.Drop();
-                player.Inventory.Buy();
-                LaunchBuyDialog();
-            }
+            player.Buy(input, questMap.PlayerSpot.npc);
+            LaunchBuyDialog();
         }
         private void Cancel()
         {
@@ -318,9 +307,7 @@ namespace ELEKSUNI
         }
         private void TakeItemFromNpcInventory(int input)
         {
-            SelectItemInNpcInventory(input);
-            player.Inventory.Add(player.Inventory.CurrentItem);
-            questMap.PlayerSpot.npc.inventory.Drop();
+            player.Take(input, questMap.PlayerSpot.npc);
         }
         private void ResetMenuCallsChain()
         {
@@ -339,7 +326,6 @@ namespace ELEKSUNI
         private void SetQuestLanguage(string language)
         {
             report.SetLanguage(language);
-            report.SetReportMessage(Keys.InitialMessage);
             LaunchMainDialog();
         }
         private void Sleep()
@@ -367,18 +353,7 @@ namespace ELEKSUNI
             questMap.Go(direction);
             PlayerReachedNewZone();
         }
-        private void Equip()
-        {
-            if (player.Inventory.CurrentItem is Weapon)
-            {
-                player.CurrentWeapon = (Weapon)player.Inventory.CurrentItem;
-            }
-            else
-            {
-                player.CurrentClothes = (Clothes)player.Inventory.CurrentItem;
-            }
-            Cancel();
-        }
+
         private void PlayerReachedNewZone(int speedModifier = 1)
         {
             report.SetReportMessage(Keys.NextZone);
@@ -440,37 +415,14 @@ namespace ELEKSUNI
         }
         private void FoundHiddenItem(Item newItem)
         {
-            player.Inventory.Add(newItem);
+            player.PickItem(newItem);
             questMap.PlayerSpot.item = null;
             report.SetReportMessage(Keys.Found);
             report.AppendRepportMessage(newItem.Name);
         }
         private void SelectItemInPlayerInventory(int input)
         {
-            player.Inventory.CurrentItem = player.Inventory.Items[input];
-            report.SetReportMessage(player.Inventory.CurrentItem.Name);
-        }
-        private void SelectItemInNpcInventory(int input)
-        {
-            player.Inventory.CurrentItem = questMap.PlayerSpot.npc.inventory.Items[input];
-            questMap.PlayerSpot.npc.inventory.CurrentItem = player.Inventory.CurrentItem;
-        }
-        private void DropSelectedItem()
-        {
-            UnequipSelectedItem();
-            player.Inventory.Drop();
-            Cancel();
-        }
-        private void UnequipSelectedItem()
-        {
-            if (player.CurrentClothes == player.Inventory.CurrentItem)
-            {
-                player.CurrentClothes = null;
-            }
-            else if (player.CurrentWeapon == player.Inventory.CurrentItem)
-            {
-                player.CurrentWeapon = null;
-            }
+            report.SetReportMessage(player.SelectItemToOperate(input));
         }
         private void Eat()
         {

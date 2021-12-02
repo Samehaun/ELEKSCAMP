@@ -17,34 +17,17 @@ namespace ELEKSUNI
         };
         private List<Spot> spots;
         private Dictionary<(int x, int y), Spot> map;
-        internal Player player;
         public Spot PlayerSpot { get; private set; }
         private Spot exit;
         public bool ExitReached { get; private set; }
-        public Map()
+        public Map(Prefabs prefabs)
         {
-            prefabs = new Prefabs();
+            this.prefabs = prefabs;
             randomizer = new Random(DateTime.Now.Millisecond);
             map = new Dictionary<(int x, int y), Spot>();
             ExitReached = false;
-            player = new Player();
-        }
-        public Map(Player player) : this()
-        {
             prefabs.GenerateSpotPrefabs();
             spots = new List<Spot>(prefabs.GetPrefabs());
-            this.player = player;
-            player.Inventory.Add(prefabs.simpleClothes);
-            player.CurrentClothes = prefabs.simpleClothes;
-            if (player.Name == "Test" || player.Name == "test")
-            {
-                player.Inventory.AddMoney(500);
-                CreateTestMap();
-            }
-            else
-            {
-                CreateNewMap((int)MainQuestConfig.MapSize);
-            }
         }
         private void AddSpot(Spot newSpot)
         {
@@ -54,7 +37,7 @@ namespace ELEKSUNI
         {
             PlayerSpot = map[index];
         }
-        private void CreateNewMap(int mapSize)
+        internal void CreateNewMap(int mapSize)
         {
             for (int i = 0; i <= mapSize; i++)
             {
@@ -168,7 +151,7 @@ namespace ELEKSUNI
                 ExitReached = true;
             }
         }
-        private void CreateTestMap()
+        internal void CreateTestMap()
         {
             prefabs.GenerateTestSpotPrefabs();
             List<Spot> spotsToTest = prefabs.GetPrefabs();
@@ -196,20 +179,18 @@ namespace ELEKSUNI
             }
             exit = map[save.Exit];
             PlayerSpot = map[save.PlayerSpot];
-            player.Load(save.Player, prefabs);
         }
         public MapSave Save()
         {
-            return new MapSave(map, exit, PlayerSpot, player);
+            return new MapSave(map, exit, PlayerSpot);
         }
     }
     struct MapSave
     {
-        public PlayerSave Player { get; set; }
         public List<SpotSave> Map { get; set; }
         public (int x, int y) PlayerSpot { get; set; }
         public (int x, int y) Exit { get; set; }
-        public MapSave(Dictionary<(int x, int y), Spot> map, Spot exit, Spot playerSpot, Player player)
+        public MapSave(Dictionary<(int x, int y), Spot> map, Spot exit, Spot playerSpot)
         {
             Map = new List<SpotSave>();
             PlayerSpot = playerSpot.Coordinates;
@@ -218,7 +199,6 @@ namespace ELEKSUNI
             {
                 Map.Add(spot.Save());
             }
-            Player = player.Save();
         }
     }
 }

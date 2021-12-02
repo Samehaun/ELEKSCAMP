@@ -68,6 +68,7 @@ namespace ELEKSUNI
         internal void SetLanguage(string language)
         {
             this.language = language;
+            SetReportMessage(Keys.InitialMessage);
         }
         internal void EndingReport(Keys result)
         {
@@ -75,10 +76,10 @@ namespace ELEKSUNI
             PlayerState = null;
             Options = null;
         }
-        internal void ShowInventory(Inventory inventory, Player player, Func<Item, string> itemSpecShowMode)
+        internal void ShowInventory(List<Item> items, Player player, Func<Item, string> itemSpecShowMode)
         {
             List<string> itemsDescriptions = new List<string>();
-            foreach (var item in inventory.Items)
+            foreach (var item in items)
             {
                 if (item == player.CurrentClothes || item == player.CurrentWeapon)
                 {
@@ -91,7 +92,7 @@ namespace ELEKSUNI
             }
             if (itemSpecShowMode == ItemSpecsForTrading)
             {
-                PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
+                PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.HowMuchCoins() } { Data.Localize(Keys.Coins, language) }";
             }
             itemsDescriptions.Add(Data.Localize(Keys.Cancel, language));
             ResetOptions(itemsDescriptions);

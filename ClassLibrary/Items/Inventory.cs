@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace ELEKSUNI
 {
@@ -9,40 +10,49 @@ namespace ELEKSUNI
         public double Weight { get; private set; }
         public int Coins { get; private set; }
         public Item CurrentItem { get; set; }
-        public List<Item> Items { get; private set; }
+        public List<Item> items;
         public Inventory()
         {
             Weight = 0;
             Coins = 0;
-            Items = new List<Item>();
+            items = new List<Item>();
         }
         public Inventory(List<Item> items, int coins = 0) : this()
         {
-            this.Items.AddRange(items);
+            this.items.AddRange(items);
             Weight = CalculateWeight();
             Coins = coins;
         }
-        public void Drop()
+        public void DropSelected()
         {
-            Items.Remove(CurrentItem);
-            Weight -= CurrentItem.Weight;
+            Drop(CurrentItem);
             CurrentItem = null;
         }
-        public void Sell()
+        public void Drop(Item item)
         {
-            Coins += CurrentItem.Price;
-            Drop();
+            items.Remove(item);
+            Weight -= item.Weight;
+        }
+        public Item GetItem(int index)
+        {
+            return items[index];
+        }
+        public List<Item> GetItemList()
+        {
+            return items;
         }
         public void Add(Item newItem)
         {
-            Items.Add(newItem);
+            items.Add(newItem);
             Weight += newItem.Weight;
         }
-        public void Buy()
+        public List<Keys> GetItemsNameList()
         {
-            Coins -= CurrentItem.Price;
-            Items.Add(CurrentItem);
-            CurrentItem = null;
+            return (from item in items select item.Name).ToList<Keys>();
+        }
+        public int GetItemsCount()
+        {
+            return items.Count();
         }
         public void AddMoney(int amount)
         {
@@ -51,7 +61,7 @@ namespace ELEKSUNI
         private double CalculateWeight()
         {
             double weight = 0;
-            foreach (var item in Items)
+            foreach (var item in items)
             {
                 weight += item.Weight;
             }
@@ -71,7 +81,7 @@ namespace ELEKSUNI
             }
             foreach (var key in save.Items)
             {
-                Items.Add(prefabs.GetItemByKey(key));
+                items.Add(prefabs.GetItemByKey(key));
             }
         }
     }
@@ -93,11 +103,7 @@ namespace ELEKSUNI
             {
                 CurrentItem = null;
             }
-            Items = new List<Keys>();
-            foreach (var item in inventory.Items)
-            {
-                Items.Add(item.Name);
-            }
+            Items = inventory.GetItemsNameList();
         }
     }
 }
