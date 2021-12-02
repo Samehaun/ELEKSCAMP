@@ -19,18 +19,18 @@ namespace ELEKSUNI
         private Dictionary<(int x, int y), Spot> map;
         internal Player player;
         public Spot PlayerSpot { get; private set; }
-        private Spot playerSpot;
-        private Spot playerSpot;
         private Spot exit;
         public bool ExitReached { get; private set; }
         public Map()
         {
             prefabs = new Prefabs();
-            this.player = player;
-            CreateNewMap((int)MainQuestConfig.MapSize, player);
+            randomizer = new Random(DateTime.Now.Millisecond);
+            map = new Dictionary<(int x, int y), Spot>();
             ExitReached = false;
             player = new Player();
         }
+        public Map(Player player) : this()
+        {
             prefabs.GenerateSpotPrefabs();
             spots = new List<Spot>(prefabs.GetPrefabs());
             this.player = player;
@@ -47,16 +47,14 @@ namespace ELEKSUNI
             }
         }
         private void AddSpot(Spot newSpot)
-        }
-            map.Add(newSpot.Coordinates, newSpot);
         {
+            map.Add(newSpot.Coordinates, newSpot);
+        }
         public void SetPlayerLocation((int, int) index)
         {
             PlayerSpot = map[index];
         }
         private void CreateNewMap(int mapSize)
-        }
-        private void CreateNewMap(int mapSize, Player player)
         {
             for (int i = 0; i <= mapSize; i++)
             {
@@ -157,6 +155,8 @@ namespace ELEKSUNI
             nextSpot.RemoveAvailableTravelDirection(GetOppositeDirection(direction));
         }
         private Keys GetOppositeDirection(Keys direction)
+        {
+            (int, int) vector = directionVectors[direction];
             (int, int) inverseVector = (vector.Item1 * -1, vector.Item2 * -1);
             return directionNames[inverseVector];
         }
@@ -219,9 +219,6 @@ namespace ELEKSUNI
                 Map.Add(spot.Save());
             }
             Player = player.Save();
-        {
-            return playerSpot.GetAvailableDirections();
         }
-        
     }
 }

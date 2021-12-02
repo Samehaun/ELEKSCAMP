@@ -37,7 +37,7 @@ namespace ELEKSUNI
         }
         internal void AddNewLineMessage(Keys key)
         {
-            if(Message != null)
+            if (Message != null)
             {
                 Message = $"{ Message }{ Environment.NewLine }{ Data.Localize(key, language) }";
             }
@@ -89,7 +89,7 @@ namespace ELEKSUNI
                     itemsDescriptions.Add(itemSpecShowMode(item));
                 }
             }
-            if(itemSpecShowMode == ItemSpecsForTrading)
+            if (itemSpecShowMode == ItemSpecsForTrading)
             {
                 PlayerState = $"{ Data.Localize(Keys.Remains, language) } { player.Inventory.Coins } { Data.Localize(Keys.Coins, language) }";
             }

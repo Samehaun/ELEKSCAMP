@@ -167,9 +167,9 @@ namespace ELEKSUNI
         }
         private bool IsSelectedActionNeedsIndexParam(int index)
         {
-            if(availableCommands[index] == Keys.SellItem || availableCommands[index] == Keys.BuyItem 
+            if (availableCommands[index] == Keys.SellItem || availableCommands[index] == Keys.BuyItem
                 || availableCommands[index] == Keys.StealItem || availableCommands[index] == Keys.LootItem
-                || availableCommands[index] == Keys.Select )
+                || availableCommands[index] == Keys.Select)
             {
                 return true;
             }
@@ -512,24 +512,6 @@ namespace ELEKSUNI
             if (menuCallChain.Peek() != recentMenu)
             {
                 menuCallChain.Push(recentMenu);
-                    break;
-                case 1:
-                    language = "RU";
-                    break;
-                case 2:
-                    language = "UA";
-                    break;
-                default:
-                    break;
-                    break;
-                case 1:
-                    language = "RU";
-                    break;
-                case 2:
-                    language = "UA";
-                    break;
-                default:
-                    break;
             }
         }
     }
