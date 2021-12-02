@@ -7,7 +7,7 @@ namespace ConsoleQuest
     class ConsoleQuestLauncher
     {
         Quest quest;
-        QuestState state;
+        Report state;
         public ConsoleQuestLauncher()
         {
             Console.WriteLine("Enter your name");
@@ -42,15 +42,15 @@ namespace ConsoleQuest
             while (!CheckInput(input, maxPossibleInput));
             return Convert.ToInt32(input);
         }
-        public static void ShowState(QuestState state)
+        public static void ShowState(Report state)
         {
             Console.Clear();
             Output(state);
         }
-        private static void Output(QuestState state)
+        private static void Output(Report state)
         {
             Console.WriteLine(state.Message);
-            if(state.PlayerState != null)
+            if (state.PlayerState != null)
             {
                 Console.WriteLine(state.PlayerState);
             }

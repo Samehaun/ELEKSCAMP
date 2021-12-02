@@ -5,7 +5,7 @@ namespace ELEKSUNI
 {
     class Map
     {
-        private Prefabs prefabs;
+        public Prefabs prefabs;
         private Random randomizer;
         public static Dictionary<Keys, (int, int)> directionVectors = new Dictionary<Keys, (int, int)>()
         {
@@ -17,35 +17,44 @@ namespace ELEKSUNI
         };
         private List<Spot> spots;
         private Dictionary<(int x, int y), Spot> map;
-        private Player player;
+        internal Player player;
         public Spot PlayerSpot { get; private set; }
+        private Spot playerSpot;
+        private Spot playerSpot;
         private Spot exit;
         public bool ExitReached { get; private set; }
-        public Map(Player player)
+        public Map()
         {
             prefabs = new Prefabs();
-            randomizer = new Random(DateTime.Now.Millisecond);
-            map = new Dictionary<(int x, int y), Spot>();
-            spots = new List<Spot>(prefabs.GetPrefabs());
             this.player = player;
             CreateNewMap((int)MainQuestConfig.MapSize, player);
             ExitReached = false;
+            player = new Player();
+        }
+            prefabs.GenerateSpotPrefabs();
+            spots = new List<Spot>(prefabs.GetPrefabs());
+            this.player = player;
+            player.Inventory.Add(prefabs.simpleClothes);
+            player.CurrentClothes = prefabs.simpleClothes;
+            if (player.Name == "Test" || player.Name == "test")
+            {
+                player.Inventory.AddMoney(500);
+                CreateTestMap();
+            }
+            else
+            {
+                CreateNewMap((int)MainQuestConfig.MapSize);
+            }
         }
         private void AddSpot(Spot newSpot)
-        {
-            map.Add(newSpot.Coordinates, newSpot);
         }
+            map.Add(newSpot.Coordinates, newSpot);
+        {
         public void SetPlayerLocation((int, int) index)
         {
             PlayerSpot = map[index];
         }
-        public List<Keys> GetPossibleOptions()
-        {
-            return PlayerSpot.GetListOfPossibleOptions();
-        }
-        public Keys GetLocationDescription()
-        {
-            return PlayerSpot.Description;
+        private void CreateNewMap(int mapSize)
         }
         private void CreateNewMap(int mapSize, Player player)
         {
@@ -55,7 +64,7 @@ namespace ELEKSUNI
                 {
                     Spot nextSpot = PickRandomSpotFromSpotPrefabs(spots);
                     nextSpot.SetPosition((i, j));
-                    this.AddSpot(nextSpot);
+                    AddSpot(nextSpot);
                 }
             }
             CreateExit();
@@ -106,7 +115,7 @@ namespace ELEKSUNI
         private void CreateMaze()
         {
             int mazeWallCounter = 0;
-            while(mazeWallCounter < (int)MainQuestConfig.MapSize * (int)MainQuestConfig.MazeDifficulty)
+            while (mazeWallCounter < (int)MainQuestConfig.MapSize * (int)MainQuestConfig.MazeDifficulty)
             {
                 Spot baseSpot = GetRandomSpotOnTheMap();
                 Keys direction = GetRandomAvailableDirection(baseSpot);
@@ -118,7 +127,7 @@ namespace ELEKSUNI
                 }
             }
         }
-        private Keys GetRandomAvailableDirection(Spot baseSpot)
+        public Keys GetRandomAvailableDirection(Spot baseSpot)
         {
             return baseSpot.GetAvailableDirections()[randomizer.Next(0, baseSpot.GetAvailableDirections().Count - 1)];
         }
@@ -145,17 +154,11 @@ namespace ELEKSUNI
         private void SeparateSpots(Spot baseSpot, Spot nextSpot, Keys direction)
         {
             baseSpot.RemoveAvailableTravelDirection(direction);
-            nextSpot.RemoveAvailableTravelDirection(GetOppositeDirection(direction));     
+            nextSpot.RemoveAvailableTravelDirection(GetOppositeDirection(direction));
         }
         private Keys GetOppositeDirection(Keys direction)
-        {
-            (int, int) vector = directionVectors[direction];
             (int, int) inverseVector = (vector.Item1 * -1, vector.Item2 * -1);
             return directionNames[inverseVector];
-        }
-        public List<Keys> GetTravelDirections()
-        {
-            return PlayerSpot.GetAvailableDirections();
         }
         public void Go(Keys direction)
         {
@@ -164,6 +167,60 @@ namespace ELEKSUNI
             {
                 ExitReached = true;
             }
+        }
+        private void CreateTestMap()
+        {
+            prefabs.GenerateTestSpotPrefabs();
+            List<Spot> spotsToTest = prefabs.GetPrefabs();
+            int n = 0;
+            for (int i = 0; i <= 3; i++)
+            {
+                for (int j = 0; j <= 3; j++)
+                {
+                    spotsToTest[n].SetPosition((i, j));
+                    AddSpot(spotsToTest[n]);
+                    n++;
+                }
+            }
+            exit = new Spot((0, -1), Keys.Exit);
+            map[(0, 0)].AddAvailableTravelDirection(Keys.West);
+            AddSpot(exit);
+        }
+        public void Load(MapSave save)
+        {
+            foreach (var spotSave in save.Map)
+            {
+                Spot spot = new Spot();
+                spot.Load(spotSave, prefabs);
+                AddSpot(spot);
+            }
+            exit = map[save.Exit];
+            PlayerSpot = map[save.PlayerSpot];
+            player.Load(save.Player, prefabs);
+        }
+        public MapSave Save()
+        {
+            return new MapSave(map, exit, PlayerSpot, player);
+        }
+    }
+    struct MapSave
+    {
+        public PlayerSave Player { get; set; }
+        public List<SpotSave> Map { get; set; }
+        public (int x, int y) PlayerSpot { get; set; }
+        public (int x, int y) Exit { get; set; }
+        public MapSave(Dictionary<(int x, int y), Spot> map, Spot exit, Spot playerSpot, Player player)
+        {
+            Map = new List<SpotSave>();
+            PlayerSpot = playerSpot.Coordinates;
+            Exit = exit.Coordinates;
+            foreach (var spot in map.Values)
+            {
+                Map.Add(spot.Save());
+            }
+            Player = player.Save();
+        {
+            return playerSpot.GetAvailableDirections();
         }
         
     }

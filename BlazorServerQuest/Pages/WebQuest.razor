@@ -10,7 +10,7 @@ else if (name != null)
         Begin();
     }
     <h4 class="message">@state.Message</h4>
-    <h4>@state.PlayerState</h4>
+    <h4>@state.PlayerStateOrAdditionalInformation</h4>
     if (state.Options != null)
     {
         for (int i = 0; i < state.Options.Count - 1; i++)
@@ -32,7 +32,7 @@ else
     private string name;
     private int input;
     private Quest quest;
-    private QuestState state;
+    private Report state;
     private bool questOver = false;
     private string endMessage;
     private void Begin()
@@ -43,6 +43,6 @@ else
     private void Input(int i)
     {
         input = i;
-        state = quest.ProcceedInput(input);
+        state = quest.ProceedInput(input);
     }
 }
