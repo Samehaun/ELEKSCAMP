@@ -69,8 +69,11 @@ namespace WebQuest.Pages
             quest = new Quest();
             quest.Load(ActiveQuests.quests[id]);
             state = quest.ProceedInput(selectedOptionId);
-            ActiveQuests.quests.Remove(id);
-            ActiveQuests.quests.Add(id, quest.Save());
+            if (!quest.IsEnded)
+            {
+                ActiveQuests.quests.Remove(id);
+                ActiveQuests.quests.Add(id, quest.Save());
+            }
             Message = state.Message;
             PlayerState = state.PlayerState;
             Options = state.Options;

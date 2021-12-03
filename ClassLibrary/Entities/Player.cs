@@ -13,7 +13,7 @@ namespace ELEKSUNI
         public Weapon CurrentWeapon { get; set; }
         public Clothes CurrentClothes { get; set; }
         public List<Keys> Effects { get; private set; }
-        public Inventory inventory;
+        private Inventory inventory;
         private double hungerModifier;
         public Player()
         {
@@ -190,10 +190,14 @@ namespace ELEKSUNI
         {
             return inventory.GetItemList();
         }
-        public Keys SelectItemToOperate(int index)
+        public void SelectItemToOperate(int index)
         {
             inventory.CurrentItem = inventory.GetItem(index);
-            return inventory.CurrentItem.Name;
+        }
+        public void Open()
+        {
+            inventory.AddMoney(inventory.CurrentItem.Price * 2);
+            inventory.DropSelected();
         }
         public PlayerSave Save()
         {

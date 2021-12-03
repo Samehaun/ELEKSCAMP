@@ -19,12 +19,12 @@ namespace ELEKSUNI
         Dictionary<Keys, Action> commands;
         Dictionary<Keys, Action<int>> commandsWithArgs;
         Time time;
-        Map questMap;
-        Player player;
+        internal Map questMap;
+        internal Player player;
         Prefabs prefabs;
-        private List<Keys> availableCommands;
+        internal List<Keys> availableCommands;
         public bool IsEnded { get; private set; }
-        Report report;
+        internal Report report;
         private Stack<Keys> menuCallChain;
         public Quest()
         {
@@ -279,7 +279,7 @@ namespace ELEKSUNI
         }
         private void LaunchLootDialog()
         {
-            ResetAvailableOptions(Enumerable.Repeat(Keys.LootItem, questMap.PlayerSpot.npc.inventory.Items.Count).ToList(), false);
+            ResetAvailableOptions(Enumerable.Repeat(Keys.LootItem, questMap.PlayerSpot.npc.GetListOfItemsInInventory().Count).ToList(), false);
             report.SetReportMessage(questMap.PlayerSpot.npc.Name);
             report.AddNewLineMessage(Keys.Loot);
             availableCommands.Add(Keys.Main);
@@ -455,8 +455,7 @@ namespace ELEKSUNI
         }
         private void Open()
         {
-            player.Inventory.AddMoney(player.Inventory.CurrentItem.Price * 2);
-            player.Inventory.Drop();
+            player.Open();
             LaunchOpenInventoryDialog();
         }
         private void AddUniqueCallInMenueCallHistory(Keys recentMenu)
