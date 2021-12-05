@@ -26,6 +26,13 @@ namespace ELEKSUNI
         public bool IsEnded { get; private set; }
         internal Report report;
         private Stack<Keys> menuCallChain;
+        private MainDialog mainDialog;
+        private ItemDialog itemDialog;
+        private TravelDialog travelDialog;
+        private TradeDialog tradeDialog;
+        private BuyDialog buyDialog;
+        private SellDialog sellDialog;
+        private StealDialog stealDialog;
         public Quest()
         {
             time = new Time();
@@ -50,7 +57,7 @@ namespace ELEKSUNI
                 { Keys.Drop, player.Drop },
                 { Keys.Equip, player.Equip },
                 { Keys.Search, Search },
-                { Keys.Inventory, LaunchOpenInventoryDialog },
+                { Keys.Inventory, new OpenInventoryDialog(this).Launch },
                 { Keys.Cancel, Cancel },
                 { Keys.Trade, LaunchTradeDialog },
                 { Keys.Sell, LaunchSellDialog },
@@ -58,9 +65,9 @@ namespace ELEKSUNI
                 { Keys.Eat, Eat },
                 { Keys.Fight, Fight },
                 { Keys.Run, Run },
-                { Keys.NPC, LaunchNpcDialog },
+                { Keys.NPC, new NpcDialog(this).Launch },
                 { Keys.Steal, LaunchStealDialog },
-                { Keys.Loot, LaunchLootDialog },
+                { Keys.Loot, new LootDialog(this).Launch },
                 { Keys.Open, Open },
                 { Keys.EatPoison, Poison },
                 { Keys.Drink, CurePoison },
@@ -77,6 +84,13 @@ namespace ELEKSUNI
             };
             availableCommands = new List<Keys>();
             menuCallChain = new Stack<Keys>();
+            mainDialog = new MainDialog(this);
+            itemDialog = new ItemDialog(this);
+            travelDialog = new TravelDialog(this);
+            tradeDialog = new TradeDialog(this);
+            buyDialog = new BuyDialog(this);
+            sellDialog = new SellDialog(this);
+            stealDialog = new StealDialog(this);
         }
         public QuestState Save()
         {
@@ -139,19 +153,18 @@ namespace ELEKSUNI
         }
         private void SelectItemToOperate(int index)
         {
-            SelectItemInPlayerInventory(index);
-            LaunchItemDialog();
+            player.SelectItemToOperate(index);
+            itemDialog.Launch();
         }
         private void Steal(int index)
         {
-            TakeItemFromNpcInventory(index);
-            questMap.PlayerSpot.npc.IsHostile = true;
-            LaunchNpcDialog();
+            player.Steal(index, questMap.PlayerSpot.npc);
+            commands[Keys.NPC].Invoke();
         }
         private void Loot(int index)
         {
-            TakeItemFromNpcInventory(index);
-            LaunchLootDialog();
+            player.Take(index, questMap.PlayerSpot.npc);
+            lootDialog.Launch();
         }
         private bool IsQuestEnded()
         {
@@ -198,31 +211,19 @@ namespace ELEKSUNI
             }
             else
             {
-                LaunchNpcDialog();
+                commands[Keys.NPC].Invoke();
             }
         }
         private void LaunchItemDialog()
         {
-            ResetAvailableOptions(player.GetActiveItem().Options);
+            itemDialog.Launch();
             AddUniqueCallInMenueCallHistory(Keys.Inventory);
-        }
-        private void LaunchNpcDialog()
-        {
-            report.SetReportMessage(questMap.PlayerSpot.npc.Name);
-            ResetAvailableOptions(questMap.PlayerSpot.npc.GetListOfPossibleOptions());
         }
         private void LaunchMainDialog()
         {
             if (!IsQuestEnded())
             {
-                report.AddNewLineMessage(questMap.PlayerSpot.Description);
-                if (questMap.PlayerSpot.npc != null && questMap.PlayerSpot.npc.IsHostile)
-                {
-                    report.AddNewLineMessage(Keys.Enemy);
-                    report.AppendRepportMessage(questMap.PlayerSpot.npc.Name);
-                }
-                report.RefreshPlayerState(player);
-                ResetAvailableOptions(questMap.PlayerSpot.GetListOfPossibleOptions());
+                mainDialog.Launch();
                 ResetMenuCallsChain();
             }
         }
@@ -230,60 +231,33 @@ namespace ELEKSUNI
         {
             if (time.DayTime())
             {
-                report.SetReportMessage(Keys.DirectionDialogMessage);
-                ResetAvailableOptions(questMap.PlayerSpot.GetAvailableDirections());
+                tradeDialog.Launch();
             }
             else
             {
                 report.SetReportMessage(Keys.NightTime);
-                LaunchMainDialog();
+                mainDialog.Launch();
             }
         }
         private void LaunchTradeDialog()
         {
-            report.SetReportMessage(questMap.PlayerSpot.npc.Name);
-            ResetAvailableOptions(new List<Keys>() { Keys.Sell, Keys.Buy, Keys.Cancel });
+            tradeDialog.Launch();
             AddUniqueCallInMenueCallHistory(Keys.NPC);
-        }
-        private void LaunchOpenInventoryDialog()
-        {
-            ResetAvailableOptions(Enumerable.Repeat(Keys.Select, player.GetListOfItemsInInventory().Count).ToList(), false);
-            availableCommands.Add(Keys.Cancel);
-            report.SetReportMessage(Keys.Inventory);
-            report.ShowInventory(player.GetListOfItemsInInventory(), player, report.ItemSpecs);
         }
         private void LaunchSellDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.Trade);
-            ResetAvailableOptions(Enumerable.Repeat(Keys.SellItem, player.GetListOfItemsInInventory().Count).ToList(), false);
-            availableCommands.Add(Keys.Cancel);
-            report.SetReportMessage(Keys.Sell);
-            report.ShowInventory(player.GetListOfItemsInInventory(), player, report.ItemSpecsForTrading);
+            sellDialog.Launch();
         }
         private void LaunchBuyDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.Trade);
-            ResetAvailableOptions(Enumerable.Repeat(Keys.BuyItem, questMap.PlayerSpot.npc.GetListOfItemsInInventory().Count).ToList(), false);
-            availableCommands.Add(Keys.Cancel);
-            report.SetReportMessage(Keys.Buy);
-            report.ShowInventory(questMap.PlayerSpot.npc.GetListOfItemsInInventory(), player, report.ItemSpecsForTrading);
+            buyDialog.Launch();
         }
         private void LaunchStealDialog()
         {
             AddUniqueCallInMenueCallHistory(Keys.NPC);
-            ResetAvailableOptions(Enumerable.Repeat(Keys.StealItem, questMap.PlayerSpot.npc.GetListOfItemsInInventory().Count).ToList(), false);
-            report.SetReportMessage(questMap.PlayerSpot.npc.Name);
-            report.AddNewLineMessage(Keys.Steal);
-            availableCommands.Add(Keys.Cancel);
-            report.ShowInventory(questMap.PlayerSpot.npc.GetListOfItemsInInventory(), player, report.ItemSpecs);
-        }
-        private void LaunchLootDialog()
-        {
-            ResetAvailableOptions(Enumerable.Repeat(Keys.LootItem, questMap.PlayerSpot.npc.GetListOfItemsInInventory().Count).ToList(), false);
-            report.SetReportMessage(questMap.PlayerSpot.npc.Name);
-            report.AddNewLineMessage(Keys.Loot);
-            availableCommands.Add(Keys.Main);
-            report.ShowInventory(questMap.PlayerSpot.npc.GetListOfItemsInInventory(), player, report.ItemSpecs);
+            stealDialog.Launch();
         }
         private void EndQuest(Keys result)
         {
@@ -305,23 +279,10 @@ namespace ELEKSUNI
             report.ClearReportMessage();
             commands[menuCallChain.Pop()].Invoke();
         }
-        private void TakeItemFromNpcInventory(int input)
-        {
-            player.Take(input, questMap.PlayerSpot.npc);
-        }
         private void ResetMenuCallsChain()
         {
             menuCallChain.Clear();
             menuCallChain.Push(Keys.Main);
-        }
-        private void ResetAvailableOptions(List<Keys> options, bool useCommandNameAsDisplayOption = true)
-        {
-            availableCommands.Clear();
-            availableCommands.AddRange(options);
-            if (useCommandNameAsDisplayOption)
-            {
-                report.ResetOptions(options);
-            }
         }
         private void SetQuestLanguage(string language)
         {
@@ -353,7 +314,6 @@ namespace ELEKSUNI
             questMap.Go(direction);
             PlayerReachedNewZone();
         }
-
         private void PlayerReachedNewZone(int speedModifier = 1)
         {
             report.SetReportMessage(Keys.NextZone);
@@ -389,7 +349,7 @@ namespace ELEKSUNI
         {
             report.SetReportMessage(Keys.HuntSucceed);
             questMap.PlayerSpot.npc = questMap.prefabs.hare;
-            LaunchLootDialog();
+            commands[Keys.Loot].Invoke();
         }
         private void SearchSpotForHiddenItem()
         {
@@ -419,10 +379,6 @@ namespace ELEKSUNI
             questMap.PlayerSpot.item = null;
             report.SetReportMessage(Keys.Found);
             report.AppendRepportMessage(newItem.Name);
-        }
-        private void SelectItemInPlayerInventory(int input)
-        {
-            report.SetReportMessage(player.SelectItemToOperate(input));
         }
         private void Eat()
         {
