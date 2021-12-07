@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ELEKSUNI
 {
@@ -59,19 +60,17 @@ namespace ELEKSUNI
         }
         private void CreateExit()
         {
-            Dictionary<Keys, (int, int)> possibleExitLocations = new Dictionary<Keys, (int, int)>(directionVectors);
             Spot randomBorder = GetRandomBorderSpot();
-            foreach (var direction in randomBorder.GetAvailableDirections())
-            {
-                possibleExitLocations.Remove(direction);
-            }
-            //picking random non existing direction
-            (int, int)[] tempArray = new (int, int)[possibleExitLocations.Count];
-            possibleExitLocations.Values.CopyTo(tempArray, 0);
-            (int, int) chosenEscapeDirection = tempArray[randomizer.Next(0, tempArray.Length - 1)];
+            var possibleExitLocations = directionNames.Values.Except<Keys>(randomBorder.GetAvailableDirections());
+            (int, int) chosenEscapeDirection = PicRandomDirectionVector(possibleExitLocations.ToList<Keys>());
             this.exit = new Spot(AddCoordinates(randomBorder.Coordinates, chosenEscapeDirection), Keys.Exit);
             this.AddSpot(exit);
             randomBorder.AddAvailableTravelDirection(directionNames[chosenEscapeDirection]);
+        }
+        private (int, int) PicRandomDirectionVector(List<Keys> possibleExitLocations)
+        {
+            Keys directionName = possibleExitLocations[randomizer.Next(0, possibleExitLocations.Count - 1)];          
+            return directionVectors[directionName];
         }
         private Spot GetRandomBorderSpot()
         {

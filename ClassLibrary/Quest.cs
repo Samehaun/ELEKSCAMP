@@ -40,6 +40,18 @@ namespace ELEKSUNI
             prefabs = new Prefabs();
             questMap = new Map(prefabs);
             player = new Player();
+            menuCallChain = new Stack<Keys>();           
+            availableCommands = new List<Keys>();
+        }
+        private void MapCommands()
+        {
+            mainDialog = new MainDialog(this);
+            itemDialog = new ItemDialog(this);
+            travelDialog = new TravelDialog(this);
+            tradeDialog = new TradeDialog(this);
+            buyDialog = new BuyDialog(this);
+            sellDialog = new SellDialog(this);
+            stealDialog = new StealDialog(this);
             commands = new Dictionary<Keys, Action>()
             {
                 { Keys.Main, LaunchMainDialog },
@@ -82,15 +94,6 @@ namespace ELEKSUNI
                 { Keys.StealItem, Steal },
                 { Keys.LootItem, Loot }
             };
-            availableCommands = new List<Keys>();
-            menuCallChain = new Stack<Keys>();
-            mainDialog = new MainDialog(this);
-            itemDialog = new ItemDialog(this);
-            travelDialog = new TravelDialog(this);
-            tradeDialog = new TradeDialog(this);
-            buyDialog = new BuyDialog(this);
-            sellDialog = new SellDialog(this);
-            stealDialog = new StealDialog(this);
         }
         public QuestState Save()
         {
@@ -116,6 +119,7 @@ namespace ELEKSUNI
             time.Load(JsonConvert.DeserializeObject<TimeSave>(save.Time));
             report.Load(JsonConvert.DeserializeObject<ReportSave>(save.Report));
             availableCommands = JsonConvert.DeserializeObject<List<Keys>>(save.Options);
+            MapCommands();
         }
         public Report Start(string name)
         {
@@ -136,7 +140,7 @@ namespace ELEKSUNI
             report.SetReportMessage($"Select preferred language:");
             availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
             report.ResetOptions(new List<string>() { "EN", "RU", "UA" });
-            menuCallChain = new Stack<Keys>();
+            MapCommands();
             return report;
         }
         public Report ProceedInput(int input)
@@ -164,7 +168,7 @@ namespace ELEKSUNI
         private void Loot(int index)
         {
             player.Take(index, questMap.PlayerSpot.npc);
-            lootDialog.Launch();
+            commands[Keys.Loot].Invoke();
         }
         private bool IsQuestEnded()
         {
@@ -231,7 +235,7 @@ namespace ELEKSUNI
         {
             if (time.DayTime())
             {
-                tradeDialog.Launch();
+                travelDialog.Launch();
             }
             else
             {
@@ -412,7 +416,7 @@ namespace ELEKSUNI
         private void Open()
         {
             player.Open();
-            LaunchOpenInventoryDialog();
+            commands[Keys.Inventory].Invoke();
         }
         private void AddUniqueCallInMenueCallHistory(Keys recentMenu)
         {

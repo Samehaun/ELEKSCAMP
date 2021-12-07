@@ -14,20 +14,24 @@ namespace ELEKSUNI
         protected Keys header;
         protected Keys option;
         protected Func<Item, string> mode;
+        protected Map map;
         public InventoryDialogs(Quest quest)
         {
             report = quest.report;
             player = quest.player;
             commands = quest.availableCommands;
+            map = quest.questMap;
         }
         public void Launch()
         {
             SetMessage();
             SetPlayerState();
             commands.Clear();
+            SetItemsToShow();
             SetAvailableOptions();
             SetOptionsView();
         }
+        abstract protected void SetItemsToShow();
         virtual protected void SetMessage()
         {
             report.SetReportMessage(header);
@@ -38,7 +42,7 @@ namespace ELEKSUNI
         }
         virtual protected void SetAvailableOptions()
         {
-            commands = GetListOfSameOptions();
+            commands.AddRange(GetListOfSameOptions());
             commands.Add(Keys.Cancel);
         }
         virtual protected void SetOptionsView()
@@ -56,19 +60,25 @@ namespace ELEKSUNI
         public OpenInventoryDialog(Quest quest) : base(quest)
         {
             header = Keys.Inventory;
-            itemsToShow = player.GetListOfItemsInInventory();
             option = Keys.Select;
             mode = report.ItemSpecs;
+        }
+        protected override void SetItemsToShow()
+        {
+            itemsToShow = player.GetListOfItemsInInventory();
         }
     }
     class BuyDialog : InventoryDialogs
     {
         public BuyDialog(Quest quest) : base(quest)
         {
-            header = Keys.Buy;
-            itemsToShow = quest.questMap.PlayerSpot.npc.GetListOfItemsInInventory();
-            option = Keys.Buy;
+            header = Keys.Buy;          
+            option = Keys.BuyItem;
             mode = report.ItemSpecsForTrading;
+        }
+        protected override void SetItemsToShow()
+        {
+            itemsToShow = map.PlayerSpot.npc.GetListOfItemsInInventory();
         }
     }
     class SellDialog : InventoryDialogs
@@ -80,15 +90,22 @@ namespace ELEKSUNI
             option = Keys.Sell;
             mode = report.ItemSpecsForTrading;
         }
+        protected override void SetItemsToShow()
+        {
+            itemsToShow = player.GetListOfItemsInInventory();
+        }
     }
     class StealDialog : InventoryDialogs
     {
         public StealDialog(Quest quest) : base(quest)
         {
             header = Keys.Steal;
-            itemsToShow = quest.questMap.PlayerSpot.npc.GetListOfItemsInInventory();
             option = Keys.StealItem;
             mode = report.ItemSpecs;
+        }
+        protected override void SetItemsToShow()
+        {
+            itemsToShow = map.PlayerSpot.npc.GetListOfItemsInInventory();
         }
     }
     class LootDialog : InventoryDialogs
@@ -96,14 +113,17 @@ namespace ELEKSUNI
         public LootDialog(Quest quest) : base(quest)
         {
             header = Keys.Loot;
-            itemsToShow = quest.questMap.PlayerSpot.npc.GetListOfItemsInInventory();
             option = Keys.LootItem;
             mode = report.ItemSpecs;
         }
         override protected void SetAvailableOptions()
         {
-            commands = GetListOfSameOptions();
+            commands.AddRange(GetListOfSameOptions());
             commands.Add(Keys.Main);
+        }
+        protected override void SetItemsToShow()
+        {
+            itemsToShow = map.PlayerSpot.npc.GetListOfItemsInInventory();
         }
     }
 }

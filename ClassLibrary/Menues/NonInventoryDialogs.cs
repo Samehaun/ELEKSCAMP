@@ -9,16 +9,14 @@ namespace ELEKSUNI
     {
         protected Report report;
         protected List<Keys> commands;
-        protected List<Keys> newCommands;
         protected Player player;
-        protected Spot currentSpot;
-        protected Keys header;
+        protected Map map;
         public NonInventoryDialogs(Quest quest)
         {
             report = quest.report;
             player = quest.player;
             commands = quest.availableCommands;
-            currentSpot = quest.questMap.PlayerSpot;
+            map = quest.questMap;
         }
         public void Launch()
         {
@@ -28,79 +26,80 @@ namespace ELEKSUNI
             SetAvailableOptions();
             SetOptionsView();
         }
-        virtual protected void SetMessage()
-        {
-            report.SetReportMessage(header);
-        }
+        abstract protected void SetMessage();
         virtual protected void SetPlayerState()
         {
             report.RefreshPlayerState(player);
         }
-        virtual protected void SetAvailableOptions()
-        {
-            commands.AddRange(newCommands);
-        }
+        abstract protected void SetAvailableOptions();
         virtual protected void SetOptionsView()
         {
             report.ResetOptions(commands);
         }
-        protected List<Keys> GetListOfSameOptions(Keys option, int timesToRepeatOption)
-        {
-            List<Keys> repeatingList = Enumerable.Repeat(option, timesToRepeatOption).ToList();
-            repeatingList.Add(Keys.Cancel);
-            return repeatingList;
-        }
-
     }
     class ItemDialog : NonInventoryDialogs
     {
-        public ItemDialog(Quest quest) : base(quest) 
-        { 
-            header = player.GetActiveItem().Name;
-            newCommands = player.GetActiveItem().Options;
+        public ItemDialog(Quest quest) : base(quest)  {  }
+        protected override void SetAvailableOptions()
+        {
+            commands.AddRange(player.GetActiveItem().Options);
+        }
+        protected override void SetMessage()
+        {
+            report.SetReportMessage(player.GetActiveItem().Name);
         }
     }
     class TravelDialog : NonInventoryDialogs
     {       
-        public TravelDialog(Quest quest) : base(quest)
-        { 
-            header = Keys.DirectionDialogMessage;
-            newCommands = currentSpot.GetAvailableDirections();
+        public TravelDialog(Quest quest) : base(quest) {  }
+        protected override void SetAvailableOptions()
+        {
+            commands.AddRange(map.PlayerSpot.GetAvailableDirections());
+        }
+        protected override void SetMessage()
+        {
+            report.SetReportMessage(Keys.DirectionDialogMessage);
         }
     }
     class MainDialog : NonInventoryDialogs
     {
-        public MainDialog(Quest quest) : base(quest) 
-        { 
-            newCommands = currentSpot.GetListOfPossibleOptions();
-        }
+        public MainDialog(Quest quest) : base(quest)  {  }
         protected override void SetMessage()
         {
-            report.AddNewLineMessage(currentSpot.Description);
-            if (currentSpot.npc != null && currentSpot.npc.IsHostile)
+            report.AddNewLineMessage(map.PlayerSpot.Description);
+            if (map.PlayerSpot.npc != null && map.PlayerSpot.npc.IsHostile)
             {
                 report.AddNewLineMessage(Keys.Enemy);
-                report.AppendRepportMessage(currentSpot.npc.Name);
+                report.AppendRepportMessage(map.PlayerSpot.npc.Name);
             }
+        }
+        protected override void SetAvailableOptions()
+        {
+            commands.AddRange(map.PlayerSpot.GetListOfPossibleOptions());
         }
     }
     class NpcDialog : NonInventoryDialogs
     {
-        public NpcDialog(Quest quest) : base(quest)
+        public NpcDialog(Quest quest) : base(quest) { }
+        protected override void SetAvailableOptions()
         {
-            header = currentSpot.npc.Name;
-            newCommands = currentSpot.npc.GetListOfPossibleOptions();
+            commands.AddRange(map.PlayerSpot.npc.GetListOfPossibleOptions());
+        }
+        protected override void SetMessage()
+        {
+            report.SetReportMessage(map.PlayerSpot.npc.Name);
         }
     }
     class TradeDialog : NonInventoryDialogs
     {
-        public TradeDialog(Quest quest) : base(quest)
-        {
-            newCommands = new List<Keys>() { Keys.Buy, Keys.Sell };
-        }
+        public TradeDialog(Quest quest) : base(quest) { }
         protected override void SetMessage()
         {
             report.AppendRepportMessage(Keys.Trade);
+        }
+        protected override void SetAvailableOptions()
+        {
+            commands.AddRange( new List<Keys>() { Keys.Buy, Keys.Sell } ); 
         }
     }
 }
