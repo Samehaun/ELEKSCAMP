@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
@@ -99,7 +96,7 @@ namespace ELEKSUNI
         }
         protected override void SetAvailableOptions()
         {
-            commands.AddRange( new List<Keys>() { Keys.Buy, Keys.Sell } ); 
+            commands.AddRange( new List<Keys>() { Keys.Buy, Keys.Sell, Keys.Cancel } ); 
         }
     }
 }

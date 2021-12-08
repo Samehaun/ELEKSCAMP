@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ELEKSUNI
 {
@@ -13,6 +10,7 @@ namespace ELEKSUNI
         public int Attack { get; private set; }
         public Inventory inventory;
         public bool IsHostile { get; set; }
+        private Dictionary<Keys, Keys> talkRequestResponcePairs;
         public List<Keys> GetListOfPossibleOptions()
         {
             List<Keys> posibilities = new List<Keys>();

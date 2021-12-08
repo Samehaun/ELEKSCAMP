@@ -8,6 +8,7 @@ namespace ELEKSUNI
         private double staminaRegenRate;
         private double stamina;
         private double hunger;
+        public Keys? recentlyUsedItemEffect;
         public string Name { get; private set; }
         public int Health { get; private set; }
         public Weapon CurrentWeapon { get; set; }
@@ -28,6 +29,13 @@ namespace ELEKSUNI
         {
             Name = playerName;
         }
+        public void AddEffect(Keys effect)
+        {
+            if (!Effects.Contains(effect))
+            {
+                Effects.Add(effect);
+            }
+        }
         public double Rest()
         {
             double time = CalculateStaminaNeededToTravel() / staminaRegenRate;
@@ -46,10 +54,6 @@ namespace ELEKSUNI
             hungerModifier = 1;
             InnerStateProcess(time);
             return time;
-        }
-        public double GetPlayerStamina()
-        {
-            return stamina;
         }
         public double CalculateTimeNeededToTravel()
         {
@@ -90,9 +94,9 @@ namespace ELEKSUNI
         public void InnerStateProcess(double time)
         {
             hunger += time * hungerModifier;
-            if(hunger >= 100 && !Effects.Contains(Keys.Starve))
+            if(hunger >= 100)
             {
-                Effects.Add(Keys.Starve);
+                AddEffect(Keys.Starve);
             }
             Health -= (hunger < 100) ? 0 : (int) (hunger / 100 * time);
         }
@@ -113,20 +117,22 @@ namespace ELEKSUNI
             {
                 Consumable food = (Consumable)inventory.CurrentItem;
                 hunger -= food.EffectPower;
-                if(hunger < 100 && Effects.Contains(Keys.Starve))
+                if(hunger < 100)
                 {
                     Effects.Remove(Keys.Starve);
                 }
             }
             else
             {
-                Effects.Add(Keys.IsPoisoned);
+                AddEffect(Keys.IsPoisoned);
+                recentlyUsedItemEffect = Keys.GetPoisonMessage;
             }
             inventory.DropSelected();
         }
         public void TakeAntidote()
         {
             Effects.Remove(Keys.IsPoisoned);
+            recentlyUsedItemEffect = Keys.CurePoison;
             inventory.DropSelected();
         }
         public void Unequip()
@@ -198,6 +204,10 @@ namespace ELEKSUNI
         {
             inventory.AddMoney(inventory.CurrentItem.Price * 2);
             inventory.DropSelected();
+        }
+        public bool HasItem(Item item)
+        {
+            return inventory.GetItemList().Contains(item);
         }
         public PlayerSave Save()
         {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.Linq;
 
 namespace ELEKSUNI
 {
@@ -392,7 +391,6 @@ namespace ELEKSUNI
         private void Poison()
         {
             player.Eat(true);
-            report.SetReportMessage(Keys.GetPoisonMessage);
             commands[menuCallChain.Pop()].Invoke();
         }
         private void TriggerTrap(Keys trapName, Keys effect)
@@ -404,13 +402,12 @@ namespace ELEKSUNI
         {
             Consumable trigger = (Consumable)questMap.PlayerSpot.item;
             player.TakeHit(trigger.EffectPower);
-            player.Effects.Add(effect);
+            player.AddEffect(effect);
             questMap.PlayerSpot.item = null;
         }
         private void CurePoison()
         {
             player.TakeAntidote();
-            report.SetReportMessage(Keys.CurePoison);
             commands[menuCallChain.Pop()].Invoke();
         }
         private void Open()

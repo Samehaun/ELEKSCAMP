@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ELEKSUNI
 {
@@ -478,7 +476,18 @@ namespace ELEKSUNI
                     actualState = $"{ actualState } { Localize(effect, languageSettings) }";
                 }
             }
-            return actualState;
+            if(player.recentlyUsedItemEffect == null)
+            {
+                return actualState;
+            }
+            else
+            {
+                actualState = $"{ Localize((Keys)player.recentlyUsedItemEffect, languageSettings) }" +
+                    $"{ Environment.NewLine } { actualState }";
+                player.recentlyUsedItemEffect = null;
+                return actualState;
+            }
+
         }
         public static List<string> Localize(List<Keys> options, string languageSettings)
         {
