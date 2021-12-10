@@ -62,7 +62,7 @@ namespace ELEKSUNI
         }
         public double CalculateStaminaNeededToTravel()
         {
-            return CalculateTimeNeededToTravel() * (int)MainQuestConfig.BasePlayerStaminaConsuption;
+            return CalculateTimeNeededToTravel() * (int)MainQuestConfig.BasePlayerStaminaConsuption * Math.Sqrt(OwerweightFactor()) * NegativeEffectsFactor();
         }
         public void RecaculateStateDueToTraveling(int additionalStaminaConsumptionModifier = 1)
         {
@@ -73,12 +73,36 @@ namespace ELEKSUNI
         private double Speed()
         {
             double speed = (int)MainQuestConfig.BasePlayerSpeed;
+            return speed;
+        }
+        private double NegativeEffectsFactor()
+        {
+            double modifier = 1;
+            if (Effects.Contains(Keys.IsPoisoned))
+            {
+                modifier += 0.5;
+            }
+            if (Effects.Contains(Keys.Starve))
+            {
+                modifier += 0.25;
+            }
+            if (Effects.Contains(Keys.Bleeding))
+            {
+                modifier += 0.8;
+            }
+            return modifier;
+        }
+        private double OwerweightFactor()
+        {
             double maxWeight = (int)MainQuestConfig.MaxWeightPlayerCanCarry;
             if (maxWeight < inventory.Weight)
             {
-                speed *= Math.Sqrt(maxWeight / inventory.Weight);
+                return Math.Sqrt(inventory.Weight / maxWeight);
             }
-            return speed;
+            else
+            {
+                return 1;
+            }
         }
         public void Equip()
         {
@@ -97,8 +121,16 @@ namespace ELEKSUNI
             if(hunger >= 100)
             {
                 AddEffect(Keys.Starve);
+                Health -= (int)(hunger / 200 * time);
             }
-            Health -= (hunger < 100) ? 0 : (int) (hunger / 100 * time);
+            if (Effects.Contains(Keys.IsPoisoned))
+            {
+                Health -= (int)(time * 1.5);
+            }
+            if (Effects.Contains(Keys.Bleeding))
+            {
+                Health -= (int)(time * 3);
+            }
         }
         public void TakeHit(int attack)
         {
@@ -204,6 +236,10 @@ namespace ELEKSUNI
         {
             inventory.AddMoney(inventory.CurrentItem.Price * 2);
             inventory.DropSelected();
+        }
+        public bool CanMove()
+        {
+            return stamina > CalculateStaminaNeededToTravel();
         }
         public bool HasItem(Item item)
         {

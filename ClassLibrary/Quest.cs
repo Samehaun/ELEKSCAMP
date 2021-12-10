@@ -8,7 +8,7 @@ namespace ELEKSUNI
     {
         BasePlayerSpeed = 5,
         BasePlayerStaminaConsuption = 5,
-        MaxWeightPlayerCanCarry = 7,
+        MaxWeightPlayerCanCarry = 5,
         BaseTimeToChangeLocation = 3,
         MapSize = 4,
         MazeDifficulty = 2
@@ -65,8 +65,8 @@ namespace ELEKSUNI
                 { Keys.EN, () => SetQuestLanguage("EN")},
                 { Keys.RU, () => SetQuestLanguage("EN")},
                 { Keys.UA, () => SetQuestLanguage("EN")},
-                { Keys.Drop, player.Drop },
-                { Keys.Equip, player.Equip },
+                { Keys.Drop, Drop },
+                { Keys.Equip, Equip },
                 { Keys.Search, Search },
                 { Keys.Inventory, new OpenInventoryDialog(this).Launch },
                 { Keys.Cancel, Cancel },
@@ -154,9 +154,20 @@ namespace ELEKSUNI
             }
             return report;
         }
+        private void Equip()
+        {
+            player.Equip();
+            Cancel();
+        }
+        private void Drop()
+        {
+            player.Drop();
+            Cancel();
+        }
         private void SelectItemToOperate(int index)
         {
             player.SelectItemToOperate(index);
+            AddUniqueCallInMenueCallHistory(Keys.Inventory);
             itemDialog.Launch();
         }
         private void Steal(int index)
@@ -232,13 +243,20 @@ namespace ELEKSUNI
         }
         private void LaunchTravelDialog()
         {
-            if (time.DayTime())
+            if (time.DayTime() && player.CanMove())
             {
                 travelDialog.Launch();
             }
-            else
+            else 
             {
-                report.SetReportMessage(Keys.NightTime);
+                if (!time.DayTime())
+                {
+                    report.SetReportMessage(Keys.NightTime);
+                }
+                else
+                {
+                    report.SetReportMessage(Keys.RestNeeded);
+                }
                 mainDialog.Launch();
             }
         }
@@ -326,8 +344,15 @@ namespace ELEKSUNI
         }
         private void Run()
         {
-            questMap.Go(questMap.GetRandomAvailableDirection(questMap.PlayerSpot));
-            PlayerReachedNewZone(2);
+            if (player.CanMove())
+            {
+                questMap.Go(questMap.GetRandomAvailableDirection(questMap.PlayerSpot));
+                PlayerReachedNewZone(2);
+            }
+            else
+            {
+                Fight();
+            }
         }
         private void Search()
         {

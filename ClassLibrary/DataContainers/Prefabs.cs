@@ -49,34 +49,34 @@ namespace ELEKSUNI
             spots = new List<Spot>()
             {
             { new Spot(Keys.Clearing) },
-            { new Spot(Keys.OrdinaryForest) },
-            { new Spot(Keys.OrdinaryForest) },
-            { new Spot(Keys.OrdinaryForest) },
-            { new Spot(Keys.Oak) },
-            { new Spot(Keys.Oak) },
-            { new Spot(Keys.MixedForestWithBerries) },
-            { new Spot(Keys.MixedForestWithBerries) },
-            { new Spot(Keys.MixedForestWithBerries) },
-            { new Spot(Keys.Oak) },
-            { new Spot(Keys.Cave) },
+            { new Spot(Keys.OrdinaryForest, mushrooms) },
+            { new Spot(Keys.OrdinaryForest, poisonMushrooms) },
+            { new Spot(Keys.OrdinaryForest, mushrooms) },
+            { new Spot(Keys.Oak, purse) },
+            { new Spot(Keys.OrdinaryForest, trap) },
+            { new Spot(Keys.MixedForestWithBerries, berries) },
+            { new Spot(Keys.MixedForestWithBerries, berries) },
+            { new Spot(Keys.MixedForestWithBerries, poisonBerries) },
+            { new Spot(Keys.Oak, hornetNest) },
+            { new Spot(Keys.Cave, knife) },
             { new Spot(Keys.Lake, bear) },
             { new Spot(Keys.Ravine) },
-            { new Spot(Keys.DryRiver) },
+            { new Spot(Keys.DryRiver, mushrooms) },
             { new Spot(Keys.Creek, wolf) },
-            { new Spot(Keys.Crater) },
+            { new Spot(Keys.Crater, meteor) },
             { new Spot(Keys.Cave) },
             { new Spot(Keys.ThermalSprings) },
             { new Spot(Keys.Stump, leprechaun) },
             { new Spot(Keys.SwordInStone) },
-            { new Spot(Keys.Swamp) },
+            { new Spot(Keys.Swamp, leftShoe) },
             { new Spot(Keys.Burrow) },
             { new Spot(Keys.ForesterHouse, forester) },
             { new Spot(Keys.Glade) },
             { new Spot(Keys.WolfPit, sharpStick) },
-            { new Spot(Keys.PitHouse) },
+            { new Spot(Keys.PitHouse, oldAxe) },
             { new Spot(Keys.GingerbreadHouse, witch) },
-            { new Spot(Keys.Pine) },
-            { new Spot(Keys.Hanged) },
+            { new Spot(Keys.Pine, mushrooms) },
+            { new Spot(Keys.Hanged, oldKey) },
             { new Spot(Keys.Monolith) },
             };
         }
@@ -114,7 +114,7 @@ namespace ELEKSUNI
             oldAxe = new Weapon(Keys.OldAxe, 17, 3.0, Keys.Equip, 40);
             axe = new Weapon(Keys.Axe, 27, 3.3, Keys.Equip, 60);
             //Items
-            meteor = new Item(Keys.Meteor, 150, 12.5);
+            meteor = new Item(Keys.Meteor, 150, 35.5);
             wolfSkin = new Item(Keys.WolfSkin, 15, 1.5);
             wolfTeeth = new Item(Keys.WolfTeeth, 3, 0.2);
             leftShoe = new Item(Keys.Shoe, 2, 0.5);
@@ -134,9 +134,9 @@ namespace ELEKSUNI
             //NPC
             witch = new NPC(Keys.Witch, 250, 10, 35, false, new List<Item>() { antidote });
             forester = new NPC(Keys.Forester, 100, 30, 20, false, new List<Item>() { axe, heavyClothes, bandage });
-            leprechaun = new NPC(Keys.Leprechaun, 50, 10, 10, false);
+            leprechaun = new NPC(Keys.Leprechaun, 50, 10, 10, false, new List<Item>() { sharpKnife });
             bear = new NPC(Keys.Bear, 500, 80, 80, true);
-            wolf = new NPC(Keys.Wolf, 70, 25, 30, true, new List<Item>() { wolfSkin });
+            wolf = new NPC(Keys.Wolf, 70, 25, 30, true, new List<Item>() { wolfSkin, wolfTeeth });
             hare = new NPC(Keys.Hare, 0, 0, 0, false, new List<Item>() { meat, harePaw } );
 
             items = new Dictionary<Keys, Item>()
