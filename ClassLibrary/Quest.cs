@@ -8,7 +8,7 @@ namespace ELEKSUNI
     {
         BasePlayerSpeed = 5,
         BasePlayerStaminaConsuption = 5,
-        MaxWeightPlayerCanCarry = 5,
+        MaxWeightPlayerCanCarry = 7,
         BaseTimeToChangeLocation = 3,
         MapSize = 4,
         MazeDifficulty = 2
@@ -39,7 +39,7 @@ namespace ELEKSUNI
             prefabs = new Prefabs();
             questMap = new Map(prefabs);
             player = new Player();
-            menuCallChain = new Stack<Keys>();           
+            menuCallChain = new Stack<Keys>();
             availableCommands = new List<Keys>();
         }
         private void MapCommands()
@@ -63,12 +63,13 @@ namespace ELEKSUNI
                 { Keys.Sleep, Sleep},
                 { Keys.Rest, Rest},
                 { Keys.EN, () => SetQuestLanguage("EN")},
-                { Keys.RU, () => SetQuestLanguage("EN")},
-                { Keys.UA, () => SetQuestLanguage("EN")},
+                { Keys.RU, () => SetQuestLanguage("RU")},
+                { Keys.UA, () => SetQuestLanguage("UA")},
                 { Keys.Drop, Drop },
                 { Keys.Equip, Equip },
                 { Keys.Search, Search },
                 { Keys.Inventory, new OpenInventoryDialog(this).Launch },
+                { Keys.StopBleeding, StopBleeding },
                 { Keys.Cancel, Cancel },
                 { Keys.Trade, LaunchTradeDialog },
                 { Keys.Sell, LaunchSellDialog },
@@ -123,24 +124,28 @@ namespace ELEKSUNI
         public Report Start(string name)
         {
             player = new Player(name);
+            questMap.CreateNewMap((int)MainQuestConfig.MapSize);
+            questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
+            Initialize();
+            return report;
+        }
+        public Report StartTestMode()
+        {
+            player = new Player("Test");
+            questMap.CreateTestMap();
+            questMap.SetPlayerLocation((0, 0));
+            Initialize();
+            return report;
+        }
+        private void Initialize()
+        {
             player.PickItem(prefabs.simpleClothes);
             player.CurrentClothes = prefabs.simpleClothes;
             availableCommands = new List<Keys>();
-            if (player.Name == "Test" || player.Name == "test")
-            {
-                questMap.CreateTestMap();
-                questMap.SetPlayerLocation((0, 0));
-            }
-            else
-            {
-                questMap.CreateNewMap((int)MainQuestConfig.MapSize);
-                questMap.SetPlayerLocation(((int)MainQuestConfig.MapSize / 2, (int)MainQuestConfig.MapSize / 2));
-            }
             report.SetReportMessage($"Select preferred language:");
             availableCommands.AddRange(new List<Keys>() { Keys.EN, Keys.RU, Keys.UA });
             report.ResetOptions(new List<string>() { "EN", "RU", "UA" });
             MapCommands();
-            return report;
         }
         public Report ProceedInput(int input)
         {
@@ -162,6 +167,11 @@ namespace ELEKSUNI
         private void Drop()
         {
             player.Drop();
+            Cancel();
+        }
+        private void StopBleeding()
+        {
+            player.ApplyBandage();
             Cancel();
         }
         private void SelectItemToOperate(int index)
@@ -247,7 +257,7 @@ namespace ELEKSUNI
             {
                 travelDialog.Launch();
             }
-            else 
+            else
             {
                 if (!time.DayTime())
                 {
@@ -365,6 +375,7 @@ namespace ELEKSUNI
                 else
                 {
                     report.SetReportMessage(Keys.HuntFailed);
+                    LaunchMainDialog();
                 }
                 questMap.PlayerSpot.searched = true;
             }

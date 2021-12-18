@@ -86,7 +86,7 @@ namespace ELEKSUNI
         {
             header = Keys.Sell;
             itemsToShow = player.GetListOfItemsInInventory();
-            option = Keys.Sell;
+            option = Keys.SellItem;
             mode = report.ItemSpecsForTrading;
         }
         protected override void SetItemsToShow()
@@ -111,9 +111,12 @@ namespace ELEKSUNI
     {
         public LootDialog(Quest quest) : base(quest)
         {
-            header = Keys.Loot;
             option = Keys.LootItem;
             mode = report.ItemSpecs;
+        }
+        protected override void SetMessage()
+        {
+            report.AddNewLineMessage(Keys.Loot);
         }
         override protected void SetAvailableOptions()
         {

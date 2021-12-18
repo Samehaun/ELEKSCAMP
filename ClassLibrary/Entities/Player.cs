@@ -167,6 +167,12 @@ namespace ELEKSUNI
             recentlyUsedItemEffect = Keys.CurePoison;
             inventory.DropSelected();
         }
+        public void ApplyBandage()
+        {
+            Effects.Remove(Keys.Bleeding);
+            recentlyUsedItemEffect = Keys.NoBleeding;
+            inventory.DropSelected();
+        }
         public void Unequip()
         {
             if (CurrentClothes == inventory.CurrentItem)

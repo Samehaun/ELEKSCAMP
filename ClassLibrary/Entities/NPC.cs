@@ -10,7 +10,6 @@ namespace ELEKSUNI
         public int Attack { get; private set; }
         public Inventory inventory;
         public bool IsHostile { get; set; }
-        private Dictionary<Keys, Keys> talkRequestResponcePairs;
         public List<Keys> GetListOfPossibleOptions()
         {
             List<Keys> posibilities = new List<Keys>();

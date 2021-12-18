@@ -114,7 +114,7 @@ namespace ELEKSUNI
             oldAxe = new Weapon(Keys.OldAxe, 17, 3.0, Keys.Equip, 40);
             axe = new Weapon(Keys.Axe, 27, 3.3, Keys.Equip, 60);
             //Items
-            meteor = new Item(Keys.Meteor, 150, 35.5);
+            meteor = new Item(Keys.Meteor, 150, 12.5);
             wolfSkin = new Item(Keys.WolfSkin, 15, 1.5);
             wolfTeeth = new Item(Keys.WolfTeeth, 3, 0.2);
             leftShoe = new Item(Keys.Shoe, 2, 0.5);

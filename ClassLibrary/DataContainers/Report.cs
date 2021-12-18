@@ -36,7 +36,7 @@ namespace ELEKSUNI
         }
         internal void AddNewLineMessage(Keys key)
         {
-            if (Message != null)
+            if (Message != null && !Message.Contains(Data.Localize(key, language)))
             {
                 Message = $"{ Message }{ Environment.NewLine }{ Data.Localize(key, language) }";
             }
